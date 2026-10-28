@@ -29,47 +29,47 @@ export default function GallerySection() {
   const currentImage = GALLERY_IMAGES[currentIndex];
 
   return (
-    <section id="gallery" className="relative py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <section id="gallery" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
             <ImageIcon className="w-3.5 h-3.5" /> VISUAL EXHIBIT
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-black text-white tracking-tight">
+          <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
             VISUAL GALLERY & ARCHIVE
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-xl">
+          <p className="text-slate-400 text-xs sm:text-base mt-2 max-w-xl">
             Atmospheric studio stills, editorial portraits, and covert artifacts from the transformation into UNNOTICED.
           </p>
         </div>
 
         {/* Slideshow Controls Bar */}
-        <div className="flex items-center gap-3 self-start md:self-auto">
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
           <button
             onClick={() => setIsAutoplay(!isAutoplay)}
-            className={`px-3.5 py-2 rounded-full border text-xs font-mono flex items-center gap-1.5 transition-colors ${
+            className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full border text-xs font-mono flex items-center gap-1.5 transition-colors active:scale-95 ${
               isAutoplay
                 ? 'bg-purple-600/20 border-purple-500/40 text-purple-300'
                 : 'bg-white/[0.04] border-white/[0.08] text-slate-400'
             }`}
           >
             {isAutoplay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isAutoplay ? 'Autoplay Active' : 'Paused'}</span>
+            <span>{isAutoplay ? 'Autoplay' : 'Paused'}</span>
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handlePrev}
-              className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.1] text-white border border-white/[0.08] flex items-center justify-center transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.1] text-white border border-white/[0.08] flex items-center justify-center transition-colors active:scale-90"
               title="Previous Slide"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={handleNext}
-              className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.1] text-white border border-white/[0.08] flex items-center justify-center transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.1] text-white border border-white/[0.08] flex items-center justify-center transition-colors active:scale-90"
               title="Next Slide"
             >
               <ChevronRight className="w-4 h-4" />
@@ -84,14 +84,14 @@ export default function GallerySection() {
         spotlightColor="rgba(168, 85, 247, 0.2)"
         tilt={false}
       >
-        <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-black">
+        <div className="relative aspect-[4/3] xs:aspect-[16/10] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-black">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
-              initial={{ opacity: 0, scale: 1.05 }}
+              initial={{ opacity: 0, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="relative w-full h-full"
             >
               <img
@@ -101,32 +101,32 @@ export default function GallerySection() {
               />
 
               {/* Gradient Scrim */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
 
               {/* Lightbox Trigger Button */}
               <button
                 onClick={() => setIsLightboxOpen(true)}
-                className="absolute top-4 right-4 p-2.5 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-md border border-white/[0.15] transition-all cursor-pointer hover:scale-105"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 sm:p-2.5 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-md border border-white/[0.15] transition-all cursor-pointer active:scale-95"
                 title="View Fullscreen"
               >
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               {/* Slide Caption Details Overlay */}
-              <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col md:flex-row md:items-end justify-between gap-3">
                 <div className="max-w-xl">
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-purple-400 block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-purple-400 block mb-0.5">
                     {currentImage.subtitle}
                   </span>
-                  <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white mb-2">
+                  <h3 className="font-display text-lg sm:text-2xl md:text-3xl font-extrabold text-white mb-1">
                     {currentImage.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-300 font-sans">
+                  <p className="text-[11px] sm:text-xs md:text-sm text-slate-300 font-sans line-clamp-2 sm:line-clamp-none">
                     {currentImage.caption}
                   </p>
                 </div>
 
-                <div className="text-xs font-mono text-purple-300 px-3 py-1.5 rounded-full bg-black/60 border border-white/[0.1] backdrop-blur-md self-start md:self-auto shrink-0">
+                <div className="text-[11px] sm:text-xs font-mono text-purple-300 px-2.5 py-1 rounded-full bg-black/60 border border-white/[0.1] backdrop-blur-md self-start md:self-auto shrink-0">
                   {currentIndex + 1} / {GALLERY_IMAGES.length}
                 </div>
               </div>
@@ -134,13 +134,13 @@ export default function GallerySection() {
           </AnimatePresence>
         </div>
 
-        {/* Thumbnail Selector Strip */}
-        <div className="grid grid-cols-6 gap-2 sm:gap-3 mt-4">
+        {/* Thumbnail Selector Strip (Scrollable horizontally on mobile) */}
+        <div className="flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 mt-3 sm:mt-4 overflow-x-auto no-scrollbar pb-1">
           {GALLERY_IMAGES.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`relative aspect-video rounded-xl overflow-hidden border transition-all ${
+              className={`relative aspect-video w-20 sm:w-auto shrink-0 rounded-xl overflow-hidden border transition-all active:scale-95 ${
                 currentIndex === idx
                   ? 'border-purple-500 scale-[1.02] shadow-lg shadow-purple-500/20'
                   : 'border-white/[0.08] opacity-50 hover:opacity-100'
@@ -159,44 +159,44 @@ export default function GallerySection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-8"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-8 safe-bottom"
             onClick={() => setIsLightboxOpen(false)}
           >
             {/* Top Toolbar */}
             <div className="flex items-center justify-between z-10">
               <div>
-                <h4 className="font-bold text-white text-base sm:text-lg">
+                <h4 className="font-bold text-white text-sm sm:text-lg">
                   {currentImage.title}
                 </h4>
-                <p className="text-xs text-purple-400 font-mono">
+                <p className="text-[10px] sm:text-xs text-purple-400 font-mono">
                   {currentImage.subtitle}
                 </p>
               </div>
 
               <button
                 onClick={() => setIsLightboxOpen(false)}
-                className="w-10 h-10 rounded-full bg-white/[0.1] hover:bg-white/[0.2] text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/[0.1] hover:bg-white/[0.2] text-white flex items-center justify-center active:scale-90"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            {/* Center Image with Navigation arrows */}
-            <div className="relative flex-1 flex items-center justify-center py-4">
+            {/* Center Image */}
+            <div className="relative flex-1 flex items-center justify-center py-2 sm:py-4">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePrev();
                 }}
-                className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/[0.15] flex items-center justify-center transition-all z-10"
+                className="absolute left-1 sm:left-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 text-white border border-white/[0.15] flex items-center justify-center active:scale-90 z-10"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
               <img
                 src={currentImage.url}
                 alt={currentImage.title}
-                className="max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl border border-white/[0.1]"
+                className="max-h-[70vh] sm:max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl border border-white/[0.1]"
                 onClick={(e) => e.stopPropagation()}
               />
 
@@ -205,15 +205,15 @@ export default function GallerySection() {
                   e.stopPropagation();
                   handleNext();
                 }}
-                className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/[0.15] flex items-center justify-center transition-all z-10"
+                className="absolute right-1 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 text-white border border-white/[0.15] flex items-center justify-center active:scale-90 z-10"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
             {/* Bottom Caption */}
-            <div className="text-center z-10">
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
+            <div className="text-center z-10 pb-2">
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto px-4">
                 {currentImage.caption}
               </p>
             </div>

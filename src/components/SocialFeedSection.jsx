@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, MessageCircle, Share2, Music2, ExternalLink, Play, Sparkles } from 'lucide-react';
 import { InstagramIcon } from './SocialIcons';
-import { SOCIAL_POSTS, ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function SocialFeedSection() {
+  const { socialPosts, artistInfo } = useSiteData();
+  const posts = socialPosts || [];
+  const info = artistInfo || {};
   const [likesState, setLikesState] = useState({
     'post-1': { count: 4821, liked: false },
     'post-2': { count: 28400, liked: false },
@@ -44,7 +47,7 @@ export default function SocialFeedSection() {
 
         <div className="flex items-center gap-3 self-start md:self-auto">
           <a
-            href={ARTIST_INFO.socials.instagram}
+            href={info.socials?.instagram || '#'}
             target="_blank"
             rel="noreferrer"
             className="px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-pink-600/25 transition-all"
@@ -57,7 +60,7 @@ export default function SocialFeedSection() {
 
       {/* Social Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {SOCIAL_POSTS.map((post) => {
+        {posts.map((post) => {
           const isLiked = likesState[post.id]?.liked;
           const currentCount = likesState[post.id]?.count.toLocaleString();
 
@@ -74,7 +77,7 @@ export default function SocialFeedSection() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
                     <img
-                      src={ARTIST_INFO.avatar}
+                      src={info.avatar}
                       alt="UNNOTICED"
                       className="w-9 h-9 rounded-full object-cover border border-purple-500/40"
                     />

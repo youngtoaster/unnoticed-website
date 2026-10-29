@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Download, Mail, ArrowLeft, CheckCircle2, Shield, Radio, Sparkles, Send, ExternalLink, Sliders, Music, Phone } from 'lucide-react';
-import { EPK_DATA, ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function EPKView({ onBackToMain }) {
+  const { epkData, artistInfo } = useSiteData();
+  const epk = epkData || {};
+  const artist = artistInfo || { stats: {} };
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(null);
   const [formData, setFormData] = useState({
@@ -75,13 +78,13 @@ export default function EPKView({ onBackToMain }) {
             Industry Profile & Press Archive
           </span>
           <h1 className="font-display text-3xl sm:text-6xl font-black text-white tracking-tight uppercase mb-3">
-            UNNOTICED
+            {artist.name || 'UNNOTICED'}
           </h1>
           <p className="text-sm sm:text-lg text-purple-300 font-tech font-semibold mb-4 sm:mb-6">
             Formerly Ty Sciullo • Alternative Hip-Hop / Nocturnal Rap • McKees Rocks, PA
           </p>
           <p className="text-slate-300 text-xs sm:text-base leading-relaxed max-w-2xl font-light">
-            {EPK_DATA.shortBio}
+            {epk.shortBio}
           </p>
         </div>
 
@@ -94,11 +97,11 @@ export default function EPKView({ onBackToMain }) {
             <div className="space-y-3">
               <div className="flex justify-between items-baseline border-b border-white/[0.06] pb-2">
                 <span className="text-xs text-slate-400">Monthly Listeners</span>
-                <span className="font-display font-bold text-base sm:text-lg text-white">{ARTIST_INFO.stats.monthlyListeners}</span>
+                <span className="font-display font-bold text-base sm:text-lg text-white">{artist.stats?.monthlyListeners || '142,500'}</span>
               </div>
               <div className="flex justify-between items-baseline border-b border-white/[0.06] pb-2">
                 <span className="text-xs text-slate-400">Catalog Streams</span>
-                <span className="font-display font-bold text-base sm:text-lg text-white">{ARTIST_INFO.stats.totalStreams}</span>
+                <span className="font-display font-bold text-base sm:text-lg text-white">{artist.stats?.totalStreams || '4.2M'}</span>
               </div>
               <div className="flex justify-between items-baseline border-b border-white/[0.06] pb-2">
                 <span className="text-xs text-slate-400">Demographic</span>
@@ -123,7 +126,7 @@ export default function EPKView({ onBackToMain }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {EPK_DATA.downloadableAssets.map((asset, idx) => (
+          {(epk.downloadableAssets || []).map((asset, idx) => (
             <SpotlightCard
               key={idx}
               spotlightColor="rgba(6, 182, 212, 0.16)"
@@ -159,7 +162,7 @@ export default function EPKView({ onBackToMain }) {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {EPK_DATA.pressQuotes.map((item, idx) => (
+          {(epk.pressQuotes || []).map((item, idx) => (
             <SpotlightCard
               key={idx}
               spotlightColor="rgba(168, 85, 247, 0.16)"
@@ -205,19 +208,19 @@ export default function EPKView({ onBackToMain }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
             <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
               <span className="font-mono text-cyan-400 font-bold block mb-1">Inputs & Vocal Setup</span>
-              <p className="leading-relaxed">{EPK_DATA.techRider.inputCount}</p>
+              <p className="leading-relaxed">{epk.techRider?.inputCount}</p>
             </div>
             <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
               <span className="font-mono text-cyan-400 font-bold block mb-1">In-Ear Monitoring</span>
-              <p className="leading-relaxed">{EPK_DATA.techRider.monitoring}</p>
+              <p className="leading-relaxed">{epk.techRider?.monitoring}</p>
             </div>
             <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
               <span className="font-mono text-cyan-400 font-bold block mb-1">Lighting Design Direction</span>
-              <p className="leading-relaxed">{EPK_DATA.techRider.lighting}</p>
+              <p className="leading-relaxed">{epk.techRider?.lighting}</p>
             </div>
             <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
               <span className="font-mono text-cyan-400 font-bold block mb-1">Stage Geometry</span>
-              <p className="leading-relaxed">{EPK_DATA.techRider.stagePlot}</p>
+              <p className="leading-relaxed">{epk.techRider?.stagePlot}</p>
             </div>
           </div>
         </SpotlightCard>
@@ -239,29 +242,29 @@ export default function EPKView({ onBackToMain }) {
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-[10px] font-mono uppercase text-purple-400 block">General Management</span>
-                <a href={`mailto:${EPK_DATA.industryContacts.management}`} className="font-semibold text-white hover:text-purple-300 break-all">
-                  {EPK_DATA.industryContacts.management}
+                <a href={`mailto:${epk.industryContacts?.management || ''}`} className="font-semibold text-white hover:text-purple-300 break-all">
+                  {epk.industryContacts?.management}
                 </a>
               </div>
 
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-[10px] font-mono uppercase text-cyan-400 block">Live Booking Agency</span>
-                <a href={`mailto:${EPK_DATA.industryContacts.booking}`} className="font-semibold text-white hover:text-cyan-300 break-all">
-                  {EPK_DATA.industryContacts.booking}
+                <a href={`mailto:${epk.industryContacts?.booking || ''}`} className="font-semibold text-white hover:text-cyan-300 break-all">
+                  {epk.industryContacts?.booking}
                 </a>
               </div>
 
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-[10px] font-mono uppercase text-pink-400 block">Press & Media Relations</span>
-                <a href={`mailto:${EPK_DATA.industryContacts.pressInquiries}`} className="font-semibold text-white hover:text-pink-300 break-all">
-                  {EPK_DATA.industryContacts.pressInquiries}
+                <a href={`mailto:${epk.industryContacts?.pressInquiries || ''}`} className="font-semibold text-white hover:text-pink-300 break-all">
+                  {epk.industryContacts?.pressInquiries}
                 </a>
               </div>
 
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-[10px] font-mono uppercase text-amber-400 block">Sync & Film/TV Licensing</span>
-                <a href={`mailto:${EPK_DATA.industryContacts.syncLicensing}`} className="font-semibold text-white hover:text-amber-300 break-all">
-                  {EPK_DATA.industryContacts.syncLicensing}
+                <a href={`mailto:${epk.industryContacts?.syncLicensing || ''}`} className="font-semibold text-white hover:text-amber-300 break-all">
+                  {epk.industryContacts?.syncLicensing}
                 </a>
               </div>
             </div>

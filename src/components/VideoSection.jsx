@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Eye, Clock, X, ExternalLink, Bell, Sparkles } from 'lucide-react';
 import { YoutubeIcon } from './SocialIcons';
-import { VIDEOS, ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function VideoSection() {
+  const { videos, artistInfo } = useSiteData();
   const [activeModalVideo, setActiveModalVideo] = useState(null);
   const [hasSubscribed, setHasSubscribed] = useState(false);
 
@@ -27,7 +28,7 @@ export default function VideoSection() {
         </div>
 
         <a
-          href={ARTIST_INFO.socials.youtube}
+          href={artistInfo.socials.youtube}
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-colors self-start md:self-auto shadow-lg shadow-red-600/30"
@@ -39,7 +40,7 @@ export default function VideoSection() {
 
       {/* Two-Column YouTube Video Showcase Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {VIDEOS.map((video) => (
+        {videos.map((video) => (
           <SpotlightCard
             key={video.id}
             tilt={true}
@@ -135,7 +136,7 @@ export default function VideoSection() {
             </button>
 
             <a
-              href={ARTIST_INFO.socials.youtube}
+              href={artistInfo.socials.youtube}
               target="_blank"
               rel="noreferrer"
               className="px-6 py-4 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold flex items-center gap-1.5 transition-colors"
@@ -203,7 +204,7 @@ export default function VideoSection() {
                     Watch the official HD stream directly on YouTube for high quality 4K and Dolby audio.
                   </p>
                   <a
-                    href={ARTIST_INFO.socials.youtube}
+                    href={artistInfo.socials.youtube}
                     target="_blank"
                     rel="noreferrer"
                     className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-red-600/40 transition-all"

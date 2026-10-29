@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Eye, ExternalLink, X, Check, Plus, Minus, ArrowRight, Sparkles, Tag } from 'lucide-react';
-import { MERCH_PRODUCTS } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function MerchSection({
@@ -13,6 +13,7 @@ export default function MerchSection({
   setCartOpen,
   cartTotal
 }) {
+  const { merchProducts } = useSiteData();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
@@ -20,9 +21,10 @@ export default function MerchSection({
 
   const categories = ['All', 'Hoodies', 'T-Shirts', 'Vinyl & Music', 'Headwear'];
 
+  const productsList = merchProducts || [];
   const filteredProducts = selectedCategory === 'All'
-    ? MERCH_PRODUCTS
-    : MERCH_PRODUCTS.filter((p) => p.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+    ? productsList
+    : productsList.filter((p) => (p.category || '').toLowerCase().includes(selectedCategory.toLowerCase()));
 
   const handleAddToCart = (product, size) => {
     addToCart(product, size || product.sizes[0]);

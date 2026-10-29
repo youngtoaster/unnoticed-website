@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, ShoppingBag, Menu, X, Disc3, Radio, FileText, Sparkles, Volume2, VolumeX, ArrowRight, Play, Pause } from 'lucide-react';
-import { ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import { InstagramIcon, TwitterIcon, YoutubeIcon, SpotifyIcon } from './SocialIcons';
 
 export default function Navbar({
@@ -11,10 +11,30 @@ export default function Navbar({
   cartCount,
   openCart,
   activeView,
-  setActiveView
+  setActiveView,
+  onOpenAdmin
 }) {
+  const { artistInfo } = useSiteData();
+  const info = artistInfo || { socials: {} };
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const logoClicksRef = useRef({ count: 0, timer: null });
+
+  const handleLogoClick = () => {
+    logoClicksRef.current.count += 1;
+    if (logoClicksRef.current.timer) clearTimeout(logoClicksRef.current.timer);
+    if (logoClicksRef.current.count >= 5) {
+      logoClicksRef.current.count = 0;
+      if (onOpenAdmin) onOpenAdmin();
+      return;
+    }
+    logoClicksRef.current.timer = setTimeout(() => {
+      logoClicksRef.current.count = 0;
+    }, 1500);
+
+    setActiveView('main');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,10 +94,7 @@ export default function Navbar({
           
           {/* Left: Brand Identity */}
           <button
-            onClick={() => {
-              setActiveView('main');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onClick={handleLogoClick}
             className="flex items-center gap-2.5 sm:gap-3 text-left group cursor-pointer focus:outline-none"
           >
             <div className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1px] shadow-lg shadow-purple-500/20">
@@ -294,16 +311,16 @@ export default function Navbar({
             {/* Social Icons Footer */}
             <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <a href={ARTIST_INFO.socials.instagram} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.instagram || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
                   <InstagramIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={ARTIST_INFO.socials.twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.twitter || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
                   <TwitterIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={ARTIST_INFO.socials.youtube} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.youtube || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
                   <YoutubeIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={ARTIST_INFO.socials.spotify} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.spotify || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
                   <SpotifyIcon className="w-3.5 h-3.5" />
                 </a>
               </div>

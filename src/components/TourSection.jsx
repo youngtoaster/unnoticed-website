@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Calendar, Ticket, ExternalLink, Sparkles, CheckCircle2, History, Bell, Navigation, X } from 'lucide-react';
-import { TOUR_DATES, PAST_TOUR_HIGHLIGHTS } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function TourSection() {
+  const { tourDates, pastTours } = useSiteData();
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' or 'past'
   const [rsvpCity, setRsvpCity] = useState('');
   const [rsvpEmail, setRsvpEmail] = useState('');
@@ -54,7 +55,7 @@ export default function TourSection() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Upcoming ({TOUR_DATES.length})
+              Upcoming ({tourDates.length})
             </button>
             <button
               onClick={() => setActiveTab('past')}
@@ -81,7 +82,7 @@ export default function TourSection() {
       {/* UPCOMING SHOWS SCHEDULE LIST */}
       {activeTab === 'upcoming' && (
         <div className="space-y-4">
-          {TOUR_DATES.map((show) => {
+          {tourDates.map((show) => {
             const isHometown = show.city.includes('Pittsburgh');
 
             return (
@@ -174,7 +175,7 @@ export default function TourSection() {
       {/* PAST TOUR ARCHIVE */}
       {activeTab === 'past' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {PAST_TOUR_HIGHLIGHTS.map((archive, idx) => (
+          {(pastTours || []).map((archive, idx) => (
             <SpotlightCard
               key={idx}
               spotlightColor="rgba(168, 85, 247, 0.15)"

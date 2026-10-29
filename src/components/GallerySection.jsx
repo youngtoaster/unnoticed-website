@@ -1,32 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Pause, Maximize2, X, Image as ImageIcon } from 'lucide-react';
-import { GALLERY_IMAGES } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function GallerySection() {
+  const { galleryImages } = useSiteData();
+  const images = galleryImages && galleryImages.length > 0 ? galleryImages : [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
+  // Keep index within bounds if gallery length changes
+  useEffect(() => {
+    if (currentIndex >= images.length && images.length > 0) {
+      setCurrentIndex(0);
+    }
+  }, [images.length, currentIndex]);
+
   // Autoplay interval
   useEffect(() => {
-    if (!isAutoplay || isLightboxOpen) return;
+    if (!isAutoplay || isLightboxOpen || images.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % GALLERY_IMAGES.length);
+      setCurrentIndex((prev) => (prev + 1) % images.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [isAutoplay, isLightboxOpen]);
+  }, [isAutoplay, isLightboxOpen, images.length]);
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % GALLERY_IMAGES.length);
+    if (images.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
+    if (images.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const currentImage = GALLERY_IMAGES[currentIndex];
+  const currentImage = images[currentIndex] || {
+    url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1600&q=80',
+    title: 'UNNOTICED ARCHIVE',
+    subtitle: 'STUDIO SNAPSHOT',
+    caption: 'Visual stillness from the production sanctuary.'
+  };
 
   return (
     <section id="gallery" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
@@ -127,7 +143,7 @@ export default function GallerySection() {
                 </div>
 
                 <div className="text-[11px] sm:text-xs font-mono text-purple-300 px-2.5 py-1 rounded-full bg-black/60 border border-white/[0.1] backdrop-blur-md self-start md:self-auto shrink-0">
-                  {currentIndex + 1} / {GALLERY_IMAGES.length}
+                  {images.length > 0 ? `${currentIndex + 1} / ${images.length}` : '0 / 0'}
                 </div>
               </div>
             </motion.div>
@@ -136,7 +152,7 @@ export default function GallerySection() {
 
         {/* Thumbnail Selector Strip (Scrollable horizontally on mobile) */}
         <div className="flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 mt-3 sm:mt-4 overflow-x-auto no-scrollbar pb-1">
-          {GALLERY_IMAGES.map((img, idx) => (
+          {images.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}

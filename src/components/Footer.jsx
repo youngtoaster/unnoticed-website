@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUp, Disc, Radio, ExternalLink, Sparkles } from 'lucide-react';
 import { InstagramIcon, TwitterIcon, YoutubeIcon, SpotifyIcon } from './SocialIcons';
-import { ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 
-export default function Footer({ onOpenEPK }) {
+export default function Footer({ onOpenEPK, onOpenAdmin }) {
+  const { artistInfo } = useSiteData();
+  const [clickCount, setClickCount] = useState(0);
+  const clickTimerRef = useRef(null);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Secret Easter Egg trigger: Tap "©" 3 times in 1.5 seconds to open admin login
+  const handleSecretCopyrightClick = () => {
+    const nextCount = clickCount + 1;
+    setClickCount(nextCount);
+
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+
+    if (nextCount >= 3) {
+      setClickCount(0);
+      if (onOpenAdmin) onOpenAdmin();
+    } else {
+      clickTimerRef.current = setTimeout(() => {
+        setClickCount(0);
+      }, 1500);
+    }
   };
 
   return (
@@ -18,15 +39,15 @@ export default function Footer({ onOpenEPK }) {
         <div className="space-y-3 max-w-sm">
           <div className="flex items-center gap-2">
             <span className="font-display font-extrabold text-2xl text-white tracking-wider">
-              UNNOTICED
+              {artistInfo.name}
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
-              f.k.a. Ty Sciullo
+              f.k.a. {artistInfo.previousName}
             </span>
           </div>
 
           <p className="text-xs text-slate-400 leading-relaxed font-sans">
-            Once known as Ty Sciullo, now a man unseen. Alternative hip-hop, dark pop, and nocturnal storytelling from McKees Rocks, PA.
+            {artistInfo.tagline} Alternative hip-hop, dark pop, and nocturnal storytelling from {artistInfo.location}.
           </p>
 
           <div className="pt-1 flex items-center gap-3 text-xs text-slate-500 font-mono">
@@ -53,7 +74,7 @@ export default function Footer({ onOpenEPK }) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <a
-              href={ARTIST_INFO.socials.instagram}
+              href={artistInfo.socials.instagram}
               target="_blank"
               rel="noreferrer"
               className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-purple-600 hover:text-white text-slate-300 border border-white/[0.08] flex items-center justify-center transition-colors"
@@ -62,7 +83,7 @@ export default function Footer({ onOpenEPK }) {
               <InstagramIcon className="w-4 h-4" />
             </a>
             <a
-              href={ARTIST_INFO.socials.twitter}
+              href={artistInfo.socials.twitter}
               target="_blank"
               rel="noreferrer"
               className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-cyan-600 hover:text-white text-slate-300 border border-white/[0.08] flex items-center justify-center transition-colors"
@@ -71,7 +92,7 @@ export default function Footer({ onOpenEPK }) {
               <TwitterIcon className="w-4 h-4" />
             </a>
             <a
-              href={ARTIST_INFO.socials.youtube}
+              href={artistInfo.socials.youtube}
               target="_blank"
               rel="noreferrer"
               className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-red-600 hover:text-white text-slate-300 border border-white/[0.08] flex items-center justify-center transition-colors"
@@ -80,7 +101,7 @@ export default function Footer({ onOpenEPK }) {
               <YoutubeIcon className="w-4 h-4" />
             </a>
             <a
-              href={ARTIST_INFO.socials.spotify}
+              href={artistInfo.socials.spotify}
               target="_blank"
               rel="noreferrer"
               className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-emerald-600 hover:text-white text-slate-300 border border-white/[0.08] flex items-center justify-center transition-colors"
@@ -103,8 +124,27 @@ export default function Footer({ onOpenEPK }) {
 
       </div>
 
+      {/* Bottom Copyright Row with Secret Admin Triggers */}
       <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 gap-4">
-        <span>© 2026 UNNOTICED (Tyler R. Sciullo). All rights reserved.</span>
+        <div>
+          {/* Secret Trigger 1: Triple-clicking the copyright symbol opens the login modal */}
+          <span
+            onClick={handleSecretCopyrightClick}
+            className="cursor-default select-none transition-colors hover:text-slate-400"
+            title=""
+          >
+            © 2026 {artistInfo.name} ({artistInfo.legalName || 'Tyler R. Sciullo'}). All rights reserved.
+          </span>
+
+          {/* Secret Trigger 2: A stealth 1.5px invisible micro-button right here */}
+          <button
+            onClick={onOpenAdmin}
+            aria-label=""
+            tabIndex={-1}
+            className="w-1.5 h-1.5 rounded-full bg-white/[0.03] hover:bg-purple-500/40 inline-block align-middle ml-2.5 opacity-25 cursor-default focus:outline-none"
+          />
+        </div>
+
         <span>Fluid motion inspired by Planes & Designeer</span>
       </div>
 

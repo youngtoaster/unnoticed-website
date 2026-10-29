@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ExternalLink, Disc, Music, CheckCircle2, Quote, Sparkles, Volume2, Share2, Info, X, ChevronRight } from 'lucide-react';
-import { TRACKS, ARTIST_INFO } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function MusicSection({
@@ -10,9 +10,10 @@ export default function MusicSection({
   togglePlay,
   onSelectTrack
 }) {
-  const [selectedTrackForLyrics, setSelectedTrackForLyrics] = useState(TRACKS[0]);
+  const { tracks, artistInfo } = useSiteData();
+  const [selectedTrackForLyrics, setSelectedTrackForLyrics] = useState(tracks[0] || currentTrack);
   const [activeAnnotation, setActiveAnnotation] = useState(
-    TRACKS[0].lyrics.find((l) => l.annotated)?.annotation || null
+    (tracks[0] || currentTrack).lyrics?.find((l) => l.annotated)?.annotation || null
   );
   const [activeTab, setActiveTab] = useState('tracks'); // 'tracks', 'spotifyEmbed', 'platforms'
   const [mobileSubTab, setMobileSubTab] = useState('list'); // 'list' or 'lyrics'
@@ -60,7 +61,7 @@ export default function MusicSection({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Studio Tracks ({TRACKS.length})
+            Studio Tracks ({tracks.length})
           </button>
           <button
             onClick={() => setActiveTab('spotifyEmbed')}
@@ -98,7 +99,7 @@ export default function MusicSection({
                   : 'text-slate-400'
               }`}
             >
-              Tracks List ({TRACKS.length})
+              Tracks List ({tracks.length})
             </button>
             <button
               onClick={() => setMobileSubTab('lyrics')}
@@ -125,7 +126,7 @@ export default function MusicSection({
                 </span>
               </div>
 
-              {TRACKS.map((track) => {
+              {tracks.map((track) => {
                 const isSelected = selectedTrackForLyrics.id === track.id;
                 const isCurrentlyPlayingThis = isPlaying && currentTrack.id === track.id;
 
@@ -293,7 +294,7 @@ export default function MusicSection({
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2.5">
                             <img
-                              src={ARTIST_INFO.avatar}
+                              src={artistInfo.avatar}
                               alt="UNNOTICED"
                               className="w-8 h-8 rounded-full object-cover border border-purple-400 shrink-0"
                             />
@@ -383,7 +384,7 @@ export default function MusicSection({
               </div>
 
               <a
-                href={ARTIST_INFO.socials.spotify}
+                href={artistInfo.socials.spotify}
                 target="_blank"
                 rel="noreferrer"
                 className="px-4 py-2 rounded-full bg-emerald-500 text-slate-950 font-semibold text-xs hover:bg-emerald-400 transition-colors flex items-center gap-1.5 self-start sm:self-auto"
@@ -420,28 +421,28 @@ export default function MusicSection({
             {
               name: 'Spotify',
               desc: 'Official artist catalog, curated playlists, and algorithmic radio.',
-              url: ARTIST_INFO.socials.spotify,
+              url: artistInfo.socials.spotify,
               badge: 'Most Popular',
               accent: 'bg-emerald-500'
             },
             {
               name: 'Apple Music',
               desc: 'Lossless audio streaming, Spatial Audio masters, and artist radio.',
-              url: ARTIST_INFO.socials.appleMusic,
+              url: artistInfo.socials.appleMusic,
               badge: 'Lossless Audio',
               accent: 'bg-pink-500'
             },
             {
               name: 'YouTube Music',
               desc: 'Official music videos, visualizers, live performance sessions.',
-              url: ARTIST_INFO.socials.youtube,
+              url: artistInfo.socials.youtube,
               badge: 'Video & Audio',
               accent: 'bg-red-500'
             },
             {
               name: 'SoundCloud',
               desc: 'Exclusive early demo snippets, unreleased beats, and bootleg mixes.',
-              url: ARTIST_INFO.socials.soundcloud,
+              url: artistInfo.socials.soundcloud,
               badge: 'Underground',
               accent: 'bg-amber-500'
             }

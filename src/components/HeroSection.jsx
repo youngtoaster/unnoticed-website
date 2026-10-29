@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ArrowUpRight, Sparkles, MapPin, Radio, Headphones, Layers } from 'lucide-react';
-import { ARTIST_INFO, TRACKS } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function HeroSection({
@@ -10,8 +10,9 @@ export default function HeroSection({
   togglePlay,
   onSelectTrack
 }) {
+  const { artistInfo, tracks } = useSiteData();
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
-  const featuredTrack = TRACKS[0]; // Andale
+  const featuredTrack = tracks[0] || currentTrack;
 
   return (
     <section className="relative min-h-screen pt-24 sm:pt-32 pb-16 sm:pb-20 flex flex-col justify-center items-center px-4 sm:px-6 overflow-hidden">
@@ -306,11 +307,11 @@ export default function HeroSection({
                   <div className="space-y-2 mb-2">
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wide block">Monthly Listeners</span>
-                      <span className="font-display text-xl sm:text-2xl font-black text-white">{ARTIST_INFO.stats.monthlyListeners}</span>
+                      <span className="font-display text-xl sm:text-2xl font-black text-white">{artistInfo.stats.monthlyListeners}</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wide block">Lifetime Streams</span>
-                      <span className="font-display text-lg font-bold text-slate-200">{ARTIST_INFO.stats.totalStreams}</span>
+                      <span className="font-display text-lg font-bold text-slate-200">{artistInfo.stats.totalStreams}</span>
                     </div>
                   </div>
                 </div>
@@ -336,7 +337,7 @@ export default function HeroSection({
             Worldwide Streams:
           </span>
           <a
-            href={ARTIST_INFO.socials.spotify}
+            href={artistInfo.socials.spotify}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] active:scale-95 text-xs text-slate-300"
@@ -344,7 +345,7 @@ export default function HeroSection({
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Spotify
           </a>
           <a
-            href={ARTIST_INFO.socials.appleMusic}
+            href={artistInfo.socials.appleMusic}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] active:scale-95 text-xs text-slate-300"
@@ -352,7 +353,7 @@ export default function HeroSection({
             <span className="w-1.5 h-1.5 rounded-full bg-pink-500" /> Apple Music
           </a>
           <a
-            href={ARTIST_INFO.socials.youtube}
+            href={artistInfo.socials.youtube}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] active:scale-95 text-xs text-slate-300"
@@ -360,7 +361,7 @@ export default function HeroSection({
             <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> YouTube
           </a>
           <a
-            href={ARTIST_INFO.socials.soundcloud}
+            href={artistInfo.socials.soundcloud}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] active:scale-95 text-xs text-slate-300"

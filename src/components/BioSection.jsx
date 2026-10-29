@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, Music, Sparkles, Award, ArrowRight, Quote } from 'lucide-react';
-import { ARTIST_INFO, BIOGRAPHY_PARAGRAPHS } from '../data/artistData';
+import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 
 export default function BioSection() {
+  const { artistInfo, biography } = useSiteData();
   const [activeBioTab, setActiveBioTab] = useState(0);
 
   return (
@@ -25,7 +26,7 @@ export default function BioSection() {
             {/* Main Portrait */}
             <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0d14]">
               <img
-                src={ARTIST_INFO.avatar}
+                src={artistInfo.avatar}
                 alt="UNNOTICED (Formerly Ty Sciullo)"
                 className="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700 ease-out"
               />
@@ -81,7 +82,7 @@ export default function BioSection() {
 
           {/* Interactive Chapter Selector Pills (Horizontally scrollable on mobile) */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            {BIOGRAPHY_PARAGRAPHS.map((para, idx) => (
+            {biography.map((para, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveBioTab(idx)}
@@ -108,17 +109,17 @@ export default function BioSection() {
             </div>
 
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-3">
-              {BIOGRAPHY_PARAGRAPHS[activeBioTab].title}
+              {biography[activeBioTab]?.title}
             </h3>
 
             <p className="text-slate-300 text-xs sm:text-base leading-relaxed font-sans font-normal">
-              {BIOGRAPHY_PARAGRAPHS[activeBioTab].text}
+              {biography[activeBioTab]?.text}
             </p>
 
             <div className="mt-5 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
               <span>Next chapter</span>
               <button
-                onClick={() => setActiveBioTab((activeBioTab + 1) % BIOGRAPHY_PARAGRAPHS.length)}
+                onClick={() => setActiveBioTab((activeBioTab + 1) % biography.length)}
                 className="text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors active:scale-95"
               >
                 Continue Reading <ArrowRight className="w-3.5 h-3.5" />

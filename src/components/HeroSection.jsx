@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
@@ -18,6 +18,15 @@ export default function HeroSection({
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
   const featuredTrack = tracks[0] || currentTrack;
   const isFeaturedPlaying = isPlaying && currentTrack?.id === featuredTrack?.id;
+
+  // Track real-time letter ignition status from NeonSign component
+  const [ignitionState, setIgnitionState] = useState({
+    ignitedCount: 0,
+    totalCount: 9,
+    progress: 0,
+    isFullyLit: false,
+    ignitedIndices: []
+  });
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -47,217 +56,302 @@ export default function HeroSection({
   const targetOpacity = (backdrop.opacity ?? 45) / 100;
   const blurAmount = backdrop.blurEnabled ? `${(backdrop.blur ?? 6) * 0.4}px` : '0px';
 
+  // Dynamic progressive illumination:
+  // Starts pitch black screen (opacity 0), reveals incrementally with each striking letter,
+  // reaches full configured opacity and ambient neon bloom once the entire title is fully lit.
+  const currentBackdropOpacity = isIlluminated
+    ? (ignitionState.isFullyLit
+        ? targetOpacity
+        : (ignitionState.progress > 0
+            ? targetOpacity * (0.12 + 0.88 * Math.pow(ignitionState.progress, 0.95))
+            : 0))
+    : targetOpacity;
+
+  const currentBackdropBrightness = isIlluminated
+    ? (ignitionState.isFullyLit
+        ? 1.05
+        : (ignitionState.progress > 0
+            ? 0.15 + (0.85 * ignitionState.progress)
+            : 0))
+    : 1;
+
+  // Mask / light cones radiating directly behind each ignited letter during ignition
+  const letterBloomOverlay = useMemo(() => {
+    if (!isIlluminated || ignitionState.isFullyLit || ignitionState.ignitedIndices.length === 0) {
+      return null;
+    }
+    const gasColor = neonConfig.color || '#a855f7';
+    return ignitionState.ignitedIndices.map((idx) => {
+      const pct = 14 + (idx / Math.max(1, ignitionState.totalCount - 1)) * 72;
+      return `radial-gradient(ellipse at ${pct}% 45%, ${gasColor}66 0%, ${gasColor}20 35%, transparent 68%)`;
+    }).join(', ');
+  }, [isIlluminated, ignitionState, neonConfig.color]);
+
   return (
-    <section className="relative min-h-[90vh] pt-28 sm:pt-36 pb-16 sm:pb-24 flex flex-col justify-center items-center px-4 sm:px-6 overflow-hidden">
+    <section className="relative w-full flex flex-col items-center overflow-x-hidden">
       
       {/* Background ambient light gradients */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[650px] h-[340px] sm:h-[450px] bg-purple-600/12 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-      <div className="w-full max-w-6xl mx-auto flex flex-col items-center text-center">
+      {/* ======================================================== */}
+      {/* 1. MAIN HOME VIEWPORT: CINEMATIC TITLE & BIO (FULL VIEW)  */}
+      {/* Dedicated full-viewport opening experience               */}
+      {/* ======================================================== */}
+      <div className="min-h-[100dvh] w-full flex flex-col justify-between items-center text-center px-4 sm:px-6 pt-24 sm:pt-28 pb-6 sm:pb-8 relative z-10">
 
-        {/* Top On Tour Badge (Fluid "Look-At-Me" Animated Button) */}
-        {artistInfo.tourBadge?.enabled !== false && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-6 sm:mb-8"
-          >
-            <motion.a
-              href={artistInfo.tourBadge?.link || '#tour'}
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.querySelector('#tour');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              animate={{
-                y: [0, -3.5, 0]
-              }}
-              transition={{
-                duration: 3.2,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }}
-              className="relative inline-flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-purple-400/40 hover:border-emerald-400/70 bg-gradient-to-r from-purple-950/80 via-[#0e0a1f]/90 to-purple-950/80 backdrop-blur-xl group shadow-xl shadow-purple-900/30 cursor-pointer transition-all hover:scale-105 active:scale-95 max-w-[95vw] overflow-hidden"
-              title="Explore Stage Dates & Tickets"
+        {/* Top Spacer / Tour Badge */}
+        <div className="w-full flex justify-center min-h-[44px]">
+          {artistInfo.tourBadge?.enabled !== false && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              {/* Dynamic Multicolored Pulsing Aura / Radial Glow */}
-              <motion.div
-                className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500/40 via-purple-600/50 to-pink-500/40 blur-md pointer-events-none -z-10"
+              <motion.a
+                href={artistInfo.tourBadge?.link || '#tour'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.querySelector('#tour');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
                 animate={{
-                  opacity: [0.45, 0.9, 0.45],
-                  scale: [0.98, 1.05, 0.98]
+                  y: [0, -3.5, 0]
                 }}
                 transition={{
-                  duration: 2.4,
+                  duration: 3.2,
                   repeat: Infinity,
                   ease: 'easeInOut'
                 }}
-              />
-
-              {/* Sweeping Fluid Light Glint / Sheen across badge */}
-              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                className="relative inline-flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-purple-400/40 hover:border-emerald-400/70 bg-gradient-to-r from-purple-950/80 via-[#0e0a1f]/90 to-purple-950/80 backdrop-blur-xl group shadow-xl shadow-purple-900/30 cursor-pointer transition-all hover:scale-105 active:scale-95 max-w-[95vw] overflow-hidden"
+                title="Explore Stage Dates & Tickets"
+              >
+                {/* Dynamic Multicolored Pulsing Aura / Radial Glow */}
                 <motion.div
-                  className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                  className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500/40 via-purple-600/50 to-pink-500/40 blur-md pointer-events-none -z-10"
                   animate={{
-                    x: ['-160%', '320%']
+                    opacity: [0.45, 0.9, 0.45],
+                    scale: [0.98, 1.05, 0.98]
                   }}
                   transition={{
-                    duration: 2.8,
+                    duration: 2.4,
                     repeat: Infinity,
-                    ease: 'easeInOut',
-                    repeatDelay: 1.2
+                    ease: 'easeInOut'
                   }}
                 />
-              </div>
 
-              {/* Dual Concentric Radar Beacon */}
-              <span className="relative flex h-2.5 sm:h-3 w-2.5 sm:w-3 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="animate-pulse absolute -inset-0.5 rounded-full bg-emerald-400/30" />
-                <span className="relative inline-flex rounded-full h-2.5 sm:h-3 w-2.5 sm:w-3 bg-gradient-to-tr from-emerald-400 to-teal-200 shadow-md shadow-emerald-400/80" />
-              </span>
+                {/* Sweeping Fluid Light Glint / Sheen across badge */}
+                <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                  <motion.div
+                    className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                    animate={{
+                      x: ['-160%', '320%']
+                    }}
+                    transition={{
+                      duration: 2.8,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      repeatDelay: 1.2
+                    }}
+                  />
+                </div>
 
-              {/* Mini Tag: LIVE */}
-              <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-[9px] font-mono font-black uppercase text-emerald-300 tracking-wider shrink-0">
-                LIVE
-              </span>
+                {/* Dual Concentric Radar Beacon */}
+                <span className="relative flex h-2.5 sm:h-3 w-2.5 sm:w-3 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="animate-pulse absolute -inset-0.5 rounded-full bg-emerald-400/30" />
+                  <span className="relative inline-flex rounded-full h-2.5 sm:h-3 w-2.5 sm:w-3 bg-gradient-to-tr from-emerald-400 to-teal-200 shadow-md shadow-emerald-400/80" />
+                </span>
 
-              {/* Fluid Text */}
-              <ShinyText
-                text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
-                className="text-[10px] xs:text-[11px] sm:text-xs font-mono font-bold tracking-wide text-purple-100 max-w-[210px] xs:max-w-none truncate sm:overflow-visible"
-                speed={4}
-              />
+                {/* Mini Tag: LIVE */}
+                <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-[9px] font-mono font-black uppercase text-emerald-300 tracking-wider shrink-0">
+                  LIVE
+                </span>
 
-              <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
-            </motion.a>
-          </motion.div>
-        )}
-
-        {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
-        <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
-
-          {/* BACKDROP IMAGE BEHIND ARTIST TITLE / HERO */}
-          {backdrop.enabled && backdrop.image && (
-            <motion.div
-              initial={isIlluminated ? { opacity: 0.1, scale: 0.98 } : { opacity: targetOpacity }}
-              animate={isIlluminated ? {
-                opacity: [0.1, targetOpacity * 1.35, targetOpacity],
-                scale: 1,
-                filter: [`brightness(0.35) blur(${blurAmount})`, `brightness(1.3) blur(${blurAmount})`, `brightness(1.05) blur(${blurAmount})`]
-              } : {
-                opacity: targetOpacity,
-                filter: `brightness(1) blur(${blurAmount})`
-              }}
-              transition={{
-                delay: isIlluminated ? 0.28 : 0,
-                duration: isIlluminated ? 0.85 : 0.4,
-                ease: 'easeOut'
-              }}
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden ${
-                backdrop.scope === 'hero'
-                  ? 'fixed inset-0 w-screen h-screen'
-                  : 'w-full max-w-5xl h-[300px] sm:h-[420px] md:h-[500px] rounded-3xl'
-              }`}
-              style={{
-                maskImage: backdrop.vignette
-                  ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
-                  : 'none',
-                WebkitMaskImage: backdrop.vignette
-                  ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
-                  : 'none',
-              }}
-            >
-              <img
-                src={backdrop.image}
-                alt="Artist Title Backdrop"
-                className="w-full h-full object-cover transition-transform duration-700 ease-out"
-                style={{
-                  objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
-                  transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
-                  mixBlendMode: backdrop.blendMode || 'screen',
-                }}
-              />
-
-              {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop */}
-              {isIlluminated && (
-                <div
-                  className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-                  style={{
-                    background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}40 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
-                    mixBlendMode: 'color-dodge'
-                  }}
+                {/* Fluid Text */}
+                <ShinyText
+                  text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
+                  className="text-[10px] xs:text-[11px] sm:text-xs font-mono font-bold tracking-wide text-purple-100 max-w-[210px] xs:max-w-none truncate sm:overflow-visible"
+                  speed={4}
                 />
-              )}
+
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
+              </motion.a>
             </motion.div>
           )}
-
-          {/* Neon Title: Tubes are mounted immediately on page load, then randomly sputter & spark into light */}
-          <div className="w-full flex justify-center py-2 px-1 overflow-visible">
-            <NeonSign
-              as="h1"
-              color={neonConfig.color || '#a855f7'}
-              delay={0.2}
-              flicker={neonConfig.flicker ?? true}
-              className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.95] text-balance text-center justify-center whitespace-nowrap`}
-            >
-              {artistInfo.name || 'UNNOTICED'}
-            </NeonSign>
-          </div>
-
-          {/* Subtitle badge with Neon Illumination - Scaled for mobile */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex items-center justify-center gap-2 sm:gap-3 mt-3 w-full max-w-xl px-2"
-          >
-            <div
-              className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
-              style={{
-                background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
-                boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
-              }}
-            />
-            <p
-              className="font-tech text-[9.5px] xs:text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.14em] xs:tracking-[0.18em] sm:tracking-[0.26em] font-bold text-center px-1 select-none transition-all"
-              style={{
-                color: '#ffffff',
-                textShadow: `0 0 4px #ffffff, 0 0 10px ${neonConfig.color || '#a855f7'}, 0 0 20px ${neonConfig.color || '#a855f7'}99, 0 0 35px ${neonConfig.color || '#a855f7'}66`
-              }}
-            >
-              {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
-            </p>
-            <div
-              className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
-              style={{
-                background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
-                boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
-              }}
-            />
-          </motion.div>
         </div>
 
-        {/* Bio Teaser */}
-        <motion.p
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="max-w-2xl text-xs sm:text-base md:text-lg text-slate-300 font-light leading-relaxed mb-8 sm:mb-10 text-balance px-2"
-        >
-          Forged in the blue-collar industrial grit of McKees Rocks. 
-          Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.
-        </motion.p>
+        {/* Center Main Stage: Artist Title + Subtitle + Bio Teaser */}
+        <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center my-auto py-4 sm:py-8">
 
-        {/* Primary Action Row (Clean Spacing, Zero Overlap) - Image 2 Fix */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 mb-12 sm:mb-16 w-full px-2"
-        >
-          {/* Main Play Button with controlled Magnet (no clipping) */}
+          {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
+          <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
+
+            {/* BACKDROP IMAGE BEHIND ARTIST TITLE / HERO */}
+            {backdrop.enabled && backdrop.image && (
+              <div
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out ${
+                  backdrop.scope === 'hero'
+                    ? 'fixed inset-0 w-screen h-screen'
+                    : 'w-full max-w-5xl h-[340px] sm:h-[440px] md:h-[540px] rounded-3xl'
+                }`}
+                style={{
+                  opacity: currentBackdropOpacity,
+                  filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
+                  maskImage: backdrop.vignette
+                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                    : 'none',
+                  WebkitMaskImage: backdrop.vignette
+                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                    : 'none',
+                }}
+              >
+                <img
+                  src={backdrop.image}
+                  alt="Artist Title Backdrop"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out"
+                  style={{
+                    objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
+                    transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                    mixBlendMode: backdrop.blendMode || 'screen',
+                  }}
+                />
+
+                {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
+                {letterBloomOverlay && (
+                  <div
+                    className="absolute inset-0 pointer-events-none transition-all duration-200"
+                    style={{
+                      backgroundImage: letterBloomOverlay,
+                      mixBlendMode: 'screen',
+                    }}
+                  />
+                )}
+
+                {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop when fully lit */}
+                {isIlluminated && (
+                  <div
+                    className="absolute inset-0 pointer-events-none transition-opacity duration-700"
+                    style={{
+                      opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
+                      background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}40 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
+                      mixBlendMode: 'color-dodge'
+                    }}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Neon Title: Tubes are mounted immediately on page load, then randomly sputter & spark into light */}
+            <div className="w-full flex justify-center py-2 px-1 overflow-visible">
+              <NeonSign
+                as="h1"
+                color={neonConfig.color || '#a855f7'}
+                delay={0.2}
+                flicker={neonConfig.flicker ?? true}
+                onIgnitionProgress={setIgnitionState}
+                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.95] text-balance text-center justify-center whitespace-nowrap`}
+              >
+                {artistInfo.name || 'UNNOTICED'}
+              </NeonSign>
+            </div>
+
+            {/* Subtitle badge with Neon Illumination - Scaled for mobile */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex items-center justify-center gap-2 sm:gap-3 mt-3 w-full max-w-xl px-2"
+            >
+              <div
+                className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
+                style={{
+                  background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
+                  boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
+                }}
+              />
+              <p
+                className="font-tech text-[9.5px] xs:text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.14em] xs:tracking-[0.18em] sm:tracking-[0.26em] font-bold text-center px-1 select-none transition-all"
+                style={{
+                  color: '#ffffff',
+                  textShadow: `0 0 4px #ffffff, 0 0 10px ${neonConfig.color || '#a855f7'}, 0 0 20px ${neonConfig.color || '#a855f7'}99, 0 0 35px ${neonConfig.color || '#a855f7'}66`
+                }}
+              >
+                {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
+              </p>
+              <div
+                className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
+                style={{
+                  background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
+                  boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
+                }}
+              />
+            </motion.div>
+          </div>
+
+          {/* Bio Teaser - Hero Centerpiece */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="max-w-2xl text-xs sm:text-base md:text-lg text-slate-300 font-light leading-relaxed mt-4 sm:mt-6 text-balance px-2"
+          >
+            Forged in the blue-collar industrial grit of McKees Rocks. 
+            Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.
+          </motion.p>
+        </div>
+
+        {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt */}
+        <div className="w-full flex justify-center pb-2">
+          <motion.button
+            onClick={() => {
+              const el = document.querySelector('#hero-revealed-content');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="group flex flex-col items-center gap-1.5 text-slate-400 hover:text-purple-300 transition-colors cursor-pointer py-1"
+            aria-label="Scroll to explore archive"
+          >
+            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.22em] text-slate-400 group-hover:text-purple-300">
+              Scroll To Explore
+            </span>
+            <div className="w-6 h-10 rounded-full border border-white/20 group-hover:border-purple-400/60 p-1 flex justify-center bg-black/40 backdrop-blur-md transition-colors">
+              <motion.div
+                animate={{ y: [0, 12, 0], opacity: [1, 0.4, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-1.5 h-2.5 rounded-full bg-purple-400"
+              />
+            </div>
+            <ArrowDown className="w-3.5 h-3.5 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
+          </motion.button>
+        </div>
+
+      </div>
+
+      {/* ======================================================== */}
+      {/* 2. REVEALED CONTENT ON SCROLL: CONTROLS & BENTO HUB       */}
+      {/* Unveils smoothly as user scrolls past main home viewport   */}
+      {/* ======================================================== */}
+      <motion.div
+        id="hero-revealed-content"
+        initial={{ opacity: 0, y: 35 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-20 sm:pb-28 text-center"
+      >
+        {/* Subtle section label */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <span className="h-[1px] w-8 bg-purple-500/30" />
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-purple-400">
+            Audio Studio & Transmission Hub
+          </span>
+          <span className="h-[1px] w-8 bg-purple-500/30" />
+        </div>
+
+        {/* Primary Action Row (Clean Spacing, Zero Overlap) */}
+        <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 mb-12 sm:mb-16 w-full px-2">
+          {/* Main Play Button with controlled Magnet */}
           <div className="relative shrink-0">
             <Magnet padding={20} magnetStrength={2}>
               <button
@@ -301,15 +395,10 @@ export default function HeroSection({
             <Film className="w-3.5 h-3.5 text-purple-400" />
             <span>Media Archive</span>
           </a>
-        </motion.div>
+        </div>
 
         {/* Clean, Balanced 3-Card Bento Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 text-left"
-        >
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           {/* Card 1: Artist Persona & Origin */}
           <SpotlightCard
             tilt={false}
@@ -372,7 +461,7 @@ export default function HeroSection({
 
             <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
               <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-purple-400" /> Origin
+                <MapPin className="w-3.5 h-3.5 text-purple-400" /> Origin
               </span>
               <span className="text-white font-medium">McKees Rocks, PA</span>
             </div>
@@ -471,9 +560,10 @@ export default function HeroSection({
               </a>
             </div>
           </SpotlightCard>
-        </motion.div>
+        </div>
 
-      </div>
+      </motion.div>
+
     </section>
   );
 }

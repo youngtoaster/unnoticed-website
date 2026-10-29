@@ -21,6 +21,7 @@ export function NeonSign({
   delay = 0.2,
   flicker = true,
   className = '',
+  onIgnitionProgress,
   ...props
 }) {
   const Component = as;
@@ -41,6 +42,27 @@ export function NeonSign({
 
   // Track which letter tube is experiencing a tired tube brown-out / voltage dip
   const [brownoutIndex, setBrownoutIndex] = useState(null);
+
+  // Notify parent component of ignition progress (for background illumination reveal)
+  useEffect(() => {
+    if (typeof onIgnitionProgress === 'function') {
+      const validIndices = characters
+        .map((c, i) => (c !== ' ' ? i : null))
+        .filter((i) => i !== null);
+      const totalCount = validIndices.length;
+      const count = ignitedIndices.length;
+      const progress = totalCount > 0 ? count / totalCount : 0;
+      const isFullyLit = count >= totalCount && totalCount > 0;
+
+      onIgnitionProgress({
+        ignitedCount: count,
+        totalCount,
+        progress,
+        isFullyLit,
+        ignitedIndices
+      });
+    }
+  }, [ignitedIndices, characters, onIgnitionProgress]);
 
   // Initial Random Ignition Sequence:
   // Randomizes the order of characters and simulates high-voltage transformer sputtering

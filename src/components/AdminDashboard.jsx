@@ -27,6 +27,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [previewIlluminated, setPreviewIlluminated] = useState(false);
+  const [testIgnitionStep, setTestIgnitionStep] = useState(null); // null = idle, 0..9 = letter strike simulation
   const [isFetchingMeta, setIsFetchingMeta] = useState(false);
   const [metaFeedback, setMetaFeedback] = useState(null);
   const [quickLinkInput, setQuickLinkInput] = useState('');
@@ -1318,18 +1319,38 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <Eye className="w-3.5 h-3.5" />
                   <span>Real-Time Visualizer (Live Crop, Blur & Illumination)</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewIlluminated(true);
-                    setTimeout(() => setPreviewIlluminated(false), 2600);
-                  }}
-                  className="px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-mono text-[11px] font-bold shadow-md hover:brightness-110 active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                  title="Test the neon glow light-up reveal effect"
-                >
-                  <Zap className="w-3 h-3 text-amber-300" />
-                  <span>⚡ Test Glow Illumination Reveal</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {testIgnitionStep !== null && (
+                    <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-[10px] font-mono text-purple-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span>{testIgnitionStep === 0 ? 'Black Screen (Unlit)' : testIgnitionStep >= 9 ? 'Fully Lit & Illuminated!' : `Revealing: ${testIgnitionStep}/9 Letters Lit`}</span>
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewIlluminated(true);
+                      setTestIgnitionStep(0);
+                      let step = 0;
+                      const interval = setInterval(() => {
+                        step++;
+                        setTestIgnitionStep(step);
+                        if (step >= 9) {
+                          clearInterval(interval);
+                          setTimeout(() => {
+                            setPreviewIlluminated(false);
+                            setTestIgnitionStep(null);
+                          }, 3200);
+                        }
+                      }, 140);
+                    }}
+                    className="px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-mono text-[11px] font-bold shadow-md hover:brightness-110 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                    title="Test the neon glow light-up reveal effect (black screen -> letter-by-letter reveal -> full illumination)"
+                  >
+                    <Zap className="w-3 h-3 text-amber-300" />
+                    <span>⚡ Test Glow Illumination Reveal</span>
+                  </button>
+                </div>
               </div>
 
               {/* Scaled Preview Frame */}
@@ -1341,15 +1362,11 @@ export default function AdminDashboard({ onReturnToSite }) {
                 {backdrop.enabled && backdrop.image ? (
                   <motion.div
                     animate={
-                      previewIlluminated && (backdrop.illuminateOnGlow ?? true)
+                      testIgnitionStep !== null
                         ? {
-                            opacity: [(backdrop.opacity ?? 45) / 100, 0.95, (backdrop.opacity ?? 45) / 100],
-                            filter: [
-                              `brightness(0.3) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
-                              `brightness(1.45) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
-                              `brightness(1.05) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`
-                            ],
-                            scale: [1, 1.02, 1]
+                            opacity: testIgnitionStep === 0 ? 0 : (testIgnitionStep >= 9 ? (backdrop.opacity ?? 45) / 100 : ((backdrop.opacity ?? 45) / 100) * (0.12 + 0.88 * Math.pow(testIgnitionStep / 9, 0.95))),
+                            filter: testIgnitionStep === 0 ? `brightness(0) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})` : `brightness(${testIgnitionStep >= 9 ? 1.1 : 0.15 + (0.85 * (testIgnitionStep / 9))}) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                            scale: testIgnitionStep >= 9 ? 1.02 : 1
                           }
                         : {
                             opacity: (backdrop.opacity ?? 45) / 100,
@@ -1357,7 +1374,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                             scale: 1
                           }
                     }
-                    transition={{ duration: 0.9, ease: 'easeOut' }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
                     className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
                     style={{
                       maskImage: backdrop.vignette
@@ -1383,7 +1400,9 @@ export default function AdminDashboard({ onReturnToSite }) {
                     {(previewIlluminated || (backdrop.illuminateOnGlow ?? true)) && (
                       <div
                         className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
-                          previewIlluminated ? 'opacity-100' : 'opacity-40'
+                          testIgnitionStep !== null
+                            ? (testIgnitionStep >= 9 ? 'opacity-100' : 'opacity-25')
+                            : (previewIlluminated ? 'opacity-100' : 'opacity-40')
                         }`}
                         style={{
                           background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}45 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
@@ -1404,9 +1423,11 @@ export default function AdminDashboard({ onReturnToSite }) {
                     className="font-display font-black text-4xl sm:text-6xl tracking-tight uppercase"
                     style={{
                       color: '#ffffff',
-                      textShadow: previewIlluminated
+                      textShadow: previewIlluminated || (testIgnitionStep !== null && testIgnitionStep >= 9)
                         ? `0 0 8px #ffffff, 0 0 25px ${neonConfig.color || '#a855f7'}, 0 0 60px ${neonConfig.color || '#a855f7'}`
-                        : `0 0 4px #ffffff, 0 0 15px ${neonConfig.color || '#a855f7'}`
+                        : (testIgnitionStep !== null && testIgnitionStep === 0
+                            ? `0 0 2px ${neonConfig.color || '#a855f7'}30`
+                            : `0 0 4px #ffffff, 0 0 15px ${neonConfig.color || '#a855f7'}`)
                     }}
                   >
                     {artistInfo.name || 'UNNOTICED'}
@@ -1427,7 +1448,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                       className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono text-amber-300 font-bold"
                     >
                       <Sparkles className="w-3 h-3" />
-                      <span>Neon Glow Illuminating & Revealing Background Image</span>
+                      <span>{testIgnitionStep !== null && testIgnitionStep < 9 ? `Black Screen Opening → Revealing Letter ${testIgnitionStep}/9` : 'Neon Glow Fully Illuminating & Revealing Background Image'}</span>
                     </motion.div>
                   )}
                 </div>

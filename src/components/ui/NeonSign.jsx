@@ -5,70 +5,115 @@ import { motion, useInView, useReducedMotion } from 'framer-motion';
 /**
  * NeonSign - Inspired by Planes Component Library (useplanes.com/components/neon-sign)
  * 
- * Any word as glass neon tubing. Each letter strikes on with its own stutter as
- * the sign scrolls into view, the bloom spills onto the wall behind it, and now
- * and then a tired tube browns out. Real, selectable text underneath.
- *
- * Props:
- * - children: string (the text on the sign, split into letters so each tube strikes on its own)
- * - as: "h1" | "h2" | "h3" | "h4" | "div" | "span" | "p" (default: "h2")
- * - color: string (default: "#ff3ea5") Gas color driving the glow, wall wash, and unlit tint
- * - delay: number (default: 0.3) Seconds after viewport entry before first tube strikes
- * - flicker: boolean (default: true) Random brown-outs on tubes over time
- * - className: string (Tailwind classes for font, size, tracking, weight)
+ * Physical glass neon tubing lettering.
+ * - On initial page render, cold unlit glass tubes are already physically mounted on the wall.
+ * - When ignition kickstarts, letters sputter and spark to life in a RANDOM sequence
+ *   across different positions (not sequential left-to-right) until all are brightly illuminated.
+ * - Sputter state machine: electrical arc flash -> drop -> rapid strobe -> solid neon ignition.
+ * - Ambient wall wash bloom spills behind ignited tubes.
+ * - Post-ignition random brown-outs / micro-flickers keep the neon realistic and alive.
+ * - Responsive flex-nowrap keeps multi-character words together on mobile viewports.
  */
 export function NeonSign({
   children,
   as = 'h2',
   color = '#a855f7',
-  delay = 0.3,
+  delay = 0.2,
   flicker = true,
   className = '',
   ...props
 }) {
   const Component = as;
   const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-50px' });
+  const isInView = useInView(containerRef, { once: true, margin: '-40px' });
   const shouldReduceMotion = useReducedMotion();
 
   const text = typeof children === 'string' ? children : String(children || '');
   const characters = useMemo(() => text.split(''), [text]);
 
-  // Track ignited status for each character index
+  // Track fully ignited indices
   const [ignitedIndices, setIgnitedIndices] = useState(() =>
     shouldReduceMotion ? characters.map((_, i) => i) : []
   );
 
-  // Track which letter tube is currently brown-outed
+  // Track which indices are currently in the mid-spark "sputtering" electrical arc state
+  const [sputteringMap, setSputteringMap] = useState({});
+
+  // Track which letter tube is experiencing a tired tube brown-out / voltage dip
   const [brownoutIndex, setBrownoutIndex] = useState(null);
 
-  // Ignition sequence: each letter strikes with an electrical stutter
+  // Initial Random Ignition Sequence:
+  // Randomizes the order of characters and simulates high-voltage transformer sputtering
   useEffect(() => {
     if (shouldReduceMotion || !isInView) return;
 
+    // Collect all non-space character indices
+    const validIndices = characters
+      .map((c, i) => (c !== ' ' ? i : null))
+      .filter((i) => i !== null);
+
+    if (validIndices.length === 0) return;
+
+    // Fisher-Yates shuffle to randomize strike order completely across the word
+    const randomOrder = [...validIndices];
+    for (let i = randomOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [randomOrder[i], randomOrder[j]] = [randomOrder[j], randomOrder[i]];
+    }
+
     const timeouts = [];
-    characters.forEach((char, index) => {
-      if (char === ' ') return;
-      // Stagger with realistic randomized micro-variance
-      const strikeDelay = (delay * 1000) + (index * 85) + (Math.random() * 40);
+    const baseDelayMs = Math.max(80, delay * 1000);
 
-      const t = setTimeout(() => {
-        setIgnitedIndices((prev) => [...new Set([...prev, index])]);
+    // Initial power-transformer kickstart hum: brief sign-wide micro-flash
+    const transformerStart = setTimeout(() => {
+      // First random tube strikes quickly
+    }, baseDelayMs);
+    timeouts.push(transformerStart);
+
+    // Schedule each letter's strike in the randomized sequence
+    randomOrder.forEach((charIndex, step) => {
+      // Stagger each letter by 90ms - 150ms with randomized micro-jitter
+      const strikeDelay = baseDelayMs + (step * 115) + (Math.random() * 65);
+
+      // 1. Kick off sputtering electrical arc
+      const t1 = setTimeout(() => {
+        setSputteringMap((prev) => ({ ...prev, [charIndex]: true }));
       }, strikeDelay);
+      timeouts.push(t1);
 
-      timeouts.push(t);
+      // 2. Micro-dip drop during arc
+      const t2 = setTimeout(() => {
+        setSputteringMap((prev) => ({ ...prev, [charIndex]: 'dip' }));
+      }, strikeDelay + 55);
+      timeouts.push(t2);
+
+      // 3. Second rapid flash
+      const t3 = setTimeout(() => {
+        setSputteringMap((prev) => ({ ...prev, [charIndex]: 'flash' }));
+      }, strikeDelay + 105);
+      timeouts.push(t3);
+
+      // 4. Solid permanent ignition
+      const t4 = setTimeout(() => {
+        setSputteringMap((prev) => {
+          const next = { ...prev };
+          delete next[charIndex];
+          return next;
+        });
+        setIgnitedIndices((prev) => (prev.includes(charIndex) ? prev : [...prev, charIndex]));
+      }, strikeDelay + 165);
+      timeouts.push(t4);
     });
 
     return () => timeouts.forEach(clearTimeout);
   }, [isInView, characters, delay, shouldReduceMotion]);
 
-  // Occasional random tube brown-out / flicker after ignition
+  // Occasional random tube brown-out / micro-voltage flicker after ignition
   useEffect(() => {
     if (!flicker || shouldReduceMotion || !isInView) return;
 
     let brownoutTimeout;
     const interval = setInterval(() => {
-      // Pick a random non-space character to brown out momentarily
       const validIndices = characters
         .map((c, i) => (c !== ' ' ? i : null))
         .filter((i) => i !== null);
@@ -78,11 +123,10 @@ export function NeonSign({
 
       setBrownoutIndex(targetIndex);
 
-      // Restore after a brief flicker
       brownoutTimeout = setTimeout(() => {
         setBrownoutIndex(null);
-      }, 200 + Math.random() * 250);
-    }, 4500 + Math.random() * 3000);
+      }, 160 + Math.random() * 220);
+    }, 4000 + Math.random() * 3500);
 
     return () => {
       clearInterval(interval);
@@ -90,7 +134,7 @@ export function NeonSign({
     };
   }, [flicker, characters, isInView, shouldReduceMotion]);
 
-  // Calculate neon shadows based on gas color
+  // Neon shadows calculated dynamically based on gas color
   const litShadow = useMemo(() => {
     return [
       `0 0 4px #ffffff`,
@@ -102,6 +146,15 @@ export function NeonSign({
     ].join(', ');
   }, [color]);
 
+  const flashShadow = useMemo(() => {
+    return [
+      `0 0 6px #ffffff`,
+      `0 0 16px #ffffff`,
+      `0 0 35px ${color}`,
+      `0 0 70px ${color}`
+    ].join(', ');
+  }, [color]);
+
   const brownoutShadow = useMemo(() => {
     return [
       `0 0 2px rgba(255, 255, 255, 0.4)`,
@@ -110,14 +163,15 @@ export function NeonSign({
     ].join(', ');
   }, [color]);
 
+  // Cold unlit tube shadow - subtle glass tube reflection
   const unlitShadow = useMemo(() => {
-    return `0 0 2px ${color}20`;
+    return `0 0 2px ${color}25`;
   }, [color]);
 
   return (
     <Component
       ref={containerRef}
-      className={`relative inline-flex items-center justify-center flex-wrap select-none ${className}`}
+      className={`relative inline-flex items-center justify-center flex-nowrap whitespace-nowrap select-none ${className}`}
       {...props}
     >
       {/* Diffuse Wall Wash Bloom behind the tubing */}
@@ -132,7 +186,7 @@ export function NeonSign({
         }}
       />
 
-      {/* Render each tube letter */}
+      {/* Render each glass tube letter */}
       {characters.map((char, index) => {
         if (char === ' ') {
           return (
@@ -143,43 +197,57 @@ export function NeonSign({
         }
 
         const isIgnited = shouldReduceMotion || ignitedIndices.includes(index);
+        const sputterState = sputteringMap[index];
         const isBrownout = brownoutIndex === index;
 
-        // Determine current glow state
+        // Visual properties for cold physical glass tube vs sputtering vs ignited
         let currentShadow = unlitShadow;
         let textColor = `${color}25`;
-        let textOpacity = 0.3;
+        let textOpacity = 0.36; // Cold unlit glass clearly present and readable
+        let strokeColor = `${color}40`;
+        let scale = 1;
 
-        if (isIgnited) {
+        if (sputterState) {
+          // High-speed electrical arc flicker
+          if (sputterState === true || sputterState === 'flash') {
+            currentShadow = flashShadow;
+            textColor = '#ffffff';
+            textOpacity = 1;
+            strokeColor = '#ffffff';
+            scale = 1.02;
+          } else if (sputterState === 'dip') {
+            currentShadow = unlitShadow;
+            textColor = `${color}40`;
+            textOpacity = 0.4;
+            strokeColor = `${color}60`;
+            scale = 0.99;
+          }
+        } else if (isIgnited) {
           if (isBrownout) {
             currentShadow = brownoutShadow;
             textColor = '#ffffff';
             textOpacity = 0.55;
+            strokeColor = `${color}80`;
+            scale = 0.99;
           } else {
             currentShadow = litShadow;
             textColor = '#ffffff';
             textOpacity = 1;
+            strokeColor = color;
+            scale = 1;
           }
         }
 
         return (
           <motion.span
             key={index}
-            className="inline-block relative transition-[text-shadow,color,opacity] duration-150"
-            initial={shouldReduceMotion ? false : { opacity: 0.18, scale: 0.98 }}
-            animate={
-              isIgnited
-                ? {
-                    opacity: textOpacity,
-                    scale: 1,
-                    transition: { duration: 0.1 }
-                  }
-                : { opacity: 0.22, scale: 0.98 }
-            }
+            className="inline-block relative transition-[text-shadow,color,opacity] duration-100"
             style={{
+              opacity: textOpacity,
+              transform: `scale(${scale})`,
               color: textColor,
               textShadow: currentShadow,
-              WebkitTextStroke: isIgnited ? `0.5px ${color}` : `1px ${color}33`,
+              WebkitTextStroke: isIgnited || sputterState ? `0.5px ${strokeColor}` : `1.2px ${strokeColor}`,
               paintOrder: 'stroke fill'
             }}
           >

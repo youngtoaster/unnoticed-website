@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Pause, Eye, Clock, X, ExternalLink, Bell, Sparkles,
-  ChevronLeft, ChevronRight, Maximize2, Image as ImageIcon, Video, Film,
-  Plus, Upload, Link as LinkIcon, Check, AlertCircle, FileVideo
+  ChevronLeft, ChevronRight, Maximize2, Image as ImageIcon, Video, Film
 } from 'lucide-react';
 import { YoutubeIcon } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -13,23 +12,9 @@ import Magnet from './reactbits/Magnet';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 
 export default function MediaSection() {
-  const { videos, galleryImages, artistInfo, updateData } = useSiteData();
+  const { videos, galleryImages, artistInfo } = useSiteData();
   const [activeMediaTab, setActiveMediaTab] = useState('videos'); // 'videos' | 'gallery'
   const [activeModalVideo, setActiveModalVideo] = useState(null);
-  const [showAddVideoModal, setShowAddVideoModal] = useState(false);
-
-  // Add Video Form State
-  const [addMode, setAddMode] = useState('youtube'); // 'youtube' | 'upload'
-  const [videoInputUrl, setVideoInputUrl] = useState('');
-  const [videoTitle, setVideoTitle] = useState('');
-  const [videoCategory, setVideoCategory] = useState('Music Video');
-  const [videoDuration, setVideoDuration] = useState('3:20');
-  const [videoDescription, setVideoDescription] = useState('');
-  const [uploadedVideoFile, setUploadedVideoFile] = useState(null);
-  const [uploadedVideoPreview, setUploadedVideoPreview] = useState(null);
-  const [detectedYouTubeId, setDetectedYouTubeId] = useState('');
-  const [formError, setFormError] = useState('');
-  const fileInputRef = useRef(null);
 
   // Gallery state
   const images = galleryImages && galleryImages.length > 0 ? galleryImages : [];
@@ -66,93 +51,6 @@ export default function MediaSection() {
     title: 'UNNOTICED ARCHIVE',
     subtitle: 'STUDIO SNAPSHOT',
     caption: 'Visual stillness from the production sanctuary.'
-  };
-
-  // Detect YouTube ID as user types
-  const handleYouTubeUrlChange = (val) => {
-    setVideoInputUrl(val);
-    setFormError('');
-    const id = extractYouTubeId(val);
-    setDetectedYouTubeId(id);
-  };
-
-  // Handle local video file upload
-  const handleVideoFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('video/')) {
-      setFormError('Please select a valid video file (MP4, WebM, MOV).');
-      return;
-    }
-
-    setUploadedVideoFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setUploadedVideoPreview(objectUrl);
-    setFormError('');
-    if (!videoTitle) {
-      setVideoTitle(file.name.replace(/\.[^/.]+$/, ''));
-    }
-  };
-
-  // Submit new video to site collection
-  const handleAddVideoSubmit = (e) => {
-    e.preventDefault();
-
-    if (addMode === 'youtube') {
-      const ytId = extractYouTubeId(videoInputUrl);
-      if (!ytId) {
-        setFormError('Please enter a valid YouTube link or 11-character video ID.');
-        return;
-      }
-
-      const newVid = {
-        id: `vid-${Date.now()}`,
-        title: videoTitle.trim() || 'UNNOTICED — Music Video',
-        thumbnail: getYouTubeThumbnail(ytId),
-        youtubeEmbedId: ytId,
-        views: 'New Release',
-        duration: videoDuration || '3:30',
-        category: videoCategory || 'Music Video',
-        description: videoDescription.trim() || 'Official visual project by UNNOTICED.',
-        type: 'youtube'
-      };
-
-      updateData((prev) => ({ ...prev, videos: [newVid, ...(prev.videos || [])] }));
-      closeAddModal();
-    } else {
-      // Upload mode
-      if (!uploadedVideoPreview) {
-        setFormError('Please choose a video file to upload.');
-        return;
-      }
-
-      const newVid = {
-        id: `vid-upload-${Date.now()}`,
-        title: videoTitle.trim() || uploadedVideoFile?.name || 'Uploaded Visual',
-        thumbnail: artistInfo?.avatar || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80',
-        videoUrl: uploadedVideoPreview,
-        views: 'Studio Cut',
-        duration: videoDuration || 'Uploaded',
-        category: videoCategory || 'Studio Upload',
-        description: videoDescription.trim() || 'Directly uploaded studio master clip.',
-        type: 'upload'
-      };
-
-      updateData((prev) => ({ ...prev, videos: [newVid, ...(prev.videos || [])] }));
-      closeAddModal();
-    }
-  };
-
-  const closeAddModal = () => {
-    setShowAddVideoModal(false);
-    setVideoInputUrl('');
-    setVideoTitle('');
-    setVideoDescription('');
-    setUploadedVideoFile(null);
-    setUploadedVideoPreview(null);
-    setDetectedYouTubeId('');
-    setFormError('');
   };
 
   return (
@@ -217,18 +115,6 @@ export default function MediaSection() {
               </span>
             </button>
           </div>
-
-          {/* Quick Add Video Pill Button */}
-          {activeMediaTab === 'videos' && (
-            <button
-              onClick={() => setShowAddVideoModal(true)}
-              className="px-3.5 py-2 rounded-full bg-purple-500/15 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
-              title="Add a YouTube link or upload video file"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Video</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -530,218 +416,7 @@ export default function MediaSection() {
       </AnimatePresence>
 
       {/* ======================================================== */}
-      {/* ADD VIDEO MODAL: PULL FROM YOUTUBE OR UPLOAD FILE        */}
-      {/* ======================================================== */}
-      <AnimatePresence>
-        {showAddVideoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
-            onClick={closeAddModal}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 20, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg bg-[#0e101a] border border-white/[0.15] rounded-3xl p-6 sm:p-7 shadow-2xl text-left"
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
-                <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-purple-400">
-                    Video Integration
-                  </span>
-                  <h3 className="font-display text-xl font-bold text-white">
-                    Add Video to Showcase
-                  </h3>
-                </div>
-                <button
-                  onClick={closeAddModal}
-                  className="p-1 rounded-full text-slate-400 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Source Switcher */}
-              <div className="flex items-center p-1 rounded-2xl bg-white/[0.04] border border-white/[0.08] mb-5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddMode('youtube');
-                    setFormError('');
-                  }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                    addMode === 'youtube'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <LinkIcon className="w-3.5 h-3.5" />
-                  <span>Pull from YouTube Link</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddMode('upload');
-                    setFormError('');
-                  }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                    addMode === 'upload'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload Video File</span>
-                </button>
-              </div>
-
-              {formError && (
-                <div className="p-3 mb-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{formError}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleAddVideoSubmit} className="space-y-4">
-                {addMode === 'youtube' ? (
-                  <div>
-                    <label className="text-xs font-mono text-slate-300 block mb-1">
-                      YouTube URL or Video ID
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. https://www.youtube.com/watch?v=... or youtu.be/..."
-                      value={videoInputUrl}
-                      onChange={(e) => handleYouTubeUrlChange(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-purple-400 font-mono"
-                    />
-
-                    {detectedYouTubeId && (
-                      <div className="mt-2.5 p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 flex items-center gap-3">
-                        <img
-                          src={getYouTubeThumbnail(detectedYouTubeId)}
-                          alt="Thumbnail preview"
-                          className="w-16 h-10 object-cover rounded-lg border border-white/[0.1]"
-                        />
-                        <div className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5" />
-                          <span>YouTube ID Detected: {detectedYouTubeId}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <label className="text-xs font-mono text-slate-300 block mb-1">
-                      Choose Video File (.mp4, .webm, .mov)
-                    </label>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="video/*"
-                      onChange={handleVideoFileSelect}
-                      className="hidden"
-                    />
-
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-white/[0.15] hover:border-purple-400/60 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-white/[0.02]"
-                    >
-                      <FileVideo className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-white mb-1">
-                        {uploadedVideoFile ? uploadedVideoFile.name : 'Click to select local video file'}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-mono">
-                        {uploadedVideoFile ? `${(uploadedVideoFile.size / (1024 * 1024)).toFixed(1)} MB` : 'Direct browser playback via HTML5 video'}
-                      </p>
-                    </div>
-
-                    {uploadedVideoPreview && (
-                      <div className="mt-3 aspect-video rounded-xl overflow-hidden bg-black border border-white/[0.1]">
-                        <video src={uploadedVideoPreview} controls className="w-full h-full object-contain" />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Video Meta Fields */}
-                <div>
-                  <label className="text-xs font-mono text-slate-300 block mb-1">Video Title</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. UNNOTICED — Andale (Official Music Video)"
-                    value={videoTitle}
-                    onChange={(e) => setVideoTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-mono text-slate-300 block mb-1">Category</label>
-                    <select
-                      value={videoCategory}
-                      onChange={(e) => setVideoCategory(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#141520] border border-white/[0.1] text-white text-xs focus:outline-none"
-                    >
-                      <option value="Music Video">Music Video</option>
-                      <option value="Acoustic Session">Acoustic Session</option>
-                      <option value="Visualizer">Visualizer</option>
-                      <option value="Short Documentary">Short Documentary</option>
-                      <option value="Tour Vlog">Tour Vlog</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-mono text-slate-300 block mb-1">Duration Tag</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 3:15"
-                      value={videoDuration}
-                      onChange={(e) => setVideoDuration(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-mono text-slate-300 block mb-1">Description</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Brief description of the visual piece..."
-                    value={videoDescription}
-                    onChange={(e) => setVideoDescription(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs focus:outline-none"
-                  />
-                </div>
-
-                <div className="pt-2 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={closeAddModal}
-                    className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all active:scale-95"
-                  >
-                    Add to Showcase
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* FULLSCREEN LIGHTBOX MODAL                                */}
 
       {/* ======================================================== */}
       {/* FULLSCREEN LIGHTBOX MODAL                                */}

@@ -38,7 +38,7 @@ export const ARTIST_INFO = {
   neonSign: {
     color: "#a855f7",
     font: "font-display",
-    size: "text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]",
+    size: "text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]",
     fontWeight: "font-black",
     flicker: true,
     glowCaption: true

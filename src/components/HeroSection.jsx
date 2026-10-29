@@ -22,7 +22,7 @@ export default function HeroSection({
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
     font: 'font-display',
-    size: 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]',
+    size: 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]',
     fontWeight: 'font-black',
     flicker: true
   };
@@ -55,31 +55,85 @@ export default function HeroSection({
 
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center text-center">
 
-        {/* Top On Tour Badge (Clickable to Tour Dates) - Image 1 */}
-        <motion.a
-          href={artistInfo.tourBadge?.link || '#tour'}
-          onClick={(e) => {
-            e.preventDefault();
-            const el = document.querySelector('#tour');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-purple-500/40 bg-purple-950/30 hover:bg-purple-900/40 backdrop-blur-md mb-6 sm:mb-8 group shadow-lg shadow-purple-500/10 cursor-pointer transition-all hover:scale-105 active:scale-95"
-          title="Explore Stage Dates & Tickets"
-        >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-          </span>
-          <ShinyText
-            text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
-            className="text-[11px] sm:text-xs font-mono font-bold tracking-wide text-purple-200"
-            speed={4.5}
-          />
-          <ArrowRight className="w-3.5 h-3.5 text-purple-300 group-hover:translate-x-0.5 transition-transform" />
-        </motion.a>
+        {/* Top On Tour Badge (Fluid "Look-At-Me" Animated Button) */}
+        {artistInfo.tourBadge?.enabled !== false && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6 sm:mb-8"
+          >
+            <motion.a
+              href={artistInfo.tourBadge?.link || '#tour'}
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.querySelector('#tour');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              animate={{
+                y: [0, -3.5, 0]
+              }}
+              transition={{
+                duration: 3.2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+              className="relative inline-flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-purple-400/40 hover:border-emerald-400/70 bg-gradient-to-r from-purple-950/80 via-[#0e0a1f]/90 to-purple-950/80 backdrop-blur-xl group shadow-xl shadow-purple-900/30 cursor-pointer transition-all hover:scale-105 active:scale-95 max-w-[95vw] overflow-hidden"
+              title="Explore Stage Dates & Tickets"
+            >
+              {/* Dynamic Multicolored Pulsing Aura / Radial Glow */}
+              <motion.div
+                className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500/40 via-purple-600/50 to-pink-500/40 blur-md pointer-events-none -z-10"
+                animate={{
+                  opacity: [0.45, 0.9, 0.45],
+                  scale: [0.98, 1.05, 0.98]
+                }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              />
+
+              {/* Sweeping Fluid Light Glint / Sheen across badge */}
+              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                <motion.div
+                  className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                  animate={{
+                    x: ['-160%', '320%']
+                  }}
+                  transition={{
+                    duration: 2.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    repeatDelay: 1.2
+                  }}
+                />
+              </div>
+
+              {/* Dual Concentric Radar Beacon */}
+              <span className="relative flex h-2.5 sm:h-3 w-2.5 sm:w-3 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="animate-pulse absolute -inset-0.5 rounded-full bg-emerald-400/30" />
+                <span className="relative inline-flex rounded-full h-2.5 sm:h-3 w-2.5 sm:w-3 bg-gradient-to-tr from-emerald-400 to-teal-200 shadow-md shadow-emerald-400/80" />
+              </span>
+
+              {/* Mini Tag: LIVE */}
+              <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-[9px] font-mono font-black uppercase text-emerald-300 tracking-wider shrink-0">
+                LIVE
+              </span>
+
+              {/* Fluid Text */}
+              <ShinyText
+                text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
+                className="text-[10px] xs:text-[11px] sm:text-xs font-mono font-bold tracking-wide text-purple-100 max-w-[210px] xs:max-w-none truncate sm:overflow-visible"
+                speed={4}
+              />
+
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
+            </motion.a>
+          </motion.div>
+        )}
 
         {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
         <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
@@ -139,39 +193,35 @@ export default function HeroSection({
             </motion.div>
           )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 25, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="w-full flex justify-center py-2"
-          >
+          {/* Neon Title: Tubes are mounted immediately on page load, then randomly sputter & spark into light */}
+          <div className="w-full flex justify-center py-2 px-1 overflow-visible">
             <NeonSign
               as="h1"
               color={neonConfig.color || '#a855f7'}
-              delay={0.25}
+              delay={0.2}
               flicker={neonConfig.flicker ?? true}
-              className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]'} tracking-tighter uppercase leading-[0.95] text-balance text-center justify-center`}
+              className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.95] text-balance text-center justify-center whitespace-nowrap`}
             >
               {artistInfo.name || 'UNNOTICED'}
             </NeonSign>
-          </motion.div>
+          </div>
 
-          {/* Subtitle badge with Neon Illumination - Image 3 */}
+          {/* Subtitle badge with Neon Illumination - Scaled for mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
-            className="flex items-center justify-center gap-3 mt-3 w-full max-w-xl px-2"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex items-center justify-center gap-2 sm:gap-3 mt-3 w-full max-w-xl px-2"
           >
             <div
-              className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] transition-all"
+              className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
               style={{
                 background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
                 boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
               }}
             />
             <p
-              className="font-tech text-xs sm:text-sm uppercase tracking-[0.22em] sm:tracking-[0.28em] font-bold text-center px-2 select-none transition-all"
+              className="font-tech text-[9.5px] xs:text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.14em] xs:tracking-[0.18em] sm:tracking-[0.26em] font-bold text-center px-1 select-none transition-all"
               style={{
                 color: '#ffffff',
                 textShadow: `0 0 4px #ffffff, 0 0 10px ${neonConfig.color || '#a855f7'}, 0 0 20px ${neonConfig.color || '#a855f7'}99, 0 0 35px ${neonConfig.color || '#a855f7'}66`
@@ -180,7 +230,7 @@ export default function HeroSection({
               {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
             </p>
             <div
-              className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] transition-all"
+              className="h-[1.5px] flex-1 max-w-[24px] xs:max-w-[40px] sm:max-w-[90px] md:max-w-[120px] transition-all"
               style={{
                 background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
                 boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`

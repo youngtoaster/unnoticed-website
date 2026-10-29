@@ -36,7 +36,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
     font: 'font-display',
-    size: 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]',
+    size: 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]',
     fontWeight: 'font-black',
     flicker: true
   };
@@ -1081,7 +1081,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <div>
                     <span className="text-[10px] font-mono text-slate-400 block mb-1">Sign Scale Preset</span>
                     <select
-                      value={neonConfig.size || 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]'}
+                      value={neonConfig.size || 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]'}
                       onChange={(e) => {
                         updateData({
                           artistInfo: {
@@ -1093,10 +1093,10 @@ export default function AdminDashboard({ onReturnToSite }) {
                       }}
                       className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
                     >
-                      <option value="text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]">Monumental Hero (Default)</option>
-                      <option value="text-4xl xs:text-5xl sm:text-7xl md:text-8xl lg:text-9xl">Massive Stage (9xl)</option>
-                      <option value="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl">Bold Large (8xl)</option>
-                      <option value="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl">Compact Club (7xl)</option>
+                      <option value="text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]">Monumental Hero (Mobile Fluid 10rem)</option>
+                      <option value="text-[clamp(2.1rem,9.8vw,8.5rem)] sm:text-7xl md:text-8xl lg:text-9xl">Massive Stage (Mobile Fluid 9xl)</option>
+                      <option value="text-[clamp(1.9rem,8.6vw,7.5rem)] sm:text-6xl md:text-7xl lg:text-8xl">Bold Large (Mobile Fluid 8xl)</option>
+                      <option value="text-[clamp(1.7rem,7.5vw,6.5rem)] sm:text-5xl md:text-6xl lg:text-7xl">Compact Club (Mobile Fluid 7xl)</option>
                     </select>
                   </div>
                 </div>
@@ -1163,35 +1163,112 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </p>
               </div>
 
-              {/* Edit Box for On Tour Announcement Badge */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-mono text-emerald-300 font-semibold flex items-center gap-1.5">
-                    <Ticket className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Top "On Tour" Pulsing Badge</span>
+              {/* Edit Box & Toggle for On Tour Announcement Badge */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4 text-emerald-400" />
+                    <div>
+                      <span className="text-xs font-mono font-bold text-white block">
+                        Top "On Tour" Animated Fluid Button
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        Eye-catching animated beacon button at the top of the hero
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Toggle Switch */}
+                  <label className="flex items-center gap-2 cursor-pointer bg-white/[0.05] hover:bg-white/[0.08] px-3 py-1.5 rounded-xl border border-white/[0.1] transition-all">
+                    <input
+                      type="checkbox"
+                      checked={artistInfo.tourBadge?.enabled !== false}
+                      onChange={(e) => {
+                        updateData({
+                          artistInfo: {
+                            ...artistInfo,
+                            tourBadge: {
+                              ...(artistInfo.tourBadge || {}),
+                              enabled: e.target.checked
+                            }
+                          }
+                        });
+                        showToast(e.target.checked ? 'On Tour badge visible on home' : 'On Tour badge hidden from home');
+                      }}
+                      className="rounded accent-emerald-500 w-4 h-4"
+                    />
+                    <span className="text-xs font-semibold text-emerald-300">
+                      {artistInfo.tourBadge?.enabled !== false ? 'Badge Visible' : 'Badge Hidden'}
+                    </span>
                   </label>
-                  <span className="text-[10px] font-mono text-emerald-400/80">Scrolls to #tour</span>
                 </div>
-                <input
-                  type="text"
-                  placeholder="ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"
-                  value={artistInfo.tourBadge?.text || ''}
-                  onChange={(e) => {
-                    updateData({
-                      artistInfo: {
-                        ...artistInfo,
-                        tourBadge: {
-                          ...(artistInfo.tourBadge || {}),
-                          text: e.target.value
-                        }
-                      }
-                    });
-                  }}
-                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
-                />
-                <p className="text-[10px] text-slate-400">
-                  The pulsating beacon button at the very top of the hero that directs fans directly to the tour dates.
-                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2 space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Badge Text / Announcement
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"
+                      value={artistInfo.tourBadge?.text || ''}
+                      onChange={(e) => {
+                        updateData({
+                          artistInfo: {
+                            ...artistInfo,
+                            tourBadge: {
+                              ...(artistInfo.tourBadge || {}),
+                              text: e.target.value
+                            }
+                          }
+                        });
+                      }}
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Target Link / Anchor
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="#tour"
+                      value={artistInfo.tourBadge?.link || '#tour'}
+                      onChange={(e) => {
+                        updateData({
+                          artistInfo: {
+                            ...artistInfo,
+                            tourBadge: {
+                              ...(artistInfo.tourBadge || {}),
+                              link: e.target.value
+                            }
+                          }
+                        });
+                      }}
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Live Preview in Admin */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-black/30 p-3 rounded-xl border border-white/[0.05]">
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Live Button Appearance:
+                  </span>
+                  <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-400/40 bg-gradient-to-r from-purple-950/80 via-[#0e0a1f]/90 to-purple-950/80 shadow-md">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+                    </span>
+                    <span className="px-1 py-0.2 rounded bg-emerald-500/25 text-[8px] font-mono font-bold text-emerald-300">
+                      LIVE
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-purple-100">
+                      {artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES"}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </SpotlightCard>

@@ -28,6 +28,13 @@ export const ARTIST_INFO = {
     totalStreams: "4.2M+",
     catalogReleases: "18 Tracks",
     keyMarkets: ["Pittsburgh", "Philadelphia", "New York", "Chicago", "London"]
+  },
+  neonSign: {
+    color: "#a855f7",
+    font: "font-display",
+    size: "text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]",
+    fontWeight: "font-black",
+    flicker: true
   }
 };
 

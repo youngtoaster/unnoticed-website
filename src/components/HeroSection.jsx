@@ -6,6 +6,7 @@ import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';
 import DecryptedText from './reactbits/DecryptedText';
 import Magnet from './reactbits/Magnet';
+import NeonSign from './ui/NeonSign';
 
 export default function HeroSection({
   currentTrack,
@@ -17,6 +18,14 @@ export default function HeroSection({
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
   const featuredTrack = tracks[0] || currentTrack;
   const isFeaturedPlaying = isPlaying && currentTrack?.id === featuredTrack?.id;
+
+  const neonConfig = artistInfo?.neonSign || {
+    color: '#a855f7',
+    font: 'font-display',
+    size: 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]',
+    fontWeight: 'font-black',
+    flicker: true
+  };
 
   return (
     <section className="relative min-h-[90vh] pt-28 sm:pt-36 pb-16 sm:pb-24 flex flex-col justify-center items-center px-4 sm:px-6 overflow-hidden">
@@ -44,18 +53,24 @@ export default function HeroSection({
           />
         </motion.div>
 
-        {/* Main Kinetic Title */}
-        <div className="relative mb-4 sm:mb-6 w-full">
-          <motion.h1
+        {/* Main Kinetic Title with Planes Neon Sign */}
+        <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
+          <motion.div
             initial={{ opacity: 0, y: 25, filter: 'blur(8px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="font-display text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black tracking-tighter uppercase leading-[0.95] select-none text-balance"
+            className="w-full flex justify-center py-2"
           >
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
-              UNNOTICED
-            </span>
-          </motion.h1>
+            <NeonSign
+              as="h1"
+              color={neonConfig.color || '#a855f7'}
+              delay={0.25}
+              flicker={neonConfig.flicker ?? true}
+              className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]'} tracking-tighter uppercase leading-[0.95] text-balance text-center justify-center`}
+            >
+              {artistInfo.name || 'UNNOTICED'}
+            </NeonSign>
+          </motion.div>
 
           {/* Subtitle badge */}
           <motion.div

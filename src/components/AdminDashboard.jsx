@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sliders, Music, FileText, Ticket, ShoppingBag, Image as ImageIcon,
   ArrowLeft, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
-  RotateCcw, Download, Upload, Check, AlertTriangle, Eye, Shield, Sparkles, ExternalLink
+  RotateCcw, Download, Upload, Check, AlertTriangle, Eye, Shield, Sparkles, ExternalLink,
+  Film, Video, Play, Link as LinkIcon, X
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
+import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 
 export default function AdminDashboard({ onReturnToSite }) {
   const {
@@ -606,85 +608,155 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 4: VIDEOS ================= */}
       {activeTab === 'videos' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="font-display text-2xl font-bold text-white">
-                YouTube Videos & Visualizer Grid
+              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
+                <span>YouTube Videos & Visualizer Grid</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 font-mono border border-red-500/20">
+                  {videos.length} visuals
+                </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Reorganize videos, update thumbnails, duration markers, and categories.
+                Add YouTube links or upload video files directly, edit metadata, and reorganize the showcase.
               </p>
             </div>
 
             <button
               onClick={() => {
-                const newVid = {
-                  id: `vid-${Date.now()}`,
-                  title: 'New Official Video',
-                  thumbnail: artistInfo.avatar,
-                  youtubeEmbedId: 'dQw4w9WgXcQ',
-                  views: '50K views',
-                  duration: '3:15',
-                  category: 'Music Video',
-                  description: 'Official music video by UNNOTICED.'
-                };
-                updateData((prev) => ({ ...prev, videos: [newVid, ...prev.videos] }));
-                showToast('Added video');
+                setEditingItem({
+                  type: 'video',
+                  isNew: true,
+                  data: {
+                    id: `vid-${Date.now()}`,
+                    title: '',
+                    category: 'Music Video',
+                    duration: '3:30',
+                    views: 'New Release',
+                    description: '',
+                    type: 'youtube',
+                    youtubeEmbedId: 'dQw4w9WgXcQ',
+                    videoUrl: '',
+                    thumbnail: artistInfo?.avatar || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80'
+                  }
+                });
               }}
-              className="px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-xs flex items-center gap-1.5 active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Video</span>
+              <span>Add Video to Showcase</span>
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {videos.map((vid, idx) => (
-              <SpotlightCard key={vid.id} className="p-4" tilt={false}>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-red-400">{vid.category} • {vid.duration}</span>
-                    <div className="flex items-center gap-1">
-                      <button disabled={idx === 0} onClick={() => handleMove('videos', idx, 'up')} className="p-1 rounded bg-white/[0.05] disabled:opacity-20 text-white">
-                        <ArrowUp className="w-3 h-3" />
-                      </button>
-                      <button disabled={idx === videos.length - 1} onClick={() => handleMove('videos', idx, 'down')} className="p-1 rounded bg-white/[0.05] disabled:opacity-20 text-white">
-                        <ArrowDown className="w-3 h-3" />
-                      </button>
-                      <button onClick={() => handleDelete('videos', idx)} className="p-1 rounded bg-red-500/10 text-red-400 ml-1">
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+            {videos.map((vid, idx) => {
+              const isUpload = vid.type === 'upload' || isDirectVideo(vid.videoUrl);
+              const ytId = extractYouTubeId(vid.youtubeEmbedId || vid.youtubeId || vid.url);
+
+              return (
+                <SpotlightCard key={vid.id || idx} className="p-4 sm:p-5" tilt={false}>
+                  <div className="space-y-3">
+                    {/* Top Row: Tag, Type & Reorder */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${
+                          isUpload ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`}>
+                          {isUpload ? 'Uploaded File' : 'YouTube Embed'}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {vid.category} • {vid.duration}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          disabled={idx === 0}
+                          onClick={() => handleMove('videos', idx, 'up')}
+                          className="p-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] disabled:opacity-20 text-white transition-colors"
+                          title="Move Up"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          disabled={idx === videos.length - 1}
+                          onClick={() => handleMove('videos', idx, 'down')}
+                          className="p-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] disabled:opacity-20 text-white transition-colors"
+                          title="Move Down"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete('videos', idx)}
+                          className="p-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 ml-1 transition-colors"
+                          title="Delete Video"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Media Preview Box */}
+                    <div className="relative aspect-video rounded-xl overflow-hidden border border-white/[0.08] bg-black group">
+                      {isUpload && vid.videoUrl ? (
+                        <video
+                          src={vid.videoUrl}
+                          className="w-full h-full object-cover"
+                          controls={false}
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={vid.thumbnail || (ytId ? getYouTubeThumbnail(ytId) : artistInfo?.avatar)}
+                          alt={vid.title}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-white">
+                        {vid.views || 'Visualizer'}
+                      </div>
+                    </div>
+
+                    {/* Quick Fields */}
+                    <div>
+                      <label className="text-[10px] font-mono text-slate-400 block mb-1">Video Title</label>
+                      <input
+                        type="text"
+                        value={vid.title}
+                        onChange={(e) => {
+                          const updated = [...videos];
+                          updated[idx].title = e.target.value;
+                          updateData({ videos: updated });
+                        }}
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-bold text-white focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-mono text-slate-400 block mb-1">Description</label>
+                      <textarea
+                        rows={2}
+                        value={vid.description}
+                        onChange={(e) => {
+                          const updated = [...videos];
+                          updated[idx].description = e.target.value;
+                          updateData({ videos: updated });
+                        }}
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs text-slate-300 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    {/* Edit Video Link / File Button */}
+                    <button
+                      onClick={() => setEditingItem({ type: 'video', isNew: false, data: { ...vid }, index: idx })}
+                      className="w-full py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-purple-300 hover:text-white border border-white/[0.08] flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Edit Source, Thumbnail & Details</span>
+                    </button>
                   </div>
-
-                  <div className="aspect-video rounded-xl overflow-hidden border border-white/[0.08] bg-black">
-                    <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover" />
-                  </div>
-
-                  <input
-                    type="text"
-                    value={vid.title}
-                    onChange={(e) => {
-                      const updated = [...videos];
-                      updated[idx].title = e.target.value;
-                      updateData({ videos: updated });
-                    }}
-                    className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-bold text-white focus:outline-none"
-                  />
-
-                  <textarea
-                    rows={2}
-                    value={vid.description}
-                    onChange={(e) => {
-                      const updated = [...videos];
-                      updated[idx].description = e.target.value;
-                      updateData({ videos: updated });
-                    }}
-                    className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs text-slate-300 focus:outline-none"
-                  />
-                </div>
-              </SpotlightCard>
-            ))}
+                </SpotlightCard>
+              );
+            })}
           </div>
         </div>
       )}
@@ -1129,6 +1201,314 @@ export default function AdminDashboard({ onReturnToSite }) {
                   className="px-5 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold shadow-md active:scale-95"
                 >
                   Save Changes
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* MODAL: EDIT / ADD VIDEO */}
+        {editingItem?.type === 'video' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md safe-bottom"
+            onClick={() => setEditingItem(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-2xl bg-[#0e0f18] border border-white/[0.15] rounded-3xl p-6 sm:p-7 shadow-2xl max-h-[90vh] overflow-y-auto space-y-5"
+            >
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-white flex items-center gap-2">
+                    <Film className="w-5 h-5 text-purple-400" />
+                    <span>{editingItem.isNew ? 'Add Video to Showcase' : `Edit: ${editingItem.data.title || 'Untitled Video'}`}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Embed from YouTube or upload local MP4 / WebM / MOV video files.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditingItem(null)}
+                  className="p-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-slate-400 hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Source Mode Toggle */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-white/[0.03] border border-white/[0.08] rounded-2xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, type: 'youtube' }
+                    });
+                  }}
+                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                    editingItem.data.type !== 'upload'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Youtube className="w-4 h-4" />
+                  <span>YouTube Embed / Link</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, type: 'upload' }
+                    });
+                  }}
+                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                    editingItem.data.type === 'upload'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Upload className="w-4 h-4" />
+                  <span>Upload Local Video File</span>
+                </button>
+              </div>
+
+              {/* YouTube Configuration */}
+              {editingItem.data.type !== 'upload' ? (
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-3">
+                  <div>
+                    <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                      YouTube URL or Video ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or dQw4w9WgXcQ"
+                      value={editingItem.data.youtubeEmbedId || ''}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const extracted = extractYouTubeId(raw);
+                        const newThumb = extracted ? getYouTubeThumbnail(extracted) : editingItem.data.thumbnail;
+                        setEditingItem({
+                          ...editingItem,
+                          data: {
+                            ...editingItem.data,
+                            youtubeEmbedId: raw,
+                            thumbnail: (!editingItem.data.thumbnail || editingItem.data.thumbnail.includes('img.youtube.com') || editingItem.data.thumbnail === artistInfo?.avatar) && extracted
+                              ? newThumb
+                              : editingItem.data.thumbnail
+                          }
+                        });
+                      }}
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-red-500 font-mono"
+                    />
+                  </div>
+
+                  {/* Detected ID indicator */}
+                  {(() => {
+                    const extracted = extractYouTubeId(editingItem.data.youtubeEmbedId || '');
+                    return (
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <div className="flex items-center gap-1.5">
+                          {extracted ? (
+                            <span className="text-emerald-400 font-mono flex items-center gap-1 text-[11px]">
+                              <Check className="w-3.5 h-3.5" /> Resolved ID: {extracted}
+                            </span>
+                          ) : (
+                            <span className="text-amber-400/80 text-[11px] font-mono">
+                              Paste any YouTube link or video ID
+                            </span>
+                          )}
+                        </div>
+                        {extracted && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingItem({
+                                ...editingItem,
+                                data: {
+                                  ...editingItem.data,
+                                  thumbnail: getYouTubeThumbnail(extracted)
+                                }
+                              });
+                              showToast('Fetched YouTube HD thumbnail');
+                            }}
+                            className="text-[10px] font-mono px-2 py-1 rounded-md bg-white/[0.06] hover:bg-white/[0.1] text-red-300"
+                          >
+                            Apply Official HD Thumbnail
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                /* Direct Upload Configuration */
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-3">
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                    Select Local Video File (MP4, WebM, QuickTime MOV)
+                  </label>
+                  <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-white/[0.15] hover:border-purple-500/50 rounded-2xl cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] transition-all">
+                    <Video className="w-8 h-8 text-purple-400 mb-2" />
+                    <span className="text-xs font-semibold text-white">Click to Browse and Upload Video</span>
+                    <span className="text-[10px] text-slate-400 mt-1">Plays instantly in the browser video player</span>
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const url = URL.createObjectURL(file);
+                          setEditingItem({
+                            ...editingItem,
+                            data: {
+                              ...editingItem.data,
+                              type: 'upload',
+                              videoUrl: url,
+                              title: editingItem.data.title || file.name.replace(/\.[^/.]+$/, ''),
+                              category: editingItem.data.category || 'Studio Upload'
+                            }
+                          });
+                          showToast(`Uploaded ${file.name}`);
+                        }
+                      }}
+                    />
+                  </label>
+
+                  {editingItem.data.videoUrl && (
+                    <div className="space-y-1.5 pt-2">
+                      <span className="text-[10px] font-mono text-purple-400">Live Video Preview</span>
+                      <video
+                        src={editingItem.data.videoUrl}
+                        controls
+                        className="w-full h-44 rounded-xl bg-black object-contain border border-white/[0.1]"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Common Metadata Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Video Title</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. UNNOTICED — Andale (Official Music Video)"
+                    value={editingItem.data.title || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Category Badge</label>
+                  <select
+                    value={editingItem.data.category || 'Music Video'}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="Music Video">Music Video</option>
+                    <option value="Visualizer">Visualizer</option>
+                    <option value="Acoustic Studio">Acoustic Studio</option>
+                    <option value="Live Performance">Live Performance</option>
+                    <option value="BTS Documentary">BTS Documentary</option>
+                    <option value="Teaser">Teaser</option>
+                    <option value="Studio Upload">Studio Upload</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Duration (e.g. 2:54)</label>
+                  <input
+                    type="text"
+                    placeholder="3:20"
+                    value={editingItem.data.duration || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, duration: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Views / Metric Subtitle</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 214K views or Studio Cut"
+                    value={editingItem.data.views || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, views: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Thumbnail Poster Image URL</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={editingItem.data.thumbnail || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, thumbnail: e.target.value } })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                    />
+                    {editingItem.data.thumbnail && (
+                      <div className="w-12 h-9 rounded-lg overflow-hidden border border-white/[0.1] bg-black shrink-0">
+                        <img src={editingItem.data.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Description</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Brief description of the visual piece..."
+                    value={editingItem.data.description || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editingItem.data.type === 'upload' && !editingItem.data.videoUrl) {
+                      alert('Please select a video file to upload.');
+                      return;
+                    }
+                    if (editingItem.isNew) {
+                      updateData((prev) => ({
+                        ...prev,
+                        videos: [editingItem.data, ...(prev.videos || [])]
+                      }));
+                      showToast('Added video to showcase');
+                    } else {
+                      const updated = [...videos];
+                      updated[editingItem.index] = editingItem.data;
+                      updateData({ videos: updated });
+                      showToast('Saved video changes');
+                    }
+                    setEditingItem(null);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 active:scale-95 transition-all"
+                >
+                  {editingItem.isNew ? 'Publish to Showcase' : 'Save Changes'}
                 </button>
               </div>
             </motion.div>

@@ -17,7 +17,7 @@ const DataContext = createContext(null);
 const STORAGE_KEY = 'unnoticed_cms_v1_data';
 const AUTH_KEY = 'unnoticed_admin_session_token';
 
-// Cryptographic hash of salt + 'Tyler160582'
+// Salted SHA-256 administrative authentication credential hash
 const TARGET_SALT = 'unnoticed_salt_tyler_2026_';
 const TARGET_HASH = '90eeb0b0059529a2ca4bc4b6be0c21b0d3275c1bccba6a7e958b3e336bb1ff17';
 

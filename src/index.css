@@ -110,6 +110,19 @@
   100% { background-position: 200% center; }
 }
 
+/* React Bits Shiny Text Animation */
+@keyframes shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+.animate-shine {
+  animation: shine 4.5s linear infinite;
+}
+
 /* Subtle grid texture overlay */
 .bg-grid-pattern {
   background-size: 40px 40px;

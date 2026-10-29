@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
+import ShinyText from './reactbits/ShinyText';
+import DecryptedText from './reactbits/DecryptedText';
+import Magnet from './reactbits/Magnet';
 
 export default function HeroSection({
   currentTrack,
@@ -34,9 +37,11 @@ export default function HeroSection({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <span className="text-[11px] sm:text-xs font-mono tracking-wide text-purple-200">
-            OFFICIAL ARTIST ATELIER • McKEES ROCKS, PA
-          </span>
+          <ShinyText
+            text="OFFICIAL ARTIST ATELIER • McKEES ROCKS, PA"
+            className="text-[11px] sm:text-xs font-mono tracking-wide"
+            speed={4.5}
+          />
         </motion.div>
 
         {/* Main Kinetic Title */}
@@ -85,29 +90,31 @@ export default function HeroSection({
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full max-w-md sm:max-w-none"
         >
-          {/* Main Play Button */}
-          <button
-            onClick={() => {
-              if (currentTrack?.id !== featuredTrack.id) {
-                onSelectTrack(featuredTrack);
-              } else {
-                togglePlay();
-              }
-            }}
-            className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-600/30 border border-purple-400/30 active:scale-95 transition-all"
-          >
-            {isFeaturedPlaying ? (
-              <Pause className="w-4 h-4 fill-white" />
-            ) : (
-              <Play className="w-4 h-4 fill-white ml-0.5" />
-            )}
-            <span>{isFeaturedPlaying ? 'Pause Audio Preview' : `Listen: ${featuredTrack.title}`}</span>
-            <span className="flex items-center gap-0.5 h-3 ml-1">
-              <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-1' : 'h-1.5'}`} />
-              <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3.5 animate-equalizer-2' : 'h-2'}`} />
-              <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-3' : 'h-1'}`} />
-            </span>
-          </button>
+          {/* Main Play Button with React Bits Magnet */}
+          <Magnet padding={80} magnetStrength={3} className="w-full sm:w-auto">
+            <button
+              onClick={() => {
+                if (currentTrack?.id !== featuredTrack.id) {
+                  onSelectTrack(featuredTrack);
+                } else {
+                  togglePlay();
+                }
+              }}
+              className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-600/30 border border-purple-400/30 active:scale-95 transition-all cursor-pointer"
+            >
+              {isFeaturedPlaying ? (
+                <Pause className="w-4 h-4 fill-white" />
+              ) : (
+                <Play className="w-4 h-4 fill-white ml-0.5" />
+              )}
+              <span>{isFeaturedPlaying ? 'Pause Audio Preview' : `Listen: ${featuredTrack.title}`}</span>
+              <span className="flex items-center gap-0.5 h-3 ml-1">
+                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-1' : 'h-1.5'}`} />
+                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3.5 animate-equalizer-2' : 'h-2'}`} />
+                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-3' : 'h-1'}`} />
+              </span>
+            </button>
+          </Magnet>
 
           {/* Quick Jump Pills */}
           <a
@@ -163,7 +170,7 @@ export default function HeroSection({
                     transition={{ duration: 0.2 }}
                   >
                     <h3 className="font-display text-lg font-bold text-white mb-0.5">
-                      UNNOTICED
+                      <DecryptedText text="UNNOTICED" speed={40} />
                     </h3>
                     <p className="text-[11px] text-purple-300 font-mono mb-2">
                       Current Era • The Man Unseen
@@ -181,7 +188,7 @@ export default function HeroSection({
                     transition={{ duration: 0.2 }}
                   >
                     <h3 className="font-display text-lg font-bold text-white mb-0.5">
-                      TY SCIULLO
+                      <DecryptedText text="TY SCIULLO" speed={40} />
                     </h3>
                     <p className="text-[11px] text-purple-300 font-mono mb-2">
                       2016–2023 • The Roots
@@ -222,13 +229,13 @@ export default function HeroSection({
                 <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
                   <span className="text-xs text-slate-400">Monthly Listeners</span>
                   <span className="font-display text-xl font-black text-white">
-                    {artistInfo.stats?.monthlyListeners || '142,500'}
+                    <ShinyText text={artistInfo.stats?.monthlyListeners || '142,500'} speed={3.5} />
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
                   <span className="text-xs text-slate-400">Catalog Streams</span>
                   <span className="font-display text-xl font-black text-white">
-                    {artistInfo.stats?.totalStreams || '4.2M'}
+                    <ShinyText text={artistInfo.stats?.totalStreams || '4.2M'} speed={3} />
                   </span>
                 </div>
               </div>

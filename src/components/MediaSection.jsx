@@ -7,6 +7,8 @@ import {
 import { YoutubeIcon } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
+import ShinyText from './reactbits/ShinyText';
+import Magnet from './reactbits/Magnet';
 
 export default function MediaSection() {
   const { videos, galleryImages, artistInfo } = useSiteData();
@@ -61,7 +63,8 @@ export default function MediaSection() {
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
-            <Film className="w-3.5 h-3.5" /> VISUAL & MEDIA ARCHIVE
+            <Film className="w-3.5 h-3.5" />
+            <ShinyText text="VISUAL & MEDIA ARCHIVE" speed={4} />
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
             VIDEOS & PHOTO EXHIBIT

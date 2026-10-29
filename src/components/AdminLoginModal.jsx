@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, KeyRound, Lock, X, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
+import DecryptedText from './reactbits/DecryptedText';
+import ShinyText from './reactbits/ShinyText';
+import Magnet from './reactbits/Magnet';
 
 export default function AdminLoginModal({ isOpen, onClose, onSuccess }) {
   const { verifyPassword } = useSiteData();
@@ -82,10 +85,10 @@ export default function AdminLoginModal({ isOpen, onClose, onSuccess }) {
               </div>
               <div>
                 <span className="text-[10px] font-mono tracking-widest text-purple-400 uppercase block">
-                  RESTRICTED // ROOT ACCESS
+                  <DecryptedText text="RESTRICTED // ROOT ACCESS" speed={30} />
                 </span>
                 <h3 className="font-display text-xl font-bold text-white">
-                  Admin Terminal
+                  <ShinyText text="Admin Terminal" speed={4} />
                 </h3>
               </div>
             </div>

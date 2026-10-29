@@ -15,6 +15,7 @@ import EPKView from './components/EPKView';
 import Footer from './components/Footer';
 import AdminDashboard from './components/AdminDashboard';
 import AdminLoginModal from './components/AdminLoginModal';
+import ClickSpark from './components/reactbits/ClickSpark';
 
 function AppContent() {
   const { tracks, merchProducts, isAdminAuthenticated } = useSiteData();
@@ -170,10 +171,11 @@ function AppContent() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#060608] text-slate-100 overflow-x-hidden selection:bg-purple-600/30 selection:text-purple-200">
-      
-      {/* Interactive Fluid Particle & Light Trails Canvas */}
-      <FluidCanvas isPlaying={isPlaying} />
+    <ClickSpark sparkColor="#c084fc" sparkSize={7} sparkCount={7} duration={400}>
+      <div className="relative min-h-screen bg-[#060608] text-slate-100 overflow-x-hidden selection:bg-purple-600/30 selection:text-purple-200">
+        
+        {/* Interactive Fluid Particle & Light Trails Canvas */}
+        <FluidCanvas isPlaying={isPlaying} />
 
       {/* Secret Admin Login Modal */}
       <AdminLoginModal
@@ -271,7 +273,8 @@ function AppContent() {
         </>
       )}
 
-    </div>
+      </div>
+    </ClickSpark>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag } from 'lucide-react';
+import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';
@@ -35,23 +35,31 @@ export default function HeroSection({
 
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center text-center">
 
-        {/* Top Status Pill */}
-        <motion.div
+        {/* Top On Tour Badge (Clickable to Tour Dates) - Image 1 */}
+        <motion.a
+          href={artistInfo.tourBadge?.link || '#tour'}
+          onClick={(e) => {
+            e.preventDefault();
+            const el = document.querySelector('#tour');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-purple-500/30 bg-purple-950/20 backdrop-blur-md mb-6 sm:mb-8 group shadow-lg shadow-purple-500/5"
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-purple-500/40 bg-purple-950/30 hover:bg-purple-900/40 backdrop-blur-md mb-6 sm:mb-8 group shadow-lg shadow-purple-500/10 cursor-pointer transition-all hover:scale-105 active:scale-95"
+          title="Explore Stage Dates & Tickets"
         >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
           </span>
           <ShinyText
-            text="OFFICIAL ARTIST ATELIER • McKEES ROCKS, PA"
-            className="text-[11px] sm:text-xs font-mono tracking-wide"
+            text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
+            className="text-[11px] sm:text-xs font-mono font-bold tracking-wide text-purple-200"
             speed={4.5}
           />
-        </motion.div>
+          <ArrowRight className="w-3.5 h-3.5 text-purple-300 group-hover:translate-x-0.5 transition-transform" />
+        </motion.a>
 
         {/* Main Kinetic Title with Planes Neon Sign */}
         <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
@@ -72,18 +80,36 @@ export default function HeroSection({
             </NeonSign>
           </motion.div>
 
-          {/* Subtitle badge */}
+          {/* Subtitle badge with Neon Illumination - Image 3 */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.35 }}
-            className="flex items-center justify-center gap-2 mt-3"
+            className="flex items-center justify-center gap-3 mt-3 w-full max-w-xl px-2"
           >
-            <div className="h-[1px] w-6 sm:w-16 bg-gradient-to-r from-transparent to-purple-500/50" />
-            <p className="font-tech text-xs sm:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] text-purple-300 font-semibold px-2">
-              Once Known As Ty Sciullo • Now A Man Unseen
+            <div
+              className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] transition-all"
+              style={{
+                background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
+                boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
+              }}
+            />
+            <p
+              className="font-tech text-xs sm:text-sm uppercase tracking-[0.22em] sm:tracking-[0.28em] font-bold text-center px-2 select-none transition-all"
+              style={{
+                color: '#ffffff',
+                textShadow: `0 0 4px #ffffff, 0 0 10px ${neonConfig.color || '#a855f7'}, 0 0 20px ${neonConfig.color || '#a855f7'}99, 0 0 35px ${neonConfig.color || '#a855f7'}66`
+              }}
+            >
+              {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
             </p>
-            <div className="h-[1px] w-6 sm:w-16 bg-gradient-to-l from-transparent to-purple-500/50" />
+            <div
+              className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] transition-all"
+              style={{
+                background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
+                boxShadow: `0 0 8px ${neonConfig.color || '#a855f7'}88`
+              }}
+            />
           </motion.div>
         </div>
 
@@ -98,43 +124,45 @@ export default function HeroSection({
           Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.
         </motion.p>
 
-        {/* Primary Action Row */}
+        {/* Primary Action Row (Clean Spacing, Zero Overlap) - Image 2 Fix */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full max-w-md sm:max-w-none"
+          className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 mb-12 sm:mb-16 w-full px-2"
         >
-          {/* Main Play Button with React Bits Magnet */}
-          <Magnet padding={80} magnetStrength={3} className="w-full sm:w-auto">
-            <button
-              onClick={() => {
-                if (currentTrack?.id !== featuredTrack.id) {
-                  onSelectTrack(featuredTrack);
-                } else {
-                  togglePlay();
-                }
-              }}
-              className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-600/30 border border-purple-400/30 active:scale-95 transition-all cursor-pointer"
-            >
-              {isFeaturedPlaying ? (
-                <Pause className="w-4 h-4 fill-white" />
-              ) : (
-                <Play className="w-4 h-4 fill-white ml-0.5" />
-              )}
-              <span>{isFeaturedPlaying ? 'Pause Audio Preview' : `Listen: ${featuredTrack.title}`}</span>
-              <span className="flex items-center gap-0.5 h-3 ml-1">
-                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-1' : 'h-1.5'}`} />
-                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3.5 animate-equalizer-2' : 'h-2'}`} />
-                <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-3' : 'h-1'}`} />
-              </span>
-            </button>
-          </Magnet>
+          {/* Main Play Button with controlled Magnet (no clipping) */}
+          <div className="relative shrink-0">
+            <Magnet padding={20} magnetStrength={2}>
+              <button
+                onClick={() => {
+                  if (currentTrack?.id !== featuredTrack.id) {
+                    onSelectTrack(featuredTrack);
+                  } else {
+                    togglePlay();
+                  }
+                }}
+                className="flex items-center justify-center gap-3 px-7 sm:px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-600/30 border border-purple-400/30 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+              >
+                {isFeaturedPlaying ? (
+                  <Pause className="w-4 h-4 fill-white" />
+                ) : (
+                  <Play className="w-4 h-4 fill-white ml-0.5" />
+                )}
+                <span>{isFeaturedPlaying ? 'Pause Audio Preview' : `Listen: ${featuredTrack.title}`}</span>
+                <span className="flex items-center gap-0.5 h-3 ml-1">
+                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-1' : 'h-1.5'}`} />
+                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3.5 animate-equalizer-2' : 'h-2'}`} />
+                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-3' : 'h-1'}`} />
+                </span>
+              </button>
+            </Magnet>
+          </div>
 
           {/* Quick Jump Pills */}
           <a
             href="#music"
-            className="px-5 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2"
+            className="px-5 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0"
           >
             <Headphones className="w-3.5 h-3.5 text-purple-400" />
             <span>Music & Lyrics</span>
@@ -142,7 +170,7 @@ export default function HeroSection({
 
           <a
             href="#media"
-            className="px-5 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2"
+            className="px-5 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0"
           >
             <Film className="w-3.5 h-3.5 text-purple-400" />
             <span>Media Archive</span>

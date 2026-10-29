@@ -29,12 +29,19 @@ export const ARTIST_INFO = {
     catalogReleases: "18 Tracks",
     keyMarkets: ["Pittsburgh", "Philadelphia", "New York", "Chicago", "London"]
   },
+  heroSubtitle: "Once Known As Ty Sciullo • Now A Man Unseen",
+  tourBadge: {
+    enabled: true,
+    text: "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS",
+    link: "#tour"
+  },
   neonSign: {
     color: "#a855f7",
     font: "font-display",
     size: "text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]",
     fontWeight: "font-black",
-    flicker: true
+    flicker: true,
+    glowCaption: true
   }
 };
 

@@ -887,6 +887,68 @@ export default function AdminDashboard({ onReturnToSite }) {
               </div>
 
             </div>
+
+            {/* ILLUMINATED CAPTION & ON TOUR BADGE EDIT BOXES */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/[0.08]">
+              {/* Separate Edit Box for Caption below Artist Name */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-mono text-purple-300 font-semibold flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Illuminated Caption Below Artist Name</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-slate-500">Lights up with neon</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Once Known As Ty Sciullo • Now A Man Unseen"
+                  value={artistInfo.heroSubtitle || ''}
+                  onChange={(e) => {
+                    updateData({
+                      artistInfo: {
+                        ...artistInfo,
+                        heroSubtitle: e.target.value
+                      }
+                    });
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Displays centered beneath the main neon title flanked by neon-ionized accent lines.
+                </p>
+              </div>
+
+              {/* Edit Box for On Tour Announcement Badge */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-mono text-emerald-300 font-semibold flex items-center gap-1.5">
+                    <Ticket className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Top "On Tour" Pulsing Badge</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-emerald-400/80">Scrolls to #tour</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"
+                  value={artistInfo.tourBadge?.text || ''}
+                  onChange={(e) => {
+                    updateData({
+                      artistInfo: {
+                        ...artistInfo,
+                        tourBadge: {
+                          ...(artistInfo.tourBadge || {}),
+                          text: e.target.value
+                        }
+                      }
+                    });
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                />
+                <p className="text-[10px] text-slate-400">
+                  The pulsating beacon button at the very top of the hero that directs fans directly to the tour dates.
+                </p>
+              </div>
+            </div>
           </SpotlightCard>
 
           {/* Biography Paragraphs */}

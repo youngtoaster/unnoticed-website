@@ -11,10 +11,12 @@ import { useSiteData } from '../context/DataContext';
 export default function AudioPlayerBar({
   currentTrack,
   isPlaying,
+  isPlayerVisible = false,
   togglePlay,
   onNextTrack,
   onPrevTrack,
-  onSelectTrack
+  onSelectTrack,
+  onClosePlayer
 }) {
   const { artistInfo } = useSiteData();
   const audioRef = useRef(null);
@@ -142,7 +144,7 @@ export default function AudioPlayerBar({
       {/* DESKTOP FLOATING GLASS LYRICS MODAL / DRAWER            */}
       {/* ======================================================== */}
       <AnimatePresence>
-        {desktopLyricsOpen && (
+        {isPlayerVisible && desktopLyricsOpen && (
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -319,7 +321,7 @@ export default function AudioPlayerBar({
       {/* With fluid tab switcher between 'player' & 'lyrics'      */}
       {/* ======================================================== */}
       <AnimatePresence>
-        {isMobileExpanded && (
+        {isPlayerVisible && isMobileExpanded && (
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -341,11 +343,11 @@ export default function AudioPlayerBar({
               </div>
 
               {/* Segmented Control Pill Bar */}
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center p-1 rounded-full bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
                   <button
                     onClick={() => setMobileTab('player')}
-                    className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
+                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
                       mobileTab === 'player' ? 'text-white' : 'text-slate-400'
                     }`}
                   >
@@ -364,7 +366,7 @@ export default function AudioPlayerBar({
 
                   <button
                     onClick={() => setMobileTab('lyrics')}
-                    className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
+                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
                       mobileTab === 'lyrics' ? 'text-white' : 'text-slate-400'
                     }`}
                   >
@@ -382,13 +384,27 @@ export default function AudioPlayerBar({
                   </button>
                 </div>
 
-                <button
-                  onClick={() => setIsMobileExpanded(false)}
-                  className="p-2 rounded-full bg-white/[0.06] text-white active:scale-90"
-                  aria-label="Close"
-                >
-                  <ChevronDown className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setIsMobileExpanded(false)}
+                    className="p-2 rounded-full bg-white/[0.06] text-slate-300 hover:text-white active:scale-90"
+                    aria-label="Minimize Player"
+                    title="Minimize"
+                  >
+                    <ChevronDown className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMobileExpanded(false);
+                      if (onClosePlayer) onClosePlayer();
+                    }}
+                    className="p-2 rounded-full bg-white/[0.08] hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 active:scale-90 border border-white/[0.08]"
+                    aria-label="Close Player"
+                    title="Close Player"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -627,172 +643,203 @@ export default function AudioPlayerBar({
       </AnimatePresence>
 
       {/* ======================================================== */}
-      {/* PERSISTENT FLOATING BOTTOM PLAYER BAR                   */}
-      {/* Compact pill on mobile, full studio control on desktop   */}
+      {/* DYNAMIC ISLAND FLOATING STUDIO PLAYER CAPSULE           */}
+      {/* Sleek luxury obsidian pill with sound reactive aura      */}
+      {/* Only rendered when user plays a track, dismissible with X */}
       {/* ======================================================== */}
       <AnimatePresence>
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 350, damping: 26 }}
-          className="fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-6 sm:right-6 max-w-4xl mx-auto z-30"
-        >
-          <div
-            onClick={(e) => {
-              // On mobile, tapping anywhere in the bar opens the expanded sheet
-              if (window.innerWidth < 768 && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'A') {
-                setIsMobileExpanded(true);
-              }
-            }}
-            className="relative overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0c0d14]/94 backdrop-blur-2xl shadow-2xl shadow-black/85 px-3 py-2 sm:px-6 sm:py-3 cursor-pointer md:cursor-default"
+        {isPlayerVisible && (
+          <motion.div
+            key="dynamic-island-player"
+            initial={{ y: 90, opacity: 0, scale: 0.94 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 90, opacity: 0, scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+            className="fixed bottom-3 left-3 right-3 sm:bottom-5 sm:left-6 sm:right-6 max-w-4xl mx-auto z-40"
           >
-            {/* Top Glowing Audio Progress Track */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-white/[0.08] cursor-pointer group">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 relative transition-all"
-                style={{ width: `${progressPercent}%` }}
-              >
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-md shadow-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <input
-                type="range"
-                min="0"
-                max={duration || 30}
-                step="0.1"
-                value={currentTime}
-                onChange={handleSeek}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                aria-label="Seek audio position"
-              />
-            </div>
+            {/* Ambient neon backdrop backlight */}
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600/30 via-indigo-600/25 to-cyan-500/30 blur-xl -z-10 pointer-events-none" />
 
-            <div className="flex items-center justify-between gap-3">
-              
-              {/* Left: Track Artwork & Info (Tap on mobile opens expanded sheet) */}
-              <div
-                onClick={() => setIsMobileExpanded(true)}
-                className="flex items-center gap-2.5 sm:gap-3 min-w-0 max-w-[200px] sm:max-w-[280px] cursor-pointer"
-              >
-                <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shrink-0 border border-white/[0.1]">
-                  <img
-                    src={currentTrack.cover}
-                    alt={currentTrack.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {isPlaying && (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center">
-                      <Disc3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 animate-spin" />
-                    </div>
-                  )}
+            <div
+              onClick={(e) => {
+                // On mobile, tapping anywhere in the bar opens the expanded sheet
+                if (window.innerWidth < 768 && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'A') {
+                  setIsMobileExpanded(true);
+                }
+              }}
+              className="relative overflow-hidden rounded-2xl sm:rounded-full border border-white/[0.14] bg-[#090a12]/92 backdrop-blur-2xl shadow-2xl shadow-black/90 px-3.5 py-2.5 sm:px-5 sm:py-2.5 cursor-pointer md:cursor-default"
+            >
+              {/* High-Tech Glowing Progress Track */}
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/[0.08] cursor-pointer group">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-cyan-400 relative transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                >
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-md shadow-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1">
-                    <h5 className="font-bold text-white text-xs sm:text-sm truncate">
-                      {currentTrack.title}
-                    </h5>
-                    <span className="hidden sm:inline-flex text-[9px] font-mono px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
-                      30s Preview
-                    </span>
-                  </div>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 truncate">
-                    UNNOTICED {currentTrack.featuring && `(${currentTrack.featuring})`}
-                  </p>
-                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 30}
+                  step="0.1"
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  aria-label="Seek audio position"
+                />
               </div>
 
-              {/* Center: Playback Controls */}
-              <div className="flex items-center gap-1.5 sm:gap-3">
-                <button
-                  onClick={onPrevTrack}
-                  className="hidden xs:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-90 transition-all"
-                  title="Previous Track"
-                >
-                  <SkipBack className="w-3.5 h-3.5 fill-current" />
-                </button>
-
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={togglePlay}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/40 border border-purple-400/30 active:scale-90"
-                  title={isPlaying ? 'Pause' : 'Play'}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white" />
-                  ) : (
-                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white ml-0.5" />
-                  )}
-                </motion.button>
-
-                <button
-                  onClick={onNextTrack}
-                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-90 transition-all"
-                  title="Next Track"
-                >
-                  <SkipForward className="w-3.5 h-3.5 fill-current" />
-                </button>
-
-                {/* Mobile Expand Trigger Pill */}
-                <button
+              <div className="flex items-center justify-between gap-3">
+                
+                {/* Left: Track Artwork & Info + Equalizer */}
+                <div
                   onClick={() => setIsMobileExpanded(true)}
-                  className="md:hidden flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.05] text-purple-300 active:scale-90 ml-1"
-                  title="Expand Player"
+                  className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 max-w-[210px] sm:max-w-[290px] cursor-pointer"
                 >
-                  <ChevronUp className="w-4 h-4" />
-                </button>
-              </div>
+                  <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 border border-white/[0.15] shadow-lg shadow-purple-950/40">
+                    <img
+                      src={currentTrack.cover}
+                      alt={currentTrack.title}
+                      className={`w-full h-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
+                      style={{ animationDuration: '8s' }}
+                    />
+                    <div className="absolute inset-0 rounded-full border border-white/20 pointer-events-none" />
+                    {/* Vinyl Center Hole */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#090a12] border border-white/30" />
+                    </div>
+                  </div>
 
-              {/* Right: Desktop Lyrics Trigger, Volume & Streaming Link */}
-              <div className="hidden md:flex items-center gap-3">
-                {/* Desktop Lyrics Button */}
-                <button
-                  onClick={() => setDesktopLyricsOpen(!desktopLyricsOpen)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
-                    desktopLyricsOpen
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                      : 'bg-white/[0.05] hover:bg-white/[0.1] text-purple-300 border border-purple-500/30'
-                  }`}
-                  title="Toggle Synchronized Lyrics"
-                >
-                  <Quote className="w-3.5 h-3.5" />
-                  <span>Lyrics</span>
-                  {annotatedCount > 0 && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  )}
-                </button>
-
-                {/* Volume slider */}
-                <div className="flex items-center gap-2">
-                  <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors">
-                    {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                  </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                    aria-label="Volume control"
-                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h5 className="font-display font-bold text-white text-xs sm:text-sm truncate">
+                        {currentTrack.title}
+                      </h5>
+                      {isPlaying && (
+                        <span className="flex items-end gap-[2px] h-3 shrink-0">
+                          <span className="w-[2px] h-2.5 bg-purple-400 animate-pulse rounded-full" />
+                          <span className="w-[2px] h-3.5 bg-cyan-400 animate-bounce rounded-full" />
+                          <span className="w-[2px] h-2 bg-purple-300 animate-pulse rounded-full" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[10px] font-mono text-purple-300/80 truncate">
+                        UNNOTICED
+                      </span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/25 shrink-0 hidden xs:inline-block">
+                        30s Studio Preview
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Spotify */}
-                <a
-                  href={currentTrack.spotifyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors"
-                >
-                  <span>Spotify</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
+                {/* Center: Playback Controls */}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <button
+                    onClick={onPrevTrack}
+                    className="hidden xs:flex w-8 h-8 rounded-full items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-90 transition-all"
+                    title="Previous Track"
+                  >
+                    <SkipBack className="w-3.5 h-3.5 fill-current" />
+                  </button>
 
+                  <motion.button
+                    whileTap={{ scale: 0.92 }}
+                    onClick={togglePlay}
+                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-purple-600/40 border border-white/20 active:scale-90"
+                    title={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-4 h-4 fill-white" />
+                    ) : (
+                      <Play className="w-4 h-4 fill-white ml-0.5" />
+                    )}
+                  </motion.button>
+
+                  <button
+                    onClick={onNextTrack}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-90 transition-all"
+                    title="Next Track"
+                  >
+                    <SkipForward className="w-3.5 h-3.5 fill-current" />
+                  </button>
+
+                  {/* Mobile Expand Trigger Pill */}
+                  <button
+                    onClick={() => setIsMobileExpanded(true)}
+                    className="md:hidden flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.06] text-purple-300 active:scale-90 ml-0.5"
+                    title="Expand Player"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Right: Desktop Lyrics Trigger, Volume, Streaming Link, and CLOSE (X) BUTTON */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {/* Desktop Lyrics Button */}
+                  <button
+                    onClick={() => setDesktopLyricsOpen(!desktopLyricsOpen)}
+                    className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                      desktopLyricsOpen
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                        : 'bg-white/[0.05] hover:bg-white/[0.1] text-purple-300 border border-purple-500/30'
+                    }`}
+                    title="Toggle Synchronized Lyrics"
+                  >
+                    <Quote className="w-3.5 h-3.5" />
+                    <span>Lyrics</span>
+                    {annotatedCount > 0 && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    )}
+                  </button>
+
+                  {/* Volume slider (desktop) */}
+                  <div className="hidden lg:flex items-center gap-2">
+                    <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors">
+                      {isMuted || volume === 0 ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                    </button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={isMuted ? 0 : volume}
+                      onChange={handleVolumeChange}
+                      className="w-14 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      aria-label="Volume control"
+                    />
+                  </div>
+
+                  {/* Spotify pill */}
+                  <a
+                    href={currentTrack.spotifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors"
+                  >
+                    <span>Spotify</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+
+                  {/* Dismiss / Close Player Button (Desktop & Mobile) */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onClosePlayer) onClosePlayer();
+                    }}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/15 active:scale-90 transition-all border border-white/[0.08]"
+                    title="Close Player"
+                    aria-label="Close audio player"
+                  >
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
+                </div>
+
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </>
   );

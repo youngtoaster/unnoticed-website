@@ -21,6 +21,7 @@ function AppContent() {
   const { tracks, merchProducts, isAdminAuthenticated } = useSiteData();
   const [currentTrack, setCurrentTrack] = useState(tracks && tracks[0] ? tracks[0] : null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [activeView, setActiveView] = useState('main'); // 'main' | 'epk' | 'admin'
   const [cartOpen, setCartOpen] = useState(false);
   const [adminLoginOpen, setAdminLoginOpen] = useState(false);
@@ -90,12 +91,18 @@ function AppContent() {
   });
 
   const togglePlay = () => {
-    setIsPlaying((prev) => !prev);
+    if (!isPlayerVisible) {
+      setIsPlayerVisible(true);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying((prev) => !prev);
+    }
   };
 
   const onSelectTrack = (track) => {
     setCurrentTrack(track);
     setIsPlaying(true);
+    setIsPlayerVisible(true);
   };
 
   const onNextTrack = () => {
@@ -104,6 +111,7 @@ function AppContent() {
     const nextIndex = (currentIndex + 1) % tracks.length;
     setCurrentTrack(tracks[nextIndex]);
     setIsPlaying(true);
+    setIsPlayerVisible(true);
   };
 
   const onPrevTrack = () => {
@@ -112,6 +120,12 @@ function AppContent() {
     const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
     setCurrentTrack(tracks[prevIndex]);
     setIsPlaying(true);
+    setIsPlayerVisible(true);
+  };
+
+  const handleClosePlayer = () => {
+    setIsPlaying(false);
+    setIsPlayerVisible(false);
   };
 
   // Cart operations
@@ -196,6 +210,7 @@ function AppContent() {
           <Navbar
             currentTrack={currentTrack || tracks[0]}
             isPlaying={isPlaying}
+            isPlayerVisible={isPlayerVisible}
             togglePlay={togglePlay}
             cartCount={cartCount}
             openCart={() => setCartOpen(true)}
@@ -253,15 +268,17 @@ function AppContent() {
             </main>
           )}
 
-          {/* Persistent Floating Studio Audio Player Bar */}
+          {/* Floating Studio Dynamic Island Audio Player Bar (only shown when user selects or plays music) */}
           {currentTrack && (
             <AudioPlayerBar
               currentTrack={currentTrack}
               isPlaying={isPlaying}
+              isPlayerVisible={isPlayerVisible}
               togglePlay={togglePlay}
               onNextTrack={onNextTrack}
               onPrevTrack={onPrevTrack}
               onSelectTrack={onSelectTrack}
+              onClosePlayer={handleClosePlayer}
             />
           )}
 

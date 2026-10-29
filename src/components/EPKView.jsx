@@ -19,8 +19,21 @@ export default function EPKView({ onBackToMain }) {
     message: ''
   });
 
-  const handleDownload = (assetName) => {
-    setDownloadSuccess(assetName);
+  const handleDownload = (asset) => {
+    const name = typeof asset === 'string' ? asset : asset.name;
+    const url = typeof asset === 'object' ? asset.url : null;
+    
+    if (url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name || 'unnoticed-asset';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    setDownloadSuccess(name);
     setTimeout(() => setDownloadSuccess(null), 3000);
   };
 
@@ -144,7 +157,7 @@ export default function EPKView({ onBackToMain }) {
               </div>
 
               <button
-                onClick={() => handleDownload(asset.name)}
+                onClick={() => handleDownload(asset)}
                 className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
               >
                 <Download className="w-3.5 h-3.5" />

@@ -59,11 +59,10 @@ export default function Navbar({
   const navLinks = [
     { num: '01', label: 'Music & Lyrics', href: '#music' },
     { num: '02', label: 'Biography', href: '#bio' },
-    { num: '03', label: 'Videos', href: '#videos' },
+    { num: '03', label: 'Visual Media', href: '#media' },
     { num: '04', label: 'Tour Dates', href: '#tour' },
-    { num: '05', label: 'Merch & Store', href: '#store' },
-    { num: '06', label: 'Visual Gallery', href: '#gallery' },
-    { num: '07', label: 'Social Stream', href: '#social' },
+    { num: '05', label: 'Merch Store', href: '#store' },
+    { num: '06', label: 'Community', href: '#community' },
   ];
 
   const handleNavClick = (href) => {

@@ -29,19 +29,19 @@ export default function SocialFeedSection() {
   };
 
   return (
-    <section id="social" className="relative py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <section id="community" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-300 text-xs font-mono mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
             <InstagramIcon className="w-3.5 h-3.5" /> LIVE COMMUNITY DISPATCH
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-black text-white tracking-tight">
-            SOCIAL STREAM & REELS
+          <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
+            SOCIAL REELS & DISPATCH
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-xl">
-            Live updates, studio teasers, and fan interactions synced from Instagram and TikTok.
+          <p className="text-slate-400 text-xs sm:text-base mt-2 max-w-xl">
+            Live updates, studio teasers, and fan interactions synced directly from Instagram and TikTok.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export default function SocialFeedSection() {
             href={info.socials?.instagram || '#'}
             target="_blank"
             rel="noreferrer"
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-pink-600/25 transition-all"
+            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-purple-600/25 transition-all active:scale-95"
           >
             <InstagramIcon className="w-4 h-4" />
             <span>@unnoticedmusic</span>
@@ -59,7 +59,7 @@ export default function SocialFeedSection() {
       </div>
 
       {/* Social Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {posts.map((post) => {
           const isLiked = likesState[post.id]?.liked;
           const currentCount = likesState[post.id]?.count.toLocaleString();
@@ -67,9 +67,9 @@ export default function SocialFeedSection() {
           return (
             <SpotlightCard
               key={post.id}
-              tilt={true}
-              spotlightColor="rgba(236, 72, 153, 0.16)"
-              className="p-5 flex flex-col justify-between group"
+              tilt={false}
+              spotlightColor="rgba(168, 85, 247, 0.16)"
+              className="p-4 sm:p-5 flex flex-col justify-between group"
             >
               <div>
                 

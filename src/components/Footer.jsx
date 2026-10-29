@@ -61,11 +61,11 @@ export default function Footer({ onOpenEPK, onOpenAdmin }) {
         <div className="flex flex-wrap gap-x-8 gap-y-3 text-xs font-medium text-slate-300">
           <a href="#music" className="hover:text-purple-300 transition-colors">Music & Lyrics</a>
           <a href="#bio" className="hover:text-purple-300 transition-colors">Artist Bio</a>
-          <a href="#videos" className="hover:text-purple-300 transition-colors">Videos</a>
+          <a href="#media" className="hover:text-purple-300 transition-colors">Media Archive</a>
           <a href="#tour" className="hover:text-purple-300 transition-colors">Tour Dates</a>
           <a href="#store" className="hover:text-purple-300 transition-colors">Official Merch</a>
-          <a href="#gallery" className="hover:text-purple-300 transition-colors">Gallery</a>
-          <button onClick={onOpenEPK} className="text-cyan-300 hover:text-cyan-200 transition-colors font-semibold">
+          <a href="#community" className="hover:text-purple-300 transition-colors">Community</a>
+          <button onClick={onOpenEPK} className="text-purple-300 hover:text-white transition-colors font-semibold cursor-pointer">
             EPK & Booking
           </button>
         </div>

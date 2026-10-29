@@ -5,10 +5,9 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import MusicSection from './components/MusicSection';
 import BioSection from './components/BioSection';
-import VideoSection from './components/VideoSection';
+import MediaSection from './components/MediaSection';
 import TourSection from './components/TourSection';
 import MerchSection from './components/MerchSection';
-import GallerySection from './components/GallerySection';
 import SocialFeedSection from './components/SocialFeedSection';
 import MailingListSection from './components/MailingListSection';
 import AudioPlayerBar from './components/AudioPlayerBar';
@@ -224,8 +223,8 @@ function AppContent() {
               {/* 3. Bio: McKees Rocks Roots, Ty Sciullo Era, Rebirth into Unnoticed */}
               <BioSection />
 
-              {/* 4. Videos: Two-Column YouTube Showcase & Channel Subscription Banner */}
-              <VideoSection />
+              {/* 4. Visual & Media Archive: Combined Videos & Photography Gallery */}
+              <MediaSection />
 
               {/* 5. Tour Dates: Schedule, VIP Tickets, Past Tour Archive & RSVP */}
               <TourSection />
@@ -241,13 +240,8 @@ function AppContent() {
                 cartTotal={cartTotal}
               />
 
-              {/* 7. Gallery: Full-Width Slideshow Carousel with Navigation & Fullscreen Lightbox */}
-              <GallerySection />
-
-              {/* 8. Social Feed: Live Instagram & TikTok Reel Cards with Sound Tags */}
+              {/* 7. Community: Social Feed & Newsletter Syndicate */}
               <SocialFeedSection />
-
-              {/* 9. Mailing List: Newsletter Capture linked to marketing service */}
               <MailingListSection />
             </main>
           ) : (

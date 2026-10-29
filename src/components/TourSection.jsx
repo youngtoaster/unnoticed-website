@@ -28,12 +28,12 @@ export default function TourSection() {
     <section id="tour" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
       
       {/* Background ambient lighting */}
-      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[320px] sm:w-[600px] h-[250px] sm:h-[300px] bg-cyan-600/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
+      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[320px] sm:w-[600px] h-[250px] sm:h-[300px] bg-purple-600/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-mono mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
             <Ticket className="w-3.5 h-3.5" /> LIVE EXPERIENCES
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
@@ -51,7 +51,7 @@ export default function TourSection() {
               onClick={() => setActiveTab('upcoming')}
               className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 activeTab === 'upcoming'
-                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -61,7 +61,7 @@ export default function TourSection() {
               onClick={() => setActiveTab('past')}
               className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 activeTab === 'past'
-                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -71,7 +71,7 @@ export default function TourSection() {
 
           <button
             onClick={() => setShowRsvpModal(true)}
-            className="px-3.5 sm:px-4 py-2.5 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-cyan-300 border border-cyan-500/30 transition-colors flex items-center gap-1.5 active:scale-95"
+            className="px-3.5 sm:px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-purple-300 border border-purple-500/30 transition-colors flex items-center gap-1.5 active:scale-95"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Request City</span>
@@ -158,7 +158,7 @@ export default function TourSection() {
                       href={show.ticketLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-500/25 transition-all active:scale-95"
+                      className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/30 transition-all active:scale-95"
                     >
                       <span>Tickets</span>
                       <ExternalLink className="w-3.5 h-3.5" />

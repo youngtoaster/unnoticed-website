@@ -5,13 +5,14 @@ import {
   ArrowLeft, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
-  Zap, Palette, Type
+  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import MediaUploadOrLink from './MediaUploadOrLink';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
+import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
 import NeonSign from './ui/NeonSign';
 
 export default function AdminDashboard({ onReturnToSite }) {
@@ -25,6 +26,12 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [toastMessage, setToastMessage] = useState(null);
   const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [previewIlluminated, setPreviewIlluminated] = useState(false);
+  const [isFetchingMeta, setIsFetchingMeta] = useState(false);
+  const [metaFeedback, setMetaFeedback] = useState(null);
+  const [quickLinkInput, setQuickLinkInput] = useState('');
+  const [quickLinkResult, setQuickLinkResult] = useState(null);
+  const [isQuickFetching, setIsQuickFetching] = useState(false);
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -32,6 +39,121 @@ export default function AdminDashboard({ onReturnToSite }) {
     size: 'text-5xl xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]',
     fontWeight: 'font-black',
     flicker: true
+  };
+
+  const backdrop = artistInfo?.heroBackdrop || {
+    enabled: true,
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+    blur: 6,
+    blurEnabled: true,
+    opacity: 45,
+    zoom: 105,
+    positionX: 50,
+    positionY: 45,
+    scope: "title",
+    blendMode: "screen",
+    vignette: true,
+    illuminateOnGlow: true,
+    glowIntensity: 85
+  };
+
+  const updateBackdrop = (partial) => {
+    updateData({
+      artistInfo: {
+        ...artistInfo,
+        heroBackdrop: {
+          ...(artistInfo.heroBackdrop || backdrop),
+          ...partial
+        }
+      }
+    });
+  };
+
+  // Quick universal link metadata fetcher
+  const handleQuickLinkExtract = async (urlToFetch) => {
+    const targetUrl = urlToFetch || quickLinkInput;
+    if (!targetUrl || !targetUrl.trim()) {
+      showToast('Please enter a link to fetch metadata');
+      return;
+    }
+    setIsQuickFetching(true);
+    setQuickLinkResult(null);
+    try {
+      const res = await fetchMediaMetadata(targetUrl.trim());
+      if (res && res.success) {
+        setQuickLinkResult(res);
+        showToast(`Pulled metadata: ${res.title}`);
+      } else {
+        showToast(res.error || 'Could not pull metadata from link');
+      }
+    } catch (e) {
+      showToast('Error pulling metadata');
+    } finally {
+      setIsQuickFetching(false);
+    }
+  };
+
+  const handleAutoFetchVideoInModal = async (url) => {
+    if (!url || !url.trim()) return;
+    setIsFetchingMeta(true);
+    setMetaFeedback(null);
+    try {
+      const res = await fetchMediaMetadata(url.trim());
+      if (res && res.success) {
+        setEditingItem((prev) => ({
+          ...prev,
+          data: {
+            ...prev.data,
+            title: res.title || prev.data.title,
+            category: res.category || prev.data.category || 'Music Video',
+            duration: res.duration || prev.data.duration,
+            views: res.views || prev.data.views,
+            description: res.description || prev.data.description,
+            thumbnail: res.thumbnail || prev.data.thumbnail,
+            youtubeEmbedId: res.embedId || res.videoId || prev.data.youtubeEmbedId
+          }
+        }));
+        setMetaFeedback('✓ Video metadata pulled & auto-updated! All fields below are fully editable.');
+        showToast('Auto-fetched video metadata');
+      } else {
+        setMetaFeedback(res.error || 'Could not fetch metadata from link');
+      }
+    } catch (err) {
+      setMetaFeedback('Failed to pull link metadata');
+    } finally {
+      setIsFetchingMeta(false);
+    }
+  };
+
+  const handleAutoFetchTrackInModal = async (url) => {
+    if (!url || !url.trim()) return;
+    setIsFetchingMeta(true);
+    setMetaFeedback(null);
+    try {
+      const res = await fetchMediaMetadata(url.trim());
+      if (res && res.success) {
+        setEditingItem((prev) => ({
+          ...prev,
+          data: {
+            ...prev.data,
+            title: res.title || prev.data.title,
+            featuring: res.artist && res.artist !== 'UNNOTICED' ? `feat. ${res.artist}` : (prev.data.featuring || ''),
+            duration: res.duration || prev.data.duration,
+            cover: res.thumbnail || res.cover || prev.data.cover,
+            spotifyUrl: res.spotifyUrl || prev.data.spotifyUrl || url,
+            description: res.description || prev.data.description
+          }
+        }));
+        setMetaFeedback('✓ Track metadata pulled & auto-updated! All fields below are fully editable.');
+        showToast('Auto-fetched track metadata');
+      } else {
+        setMetaFeedback(res.error || 'Could not fetch metadata from link');
+      }
+    } catch (err) {
+      setMetaFeedback('Failed to pull link metadata');
+    } finally {
+      setIsFetchingMeta(false);
+    }
   };
 
   const showToast = (msg) => {
@@ -300,13 +422,136 @@ export default function AdminDashboard({ onReturnToSite }) {
                     ]
                   }
                 });
+                setMetaFeedback(null);
               }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Track</span>
             </button>
           </div>
+
+          {/* Quick Track Auto-Pull from Link */}
+          <SpotlightCard className="p-4 sm:p-5 border-purple-500/30 bg-purple-950/20" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-bold text-sm text-white">
+                  Smart Track Metadata Auto-Fetcher
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                  Spotify • SoundCloud • Direct Audio
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                Pulls Title, Artist, Cover Artwork & Duration
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                placeholder="Paste any Spotify track URL, SoundCloud link, or audio file..."
+                value={quickLinkInput}
+                onChange={(e) => setQuickLinkInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleQuickLinkExtract();
+                }}
+                className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/[0.12] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+              />
+              <button
+                type="button"
+                disabled={isQuickFetching}
+                onClick={() => handleQuickLinkExtract()}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                {isQuickFetching ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-200" />
+                    <span>Pulling Metadata...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Auto-Pull Details</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Quick Preview Card if extracted */}
+            {quickLinkResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3.5 p-3.5 rounded-xl bg-black/80 border border-purple-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left"
+              >
+                <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                  {(quickLinkResult.thumbnail || quickLinkResult.cover) && (
+                    <img
+                      src={quickLinkResult.thumbnail || quickLinkResult.cover}
+                      alt="Preview"
+                      className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h5 className="font-bold text-xs text-white truncate">{quickLinkResult.title}</h5>
+                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 uppercase">
+                        {quickLinkResult.provider}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      {quickLinkResult.duration} • {quickLinkResult.artist || quickLinkResult.author}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingItem({
+                        type: 'track',
+                        isNew: true,
+                        data: {
+                          id: `track-${Date.now()}`,
+                          title: quickLinkResult.title,
+                          featuring: quickLinkResult.artist && quickLinkResult.artist !== 'UNNOTICED' ? `feat. ${quickLinkResult.artist}` : '',
+                          type: 'Single',
+                          duration: quickLinkResult.duration || '3:00',
+                          releaseYear: new Date().getFullYear().toString(),
+                          previewAudio: 'https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8',
+                          cover: quickLinkResult.cover || quickLinkResult.thumbnail || artistInfo.avatar,
+                          spotifyUrl: quickLinkResult.spotifyUrl || quickLinkInput,
+                          appleMusicUrl: artistInfo.socials?.appleMusic || 'https://music.apple.com',
+                          deezerUrl: 'https://deezer.com',
+                          description: quickLinkResult.description || 'Studio recording mastered by UNNOTICED.',
+                          lyrics: [
+                            { text: 'New lyric verse bar one...', annotated: false },
+                            { text: 'Annotated punchline with meaning...', annotated: true, annotation: { author: 'UNNOTICED', badge: 'Verified Artist', content: 'Story behind the verse.' } }
+                          ]
+                        }
+                      });
+                      setQuickLinkResult(null);
+                      setQuickLinkInput('');
+                    }}
+                    className="px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Import to Discography</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuickLinkResult(null)}
+                    className="p-2 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </SpotlightCard>
 
           <div className="space-y-3">
             {tracks.map((track, idx) => (
@@ -951,6 +1196,459 @@ export default function AdminDashboard({ onReturnToSite }) {
             </div>
           </SpotlightCard>
 
+          {/* ======================================================== */}
+          {/* ARTIST TITLE & HERO BACKDROP ILLUMINATION STUDIO         */}
+          {/* Live visualizer, crop, zoom, blur %, and glow reveal     */}
+          {/* ======================================================== */}
+          <SpotlightCard className="p-6 space-y-6" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <h3 className="font-display text-lg font-bold text-white">
+                    Artist Title & Hero Backdrop Illumination Studio
+                  </h3>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                    Live Visualizer & Crop
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Place custom imagery behind the neon artist title. Configure crop zoom, focal alignment, blur percentage, and dynamic neon light reveal.
+                </p>
+              </div>
+
+              {/* Master Enable/Disable Switch */}
+              <label className="flex items-center gap-2 cursor-pointer bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-white/[0.08] self-start sm:self-auto hover:bg-white/[0.08] transition-colors">
+                <input
+                  type="checkbox"
+                  checked={backdrop.enabled ?? true}
+                  onChange={(e) => {
+                    updateBackdrop({ enabled: e.target.checked });
+                    showToast(e.target.checked ? 'Backdrop image enabled' : 'Backdrop image disabled');
+                  }}
+                  className="rounded accent-purple-500 w-4 h-4"
+                />
+                <span className="text-xs font-semibold text-white">
+                  {backdrop.enabled ? 'Backdrop Active' : 'Backdrop Disabled'}
+                </span>
+              </label>
+            </div>
+
+            {/* INTERACTIVE LIVE VISUALIZER PREVIEW */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono text-purple-300 font-semibold flex items-center gap-1.5">
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Real-Time Visualizer (Live Crop, Blur & Illumination)</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreviewIlluminated(true);
+                    setTimeout(() => setPreviewIlluminated(false), 2600);
+                  }}
+                  className="px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-mono text-[11px] font-bold shadow-md hover:brightness-110 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  title="Test the neon glow light-up reveal effect"
+                >
+                  <Zap className="w-3 h-3 text-amber-300" />
+                  <span>⚡ Test Glow Illumination Reveal</span>
+                </button>
+              </div>
+
+              {/* Scaled Preview Frame */}
+              <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/[0.14] bg-[#07080d] flex items-center justify-center shadow-2xl">
+                {/* Ambient Room Darkness */}
+                <div className="absolute inset-0 bg-radial from-purple-950/25 via-transparent to-black pointer-events-none" />
+
+                {/* The Configured Backdrop Image in Preview */}
+                {backdrop.enabled && backdrop.image ? (
+                  <motion.div
+                    animate={
+                      previewIlluminated && (backdrop.illuminateOnGlow ?? true)
+                        ? {
+                            opacity: [(backdrop.opacity ?? 45) / 100, 0.95, (backdrop.opacity ?? 45) / 100],
+                            filter: [
+                              `brightness(0.3) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                              `brightness(1.45) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                              `brightness(1.05) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`
+                            ],
+                            scale: [1, 1.02, 1]
+                          }
+                        : {
+                            opacity: (backdrop.opacity ?? 45) / 100,
+                            filter: `brightness(1) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                            scale: 1
+                          }
+                    }
+                    transition={{ duration: 0.9, ease: 'easeOut' }}
+                    className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
+                    style={{
+                      maskImage: backdrop.vignette
+                        ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.5) 65%, transparent 95%)'
+                        : 'none',
+                      WebkitMaskImage: backdrop.vignette
+                        ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.5) 65%, transparent 95%)'
+                        : 'none',
+                    }}
+                  >
+                    <img
+                      src={backdrop.image}
+                      alt="Hero Backdrop Preview"
+                      className="w-full h-full object-cover transition-all"
+                      style={{
+                        objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
+                        transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                        mixBlendMode: backdrop.blendMode || 'screen',
+                      }}
+                    />
+
+                    {/* Neon Light Wash when illuminated */}
+                    {(previewIlluminated || (backdrop.illuminateOnGlow ?? true)) && (
+                      <div
+                        className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
+                          previewIlluminated ? 'opacity-100' : 'opacity-40'
+                        }`}
+                        style={{
+                          background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}45 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
+                          mixBlendMode: 'color-dodge'
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                ) : (
+                  <div className="text-center text-slate-500 font-mono text-xs p-6">
+                    No backdrop image selected. Upload a file or paste an image link below.
+                  </div>
+                )}
+
+                {/* Overlaid Neon Title in Preview */}
+                <div className="relative z-10 text-center select-none pointer-events-none px-4">
+                  <h1
+                    className="font-display font-black text-4xl sm:text-6xl tracking-tight uppercase"
+                    style={{
+                      color: '#ffffff',
+                      textShadow: previewIlluminated
+                        ? `0 0 8px #ffffff, 0 0 25px ${neonConfig.color || '#a855f7'}, 0 0 60px ${neonConfig.color || '#a855f7'}`
+                        : `0 0 4px #ffffff, 0 0 15px ${neonConfig.color || '#a855f7'}`
+                    }}
+                  >
+                    {artistInfo.name || 'UNNOTICED'}
+                  </h1>
+                  <p
+                    className="text-[10px] font-mono tracking-widest uppercase mt-1 font-bold text-slate-200"
+                    style={{
+                      textShadow: `0 0 6px ${neonConfig.color || '#a855f7'}`
+                    }}
+                  >
+                    {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
+                  </p>
+
+                  {previewIlluminated && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono text-amber-300 font-bold"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Neon Glow Illuminating & Revealing Background Image</span>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Floating Status Pill in Preview */}
+                <div className="absolute bottom-3 left-3 flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300">
+                  <span>Zoom: {backdrop.zoom ?? 105}%</span>
+                  <span>•</span>
+                  <span>Focal: {backdrop.positionX ?? 50}%x, {backdrop.positionY ?? 45}%y</span>
+                  <span>•</span>
+                  <span>Blur: {backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Off'}</span>
+                  <span>•</span>
+                  <span>Reveal: {backdrop.illuminateOnGlow ? 'ON' : 'OFF'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* SETTINGS CONTROLS GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+              
+              {/* Left Column: Image Source & Upload */}
+              <div className="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>1. Image Source & Upload</span>
+                </h4>
+
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                    Image URL or Local Upload
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://images.unsplash.com/... or paste link"
+                      value={backdrop.image || ''}
+                      onChange={(e) => updateBackdrop({ image: e.target.value })}
+                      className="flex-1 px-3 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                    />
+                    <label className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload File</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            if (ev.target?.result) {
+                              updateBackdrop({ image: ev.target.result });
+                              showToast('Uploaded backdrop image');
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Framing Scope */}
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Framing Scope</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => updateBackdrop({ scope: 'title' })}
+                      className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+                        (backdrop.scope ?? 'title') === 'title'
+                          ? 'bg-purple-600 text-white border-purple-500 shadow-md'
+                          : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      Framed Behind Artist Title
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateBackdrop({ scope: 'hero' })}
+                      className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+                        backdrop.scope === 'hero'
+                          ? 'bg-purple-600 text-white border-purple-500 shadow-md'
+                          : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      Full Hero Section
+                    </button>
+                  </div>
+                </div>
+
+                {/* Blend Mode & Vignette */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-mono text-slate-400 block mb-1">Blend Mode</label>
+                    <select
+                      value={backdrop.blendMode || 'screen'}
+                      onChange={(e) => updateBackdrop({ blendMode: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-[#12131f] border border-white/[0.1] text-xs text-white focus:outline-none"
+                    >
+                      <option value="screen">Screen (Luminous)</option>
+                      <option value="overlay">Overlay (High Contrast)</option>
+                      <option value="soft-light">Soft Light (Subtle)</option>
+                      <option value="luminosity">Luminosity (Monochrome)</option>
+                      <option value="normal">Normal</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-mono text-slate-400 block mb-1">Edge Vignette</label>
+                    <label className="flex items-center gap-2 h-9 px-3 rounded-xl bg-black/40 border border-white/[0.1] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={backdrop.vignette ?? true}
+                        onChange={(e) => updateBackdrop({ vignette: e.target.checked })}
+                        className="rounded accent-purple-500 w-3.5 h-3.5"
+                      />
+                      <span className="text-xs text-slate-200">Feathered Edges</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Illumination Reveal, Blur %, Crop & Opacity */}
+              <div className="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>2. Glow Illumination, Blur & Crop Settings</span>
+                </h4>
+
+                {/* Glow Illumination Reveal Toggle (Requested by User) */}
+                <div className="p-3 rounded-xl bg-purple-950/25 border border-purple-500/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={backdrop.illuminateOnGlow ?? true}
+                        onChange={(e) => updateBackdrop({ illuminateOnGlow: e.target.checked })}
+                        className="rounded accent-purple-500 w-4 h-4"
+                      />
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Zap className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Illuminate Image on Neon Title Glow</span>
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                      {backdrop.illuminateOnGlow ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-300 font-light leading-relaxed">
+                    When turned on, the neon sign strikes on and casts physical neon bloom onto the background image, revealing it through the light!
+                  </p>
+                </div>
+
+                {/* Blur Percentage Setting & On/Off Toggle (Requested by User) */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={backdrop.blurEnabled ?? true}
+                        onChange={(e) => updateBackdrop({ blurEnabled: e.target.checked })}
+                        className="rounded accent-purple-500 w-3.5 h-3.5"
+                      />
+                      <span className="text-[11px] font-mono text-slate-300">
+                        Blur Filter: <strong className="text-white">{backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Disabled'}</strong>
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono text-slate-500">0% (Sharp) - 100% (Abstract)</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    disabled={!backdrop.blurEnabled}
+                    value={backdrop.blur ?? 6}
+                    onChange={(e) => updateBackdrop({ blur: parseInt(e.target.value, 10) })}
+                    className="w-full accent-purple-500 cursor-pointer disabled:opacity-30"
+                  />
+                </div>
+
+                {/* Opacity Slider */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
+                    <span>Backdrop Opacity: <strong className="text-white">{backdrop.opacity ?? 45}%</strong></span>
+                    <span className="text-[10px] text-slate-500">0% (Invisible) - 100% (Solid)</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={backdrop.opacity ?? 45}
+                    onChange={(e) => updateBackdrop({ opacity: parseInt(e.target.value, 10) })}
+                    className="w-full accent-purple-500 cursor-pointer"
+                  />
+                </div>
+
+                {/* Crop & Zoom Scale Slider */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
+                    <span className="flex items-center gap-1">
+                      <Crop className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Crop Zoom / Scale: <strong className="text-white">{backdrop.zoom ?? 105}%</strong></span>
+                    </span>
+                    <span className="text-[10px] text-slate-500">100% (Full) - 250% (Tight)</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="100"
+                    max="250"
+                    step="5"
+                    value={backdrop.zoom ?? 105}
+                    onChange={(e) => updateBackdrop({ zoom: parseInt(e.target.value, 10) })}
+                    className="w-full accent-purple-500 cursor-pointer"
+                  />
+                </div>
+
+                {/* Focal Position X & Y */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
+                      <span>Focal Point X ({backdrop.positionX ?? 50}%)</span>
+                    </div>
+                    <div className="flex gap-1 mb-1">
+                      {[
+                        { label: 'Left', val: 15 },
+                        { label: 'Center', val: 50 },
+                        { label: 'Right', val: 85 }
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => updateBackdrop({ positionX: preset.val })}
+                          className={`flex-1 py-1 text-[9px] font-mono rounded ${
+                            (backdrop.positionX ?? 50) === preset.val
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={backdrop.positionX ?? 50}
+                      onChange={(e) => updateBackdrop({ positionX: parseInt(e.target.value, 10) })}
+                      className="w-full accent-purple-500 cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
+                      <span>Focal Point Y ({backdrop.positionY ?? 45}%)</span>
+                    </div>
+                    <div className="flex gap-1 mb-1">
+                      {[
+                        { label: 'Top', val: 15 },
+                        { label: 'Center', val: 50 },
+                        { label: 'Bottom', val: 85 }
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => updateBackdrop({ positionY: preset.val })}
+                          className={`flex-1 py-1 text-[9px] font-mono rounded ${
+                            (backdrop.positionY ?? 45) === preset.val
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={backdrop.positionY ?? 45}
+                      onChange={(e) => updateBackdrop({ positionY: parseInt(e.target.value, 10) })}
+                      className="w-full accent-purple-500 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </SpotlightCard>
+
           {/* Biography Paragraphs */}
           <SpotlightCard className="p-6 space-y-4" tilt={false}>
             <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
@@ -1059,18 +1757,135 @@ export default function AdminDashboard({ onReturnToSite }) {
                     views: 'New Release',
                     description: '',
                     type: 'youtube',
-                    youtubeEmbedId: 'dQw4w9WgXcQ',
+                    youtubeEmbedId: '',
                     videoUrl: '',
                     thumbnail: artistInfo?.avatar || ''
                   }
                 });
+                setMetaFeedback(null);
               }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add Video to Showcase</span>
             </button>
           </div>
+
+          {/* Quick Link Metadata Auto-Fetcher Banner */}
+          <SpotlightCard className="p-4 sm:p-5 border-purple-500/30 bg-purple-950/20" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-bold text-sm text-white">
+                  Smart Link Metadata Auto-Fetcher
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                  YouTube • Spotify • SoundCloud
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                Auto-extracts Title, HD Thumbnail, Duration, Views & Metadata
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                placeholder="Paste any YouTube video, visualizer, Spotify, or SoundCloud link..."
+                value={quickLinkInput}
+                onChange={(e) => setQuickLinkInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleQuickLinkExtract();
+                }}
+                className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/[0.12] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+              />
+              <button
+                type="button"
+                disabled={isQuickFetching}
+                onClick={() => handleQuickLinkExtract()}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                {isQuickFetching ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-200" />
+                    <span>Pulling Metadata...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Auto-Pull Details</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Quick Preview Card if extracted */}
+            {quickLinkResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3.5 p-3.5 rounded-xl bg-black/80 border border-purple-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left"
+              >
+                <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                  {quickLinkResult.thumbnail && (
+                    <img
+                      src={quickLinkResult.thumbnail}
+                      alt="Preview"
+                      className="w-16 h-11 object-cover rounded-lg border border-white/20 shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h5 className="font-bold text-xs text-white truncate">{quickLinkResult.title}</h5>
+                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 uppercase">
+                        {quickLinkResult.provider}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      {quickLinkResult.duration} • {quickLinkResult.views || 'Verified'} • {quickLinkResult.author}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingItem({
+                        type: 'video',
+                        isNew: true,
+                        data: {
+                          id: `vid-${Date.now()}`,
+                          title: quickLinkResult.title,
+                          category: quickLinkResult.category || 'Music Video',
+                          duration: quickLinkResult.duration || '3:30',
+                          views: quickLinkResult.views || '340K views',
+                          description: quickLinkResult.description || '',
+                          type: 'youtube',
+                          youtubeEmbedId: quickLinkResult.embedId || quickLinkResult.videoId || quickLinkInput,
+                          videoUrl: quickLinkResult.videoUrl || '',
+                          thumbnail: quickLinkResult.thumbnail || artistInfo?.avatar
+                        }
+                      });
+                      setQuickLinkResult(null);
+                      setQuickLinkInput('');
+                    }}
+                    className="px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Import as Music Video</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuickLinkResult(null)}
+                    className="p-2 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </SpotlightCard>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {videos.map((vid, idx) => {
@@ -1700,6 +2515,41 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </button>
               </div>
 
+              {/* Quick Metadata Auto-Pull from Link */}
+              <div className="p-3.5 rounded-2xl bg-purple-950/20 border border-purple-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-mono text-purple-300 font-semibold flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Auto-Pull Track Metadata from Link (Spotify / SoundCloud / YouTube)</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-slate-400">Auto-fills Title, Artist, Cover, Duration</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Paste Spotify track, SoundCloud, or YouTube link..."
+                    value={editingItem.data.spotifyUrl || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, spotifyUrl: e.target.value } })}
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                  <button
+                    type="button"
+                    disabled={isFetchingMeta}
+                    onClick={() => handleAutoFetchTrackInModal(editingItem.data.spotifyUrl)}
+                    className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    {isFetchingMeta ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-300" />}
+                    <span>Pull Details</span>
+                  </button>
+                </div>
+                {metaFeedback && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[11px] font-mono text-emerald-400 flex items-center gap-1 pt-0.5">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{metaFeedback}</span>
+                  </motion.p>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
                   <label className="text-[11px] font-mono text-slate-400 block mb-1">Track Title</label>
@@ -1860,25 +2710,53 @@ export default function AdminDashboard({ onReturnToSite }) {
               {/* YouTube Input or Video Upload */}
               {editingItem.data.type !== 'upload' ? (
                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-3">
-                  <label className="text-[11px] font-mono text-slate-400 block mb-1">YouTube URL or Video ID</label>
-                  <input
-                    type="text"
-                    placeholder="https://www.youtube.com/watch?v=... or ID"
-                    value={editingItem.data.youtubeEmbedId || ''}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      const extracted = extractYouTubeId(raw);
-                      setEditingItem({
-                        ...editingItem,
-                        data: {
-                          ...editingItem.data,
-                          youtubeEmbedId: raw,
-                          thumbnail: extracted ? getYouTubeThumbnail(extracted) : editingItem.data.thumbnail
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-mono text-slate-400">YouTube URL or Video Link</label>
+                    <span className="text-[10px] font-mono text-purple-300">Auto-fetches title, duration, views & thumbnail</span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://www.youtube.com/watch?v=... or youtu.be/..."
+                      value={editingItem.data.youtubeEmbedId || ''}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const extracted = extractYouTubeId(raw);
+                        setEditingItem({
+                          ...editingItem,
+                          data: {
+                            ...editingItem.data,
+                            youtubeEmbedId: raw,
+                            thumbnail: extracted ? getYouTubeThumbnail(extracted) : editingItem.data.thumbnail
+                          }
+                        });
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value && (e.target.value.includes('http') || e.target.value.includes('youtu'))) {
+                          handleAutoFetchVideoInModal(e.target.value);
                         }
-                      });
-                    }}
-                    className="w-full px-3.5 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-red-500 font-mono"
-                  />
+                      }}
+                      className="flex-1 px-3.5 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-red-500 font-mono"
+                    />
+                    <button
+                      type="button"
+                      disabled={isFetchingMeta}
+                      onClick={() => handleAutoFetchVideoInModal(editingItem.data.youtubeEmbedId)}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      {isFetchingMeta ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-300" />}
+                      <span>Auto-Fetch Details</span>
+                    </button>
+                  </div>
+
+                  {metaFeedback && (
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{metaFeedback}</span>
+                    </motion.p>
+                  )}
+
                   {extractYouTubeId(editingItem.data.youtubeEmbedId || '') && (
                     <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" /> Resolved ID: {extractYouTubeId(editingItem.data.youtubeEmbedId)}
@@ -1894,9 +2772,9 @@ export default function AdminDashboard({ onReturnToSite }) {
                 />
               )}
 
-              {/* Metadata Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
+              {/* Metadata Fields (Fully Editable) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-3">
                   <label className="text-[11px] font-mono text-slate-400 block mb-1">Video Title</label>
                   <input
                     type="text"
@@ -1928,6 +2806,17 @@ export default function AdminDashboard({ onReturnToSite }) {
                     type="text"
                     value={editingItem.data.duration || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, duration: e.target.value } })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Views Display</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 340K views"
+                    value={editingItem.data.views || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, views: e.target.value } })}
                     className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
                   />
                 </div>

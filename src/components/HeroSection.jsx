@@ -27,6 +27,26 @@ export default function HeroSection({
     flicker: true
   };
 
+  const backdrop = artistInfo?.heroBackdrop || {
+    enabled: true,
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+    blur: 6,
+    blurEnabled: true,
+    opacity: 45,
+    zoom: 105,
+    positionX: 50,
+    positionY: 45,
+    scope: "title",
+    blendMode: "screen",
+    vignette: true,
+    illuminateOnGlow: true,
+    glowIntensity: 85
+  };
+
+  const isIlluminated = backdrop.illuminateOnGlow ?? true;
+  const targetOpacity = (backdrop.opacity ?? 45) / 100;
+  const blurAmount = backdrop.blurEnabled ? `${(backdrop.blur ?? 6) * 0.4}px` : '0px';
+
   return (
     <section className="relative min-h-[90vh] pt-28 sm:pt-36 pb-16 sm:pb-24 flex flex-col justify-center items-center px-4 sm:px-6 overflow-hidden">
       
@@ -61,8 +81,64 @@ export default function HeroSection({
           <ArrowRight className="w-3.5 h-3.5 text-purple-300 group-hover:translate-x-0.5 transition-transform" />
         </motion.a>
 
-        {/* Main Kinetic Title with Planes Neon Sign */}
+        {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
         <div className="relative mb-4 sm:mb-6 w-full flex flex-col items-center justify-center">
+
+          {/* BACKDROP IMAGE BEHIND ARTIST TITLE / HERO */}
+          {backdrop.enabled && backdrop.image && (
+            <motion.div
+              initial={isIlluminated ? { opacity: 0.1, scale: 0.98 } : { opacity: targetOpacity }}
+              animate={isIlluminated ? {
+                opacity: [0.1, targetOpacity * 1.35, targetOpacity],
+                scale: 1,
+                filter: [`brightness(0.35) blur(${blurAmount})`, `brightness(1.3) blur(${blurAmount})`, `brightness(1.05) blur(${blurAmount})`]
+              } : {
+                opacity: targetOpacity,
+                filter: `brightness(1) blur(${blurAmount})`
+              }}
+              transition={{
+                delay: isIlluminated ? 0.28 : 0,
+                duration: isIlluminated ? 0.85 : 0.4,
+                ease: 'easeOut'
+              }}
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden ${
+                backdrop.scope === 'hero'
+                  ? 'fixed inset-0 w-screen h-screen'
+                  : 'w-full max-w-5xl h-[300px] sm:h-[420px] md:h-[500px] rounded-3xl'
+              }`}
+              style={{
+                maskImage: backdrop.vignette
+                  ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                  : 'none',
+                WebkitMaskImage: backdrop.vignette
+                  ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                  : 'none',
+              }}
+            >
+              <img
+                src={backdrop.image}
+                alt="Artist Title Backdrop"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out"
+                style={{
+                  objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
+                  transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                  mixBlendMode: backdrop.blendMode || 'screen',
+                }}
+              />
+
+              {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop */}
+              {isIlluminated && (
+                <div
+                  className="absolute inset-0 pointer-events-none transition-opacity duration-700"
+                  style={{
+                    background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}40 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
+                    mixBlendMode: 'color-dodge'
+                  }}
+                />
+              )}
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: 25, filter: 'blur(8px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}

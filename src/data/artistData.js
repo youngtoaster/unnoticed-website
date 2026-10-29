@@ -42,6 +42,21 @@ export const ARTIST_INFO = {
     fontWeight: "font-black",
     flicker: true,
     glowCaption: true
+  },
+  heroBackdrop: {
+    enabled: true,
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+    blur: 6,
+    blurEnabled: true,
+    opacity: 45,
+    zoom: 105,
+    positionX: 50,
+    positionY: 45,
+    scope: "title",
+    blendMode: "screen",
+    vignette: true,
+    illuminateOnGlow: true,
+    glowIntensity: 85
   }
 };
 

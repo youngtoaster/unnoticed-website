@@ -133,8 +133,8 @@ export default function StreamingHubSection() {
             key={platform.id}
             spotlightColor={platform.accentColor ? `${platform.accentColor}33` : 'rgba(168, 85, 247, 0.18)'}
             tilt={false}
-            className="p-5 sm:p-6 border-white/[0.1] hover:border-white/[0.25] transition-all duration-300 group h-full"
-            innerClassName="h-full flex flex-col justify-between"
+            className="p-5 sm:p-6 border-white/[0.1] hover:border-white/[0.25] transition-all duration-300 group h-full flex flex-col"
+            innerClassName="h-full flex-1 flex flex-col justify-between"
           >
             <div className="flex-1 flex flex-col">
               {/* Card Header: Platform Icon + Badge */}

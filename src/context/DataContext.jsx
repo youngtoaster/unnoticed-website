@@ -207,11 +207,11 @@ export function DataProvider({ children }) {
     const primaryHex = theme.primary || '#a855f7';
     const lum = getLuminance(primaryHex);
     // Lower threshold to 0.52 to catch all pastels, silvers, and lights
-    const isLight = lum > 0.52;
+    const isLight = lum > 0.52 || theme.id === 'mono';
     const onPrimary = isLight ? '#06070a' : '#ffffff';
     const shadowRgb = isLight ? '0, 0, 0' : hexToRgb(primaryHex);
     const btnShadow = isLight
-      ? '0 4px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7)'
+      ? '0 4px 14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.85)'
       : `0 10px 25px -5px rgba(${hexToRgb(primaryHex)}, 0.45)`;
 
     const root = document.documentElement;
@@ -222,7 +222,7 @@ export function DataProvider({ children }) {
     root.style.setProperty('--theme-secondary-rgb', hexToRgb(theme.secondary));
     root.style.setProperty('--theme-accent', theme.accent || '#06b6d4');
     root.style.setProperty('--theme-accent-rgb', hexToRgb(theme.accent));
-    root.style.setProperty('--theme-glow', theme.glow || primaryHex);
+    root.style.setProperty('--theme-glow', isLight ? (theme.secondary || '#94a3b8') : (theme.glow || primaryHex));
     root.style.setProperty('--theme-on-primary', onPrimary);
     root.style.setProperty('--theme-is-light', isLight ? '1' : '0');
     root.style.setProperty('--theme-shadow-rgb', shadowRgb);
@@ -310,6 +310,7 @@ export function DataProvider({ children }) {
   const pushToGitHub = useCallback(async (customMsg = null) => {
     setIsPushingGit(true);
     setSyncStatus('syncing');
+    let localErrorMessage = '';
 
     const payload = {
       ...data,
@@ -347,6 +348,7 @@ export function DataProvider({ children }) {
       }
     } catch (localErr) {
       console.warn('Local git endpoint unreachable, checking GitHub API fallback:', localErr);
+      localErrorMessage = localErr?.message;
     }
 
     // 2. Fallback attempt: Push directly to GitHub REST API (for remote/production deployments)
@@ -412,7 +414,7 @@ export function DataProvider({ children }) {
     setSyncStatus('error');
     return {
       success: false,
-      error: 'Could not connect to local Git server or GitHub API.'
+      error: localErrorMessage || 'Could not connect to local Git server or GitHub API.'
     };
   }, [data, refreshGitStatus]);
 

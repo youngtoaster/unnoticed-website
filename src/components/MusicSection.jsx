@@ -432,34 +432,25 @@ export default function MusicSection({
                       <div className="relative w-full max-w-[340px] xl:max-w-[380px] h-48 sm:h-52 xl:h-56 mx-auto my-2 flex items-center justify-center shrink-0">
                         {/* Vinyl Disc Sliding Out Prominently Behind Sleeve When Playing, Put Away Inside Sleeve When Paused */}
                         <motion.div
+                          initial={false}
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { rotate: 360, x: 125, scale: 1, opacity: 1 }
-                              : { rotate: 0, x: 0, scale: 0.92, opacity: 0 }
+                              ? { x: 115, scale: 1, opacity: 1 }
+                              : { x: 0, scale: 0.88, opacity: 0 }
                           }
-                          transition={
-                            isPlaying && currentTrack?.id === focusedTrack.id
-                              ? {
-                                  rotate: { duration: 4.5, repeat: Infinity, ease: 'linear' },
-                                  x: { type: 'spring', stiffness: 120, damping: 18 },
-                                  opacity: { duration: 0.25 },
-                                  scale: { type: 'spring', stiffness: 120, damping: 18 }
-                                }
-                              : {
-                                  rotate: { duration: 0.3 },
-                                  x: { type: 'spring', stiffness: 140, damping: 20 },
-                                  opacity: { duration: 0.2 },
-                                  scale: { type: 'spring', stiffness: 140, damping: 20 }
-                                }
-                          }
+                          transition={{
+                            x: { type: 'spring', stiffness: 130, damping: 20 },
+                            scale: { duration: 0.25 },
+                            opacity: { duration: 0.2 }
+                          }}
                           className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
                           style={{
                             boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
                             backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
                           }}
                         >
-                          {/* Vinyl Center Label */}
-                          <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+                          {/* Vinyl Center Label & Grooves - Only Spins When Audio Is Active */}
+                          <div className={`w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying && currentTrack?.id === focusedTrack.id ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
                             <img
                               src={focusedTrack.cover}
                               alt="Vinyl Center"
@@ -472,12 +463,13 @@ export default function MusicSection({
 
                         {/* Main High-Res Album Jacket / Sleeve (Smoothly slides left when playing, centered when not playing) */}
                         <motion.div
+                          initial={false}
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { x: -60 }
+                              ? { x: -55 }
                               : { x: 0 }
                           }
-                          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+                          transition={{ type: 'spring', stiffness: 130, damping: 20 }}
                           className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16]"
                         >
                           <img

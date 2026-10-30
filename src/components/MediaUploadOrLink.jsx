@@ -26,6 +26,8 @@ export default function MediaUploadOrLink({
   const [mode, setMode] = useState(() => (actualValue && (actualValue.startsWith('blob:') || actualValue.startsWith('data:')) ? 'upload' : 'link'));
   const [fileName, setFileName] = useState('');
   const [fileSize, setFileSize] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
   const fileInputRef = useRef(null);
 
   // Set default accepts based on type
@@ -43,14 +45,39 @@ export default function MediaUploadOrLink({
     'https://...'
   );
 
-  const handleFileChosen = (e) => {
+  const handleFileChosen = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
     setFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
+    setIsUploading(true);
+    setUploadProgress('Uploading asset to server & Git disk...');
 
-    // For images: automatically compress and resize to max 1400px so it fits smoothly into storage and persists
+    // 1. Try dedicated server upload endpoint (/api/upload) - guarantees permanent disk persistence & real audio playback
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'X-File-Name': encodeURIComponent(file.name),
+          'Content-Type': file.type || 'application/octet-stream'
+        },
+        body: file
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.url) {
+          setIsUploading(false);
+          setUploadProgress('');
+          actualOnChange(json.url);
+          return;
+        }
+      }
+    } catch (netErr) {
+      console.warn('[MediaUploadOrLink] Server upload bypassed/offline, using client storage fallback:', netErr);
+    }
+
+    // 2. Client-side fallback for images: resize & compress
     if (type === 'image' && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -74,9 +101,13 @@ export default function MediaUploadOrLink({
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          setIsUploading(false);
+          setUploadProgress('');
           actualOnChange(compressedDataUrl);
         };
         img.onerror = () => {
+          setIsUploading(false);
+          setUploadProgress('');
           actualOnChange(event.target?.result);
         };
         img.src = event.target?.result;
@@ -85,18 +116,19 @@ export default function MediaUploadOrLink({
       return;
     }
 
-    // For audio / video / files:
-    if (file.size <= 6 * 1024 * 1024) {
+    // 3. Fallback for audio/video if server is unreachable:
+    if (file.size <= 4 * 1024 * 1024) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        if (event.target?.result) {
-          actualOnChange(event.target.result);
-        }
+        setIsUploading(false);
+        setUploadProgress('');
+        if (event.target?.result) actualOnChange(event.target.result);
       };
       reader.readAsDataURL(file);
     } else {
-      // Large file fallback
       const objectUrl = URL.createObjectURL(file);
+      setIsUploading(false);
+      setUploadProgress('');
       actualOnChange(objectUrl);
     }
   };

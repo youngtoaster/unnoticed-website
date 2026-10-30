@@ -135,31 +135,24 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
           <div className="relative shrink-0 w-56 h-56 sm:w-68 sm:h-68 lg:w-76 lg:h-76 flex items-center justify-center">
             {/* Spinning Vinyl Disc with Grooves */}
             <motion.div
+              initial={false}
               animate={
                 isPlaying
-                  ? { rotate: 360, x: 70, scale: 1, opacity: 1 }
-                  : { rotate: 0, x: 0, scale: 0.92, opacity: 0 }
+                  ? { x: 70, scale: 1, opacity: 1 }
+                  : { x: 0, scale: 0.9, opacity: 0 }
               }
-              transition={
-                isPlaying
-                  ? {
-                      rotate: { duration: 4.5, repeat: Infinity, ease: 'linear' },
-                      x: { type: 'spring', stiffness: 120, damping: 18 },
-                      opacity: { duration: 0.25 }
-                    }
-                  : {
-                      rotate: { duration: 0.3 },
-                      x: { type: 'spring', stiffness: 140, damping: 20 },
-                      opacity: { duration: 0.2 }
-                    }
-              }
+              transition={{
+                x: { type: 'spring', stiffness: 130, damping: 20 },
+                scale: { duration: 0.25 },
+                opacity: { duration: 0.2 }
+              }}
               className="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
               style={{
                 boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.95)',
                 backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
               }}
             >
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+              <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
                 <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
                 <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
               </div>
@@ -167,8 +160,9 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
 
             {/* Album Sleeve */}
             <motion.div
+              initial={false}
               animate={isPlaying ? { x: -35 } : { x: 0 }}
-              transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+              transition={{ type: 'spring', stiffness: 130, damping: 20 }}
               className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 rounded-2xl overflow-hidden border border-white/[0.2] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16]"
             >
               <img

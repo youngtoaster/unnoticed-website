@@ -37,7 +37,7 @@ function syncArtistDataFile(data, rootDir) {
 function pushToGit(commitMsg = 'content: sync CMS updates from site admin') {
   try {
     const rootDir = process.cwd();
-    execSync('git add public/site_data.json src/data/artistData.js', { cwd: rootDir, stdio: 'pipe' });
+    execSync('git add public/site_data.json src/data/artistData.js public/uploads/', { cwd: rootDir, stdio: 'pipe' });
     const diff = execSync('git diff --cached --name-only', { cwd: rootDir, encoding: 'utf-8' }).trim();
     if (!diff) {
       return { success: true, pushed: false, message: 'Already up to date with Git' };
@@ -223,6 +223,80 @@ function devDataSyncPlugin() {
               res.setHeader('Access-Control-Allow-Origin', '*');
               res.statusCode = 500;
               res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+      });
+
+      // 3. FILE UPLOAD ENDPOINT (/api/upload)
+      // Saves uploaded audio, video, and image files directly to public/uploads/
+      // Returns clean public URL e.g. /uploads/song_12345.mp3 and auto-commits to Git
+      server.middlewares.use('/api/upload', async (req, res) => {
+        if (req.method === 'OPTIONS') {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-File-Name, X-File-Type');
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
+
+        if (req.method === 'POST') {
+          const rootDir = process.cwd();
+          const uploadsDir = path.resolve(rootDir, 'public/uploads');
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+          }
+
+          const rawHeaderName = req.headers['x-file-name'] || `media_${Date.now()}.bin`;
+          const decodedName = decodeURIComponent(String(rawHeaderName));
+          const sanitized = decodedName.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const ext = path.extname(sanitized) || '.bin';
+          const baseName = path.basename(sanitized, ext);
+          const finalFileName = `${baseName}_${Date.now()}${ext}`;
+          const targetPath = path.resolve(uploadsDir, finalFileName);
+
+          const chunks = [];
+          req.on('data', (chunk) => {
+            chunks.push(chunk);
+          });
+
+          req.on('end', () => {
+            try {
+              const fileBuffer = Buffer.concat(chunks);
+              fs.writeFileSync(targetPath, fileBuffer);
+
+              // Also copy to dist/uploads if dist exists
+              const distUploads = path.resolve(rootDir, 'dist/uploads');
+              if (fs.existsSync(distUploads)) {
+                fs.copyFileSync(targetPath, path.resolve(distUploads, finalFileName));
+              }
+
+              // Auto-commit new file to Git so GitHub repo preserves the real audio asset
+              try {
+                execSync(`git add "public/uploads/${finalFileName}"`, { cwd: rootDir, stdio: 'pipe' });
+                execSync(`git commit -m "media: upload ${finalFileName}"`, { cwd: rootDir, stdio: 'pipe' });
+                execSync('git push origin main', { cwd: rootDir, stdio: 'pipe' });
+              } catch (gitErr) {
+                console.warn('[devDataSyncPlugin] Git upload push notice:', gitErr.message);
+              }
+
+              res.setHeader('Content-Type', 'application/json');
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              res.statusCode = 200;
+              res.end(JSON.stringify({
+                success: true,
+                url: `/uploads/${finalFileName}`,
+                fileName: finalFileName,
+                size: fileBuffer.length
+              }));
+            } catch (err) {
+              console.error('Error in /api/upload:', err);
+              res.setHeader('Content-Type', 'application/json');
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: err.message }));
             }
           });
           return;

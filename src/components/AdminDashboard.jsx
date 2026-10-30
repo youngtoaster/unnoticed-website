@@ -13,6 +13,7 @@ import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import MediaUploadOrLink from './MediaUploadOrLink';
 import NewReleaseOverlay from './NewReleaseOverlay';
+import VisualSampleEditor from './VisualSampleEditor';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
 import NeonSign from './ui/NeonSign';
@@ -254,11 +255,11 @@ const THEME_PRESETS = [
     id: 'mono',
     name: 'Monochrome Silver',
     tag: 'High-Fashion Ice Chrome',
-    primary: '#ffffff',
+    primary: '#e2e8f0',
     secondary: '#94a3b8',
     accent: '#cbd5e1',
-    glow: '#ffffff',
-    swatches: ['#ffffff', '#94a3b8', '#cbd5e1']
+    glow: '#cbd5e1',
+    swatches: ['#e2e8f0', '#94a3b8', '#cbd5e1']
   }
 ];
 
@@ -1428,97 +1429,16 @@ export default function AdminDashboard({ onReturnToSite }) {
             </div>
           </div>
 
-          {/* AUDIO SAMPLE TIMING SCRUBBER */}
-          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.06]">
-              <div>
-                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-amber-400" />
-                  Site Load Sample Clip Timing & Audition
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Pick the exact high-energy chorus, hook, or bass drop to play during the on-load slam-in takeover.
-                </p>
-              </div>
-
-              {/* In-Dashboard Audition Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  const audio = sampleAuditionRef.current;
-                  if (!audio) return;
-                  if (sampleAuditionPlaying) {
-                    audio.pause();
-                    setSampleAuditionPlaying(false);
-                  } else {
-                    const start = featuredRelease?.sampleStartTime || 0;
-                    const dur = featuredRelease?.sampleDuration || 30;
-                    audio.currentTime = start;
-                    audio.play().then(() => {
-                      setSampleAuditionPlaying(true);
-                      const checkTimer = () => {
-                        if (audio.currentTime >= start + dur) {
-                          audio.pause();
-                          setSampleAuditionPlaying(false);
-                          audio.removeEventListener('timeupdate', checkTimer);
-                        }
-                      };
-                      audio.addEventListener('timeupdate', checkTimer);
-                    }).catch((err) => {
-                      console.warn(err);
-                      showToast('Could not play sample audio preview');
-                    });
-                  }
-                }}
-                className="px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0"
-              >
-                {sampleAuditionPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-                <span>{sampleAuditionPlaying ? 'Stop Audition' : `Audition Clip (${featuredRelease?.sampleStartTime || 12}s - ${(featuredRelease?.sampleStartTime || 12) + (featuredRelease?.sampleDuration || 28)}s)`}</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              {/* Sample Start Time */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <label className="text-slate-300 font-bold">Sample Start Time (Drop Point):</label>
-                  <span className="text-purple-300 font-bold">{featuredRelease?.sampleStartTime || 12} seconds</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="180"
-                  step="1"
-                  value={featuredRelease?.sampleStartTime || 12}
-                  onChange={(e) => updateFeaturedRelease({ sampleStartTime: parseInt(e.target.value) || 0 })}
-                  className="w-full accent-purple-400 cursor-pointer h-2 bg-white/[0.08] rounded-lg"
-                />
-                <p className="text-[11px] text-slate-500 font-mono">
-                  The audio will immediately seek to this timestamp upon modal impact.
-                </p>
-              </div>
-
-              {/* Sample Duration */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <label className="text-slate-300 font-bold">Sample Duration:</label>
-                  <span className="text-cyan-300 font-bold">{featuredRelease?.sampleDuration || 28} seconds</span>
-                </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="60"
-                  step="1"
-                  value={featuredRelease?.sampleDuration || 28}
-                  onChange={(e) => updateFeaturedRelease({ sampleDuration: parseInt(e.target.value) || 28 })}
-                  className="w-full accent-cyan-400 cursor-pointer h-2 bg-white/[0.08] rounded-lg"
-                />
-                <p className="text-[11px] text-slate-500 font-mono">
-                  How long the preview loops before wrapping back to the drop point.
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* INTERACTIVE VISUAL WAVEFORM SAMPLE EDITOR */}
+          <VisualSampleEditor
+            audioUrl={featuredRelease?.audioUrl}
+            sampleStartTime={featuredRelease?.sampleStartTime || 12}
+            sampleDuration={featuredRelease?.sampleDuration || 28}
+            onUpdateTiming={({ sampleStartTime, sampleDuration }) => {
+              updateFeaturedRelease({ sampleStartTime, sampleDuration });
+            }}
+            onToast={showToast}
+          />
 
           {/* RELEASE METADATA & EDITORIAL INTEL */}
           <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">

@@ -57,7 +57,7 @@ export default function SpotlightCard({
       }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       style={{ transformStyle: 'preserve-3d' }}
-      className={`relative overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0b0c14] shadow-2xl shadow-black/90 transition-colors duration-300 ${
+      className={`relative overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0b0c14] shadow-2xl shadow-black/90 transition-colors duration-300 flex flex-col ${
         isHovered ? 'border-purple-500/50 shadow-purple-500/10' : ''
       } ${className}`}
     >
@@ -69,7 +69,7 @@ export default function SpotlightCard({
           background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${resolvedSpotlight}, transparent 50%)`,
         }}
       />
-      <div className={`relative z-10 h-full ${innerClassName}`}>{children}</div>
+      <div className={`relative z-10 flex-1 flex flex-col justify-between ${innerClassName}`}>{children}</div>
     </motion.div>
   );
 }

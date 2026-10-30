@@ -233,31 +233,24 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
               <div className="relative shrink-0 w-60 h-60 sm:w-72 sm:h-72 xl:w-80 xl:h-80 flex items-center justify-center">
                 {/* Vinyl Disc - Prominently Exposed and Spinning During Preview Playback */}
                 <motion.div
+                  initial={false}
                   animate={
                     isPlaying
-                      ? { rotate: 360, x: 75, opacity: 1, scale: 1 }
-                      : { rotate: 0, x: 0, opacity: 0, scale: 0.92 }
+                      ? { x: 75, opacity: 1, scale: 1 }
+                      : { x: 0, opacity: 0, scale: 0.9 }
                   }
-                  transition={
-                    isPlaying
-                      ? {
-                          rotate: { duration: 4.5, repeat: Infinity, ease: 'linear' },
-                          x: { type: 'spring', stiffness: 120, damping: 18 },
-                          opacity: { duration: 0.25 }
-                        }
-                      : {
-                          rotate: { duration: 0.3 },
-                          x: { type: 'spring', stiffness: 140, damping: 20 },
-                          opacity: { duration: 0.2 }
-                        }
-                  }
+                  transition={{
+                    x: { type: 'spring', stiffness: 130, damping: 20 },
+                    scale: { duration: 0.25 },
+                    opacity: { duration: 0.2 }
+                  }}
                   className="absolute w-52 h-52 sm:w-64 sm:h-64 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
                   style={{
                     boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95)',
                     backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
                   }}
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+                  <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
                     <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
                     <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
                   </div>

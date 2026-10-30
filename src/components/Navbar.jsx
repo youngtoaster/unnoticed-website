@@ -92,7 +92,7 @@ export default function Navbar({
           scrolled ? 'pt-2 pb-1.5' : 'pt-3 pb-2 sm:pt-4'
         }`}
       >
-        <div className="relative flex items-center justify-between w-full max-w-6xl px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/[0.12] bg-[#07080e]/90 backdrop-blur-2xl shadow-xl shadow-black/80">
+        <div className="relative flex items-center justify-between w-full max-w-6xl px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/[0.14] bg-[#07080e] shadow-2xl shadow-black">
           
           {/* Left: Brand Identity */}
           <button
@@ -122,20 +122,20 @@ export default function Navbar({
             </div>
           </button>
 
-          {/* Center: Desktop Navigation Links (Planes/Apple Luxury Glass Capsule) */}
-          <nav className="hidden lg:flex items-center gap-0.5 bg-white/[0.04] p-1 rounded-full border border-white/[0.08] shadow-inner">
+          {/* Center: Desktop Navigation Links (Solid Luxury Obsidian Capsule) */}
+          <nav className="hidden lg:flex items-center gap-0.5 bg-[#0e0f18] p-1 rounded-full border border-white/[0.12] shadow-inner">
             {navLinks.map((link) => (
               <button
                 key={link.label}
                 onClick={() => handleNavClick(link.href)}
-                className="relative px-3.5 py-1.5 rounded-full text-[12px] font-medium tracking-wide text-slate-300 hover:text-white transition-all duration-200 hover:bg-white/[0.08] active:scale-95 cursor-pointer"
+                className="relative px-3.5 py-1.5 rounded-full text-[12px] font-medium tracking-wide text-slate-300 hover:text-white transition-all duration-200 hover:bg-[#181928] active:scale-95 cursor-pointer"
               >
                 <span>{link.label}</span>
               </button>
             ))}
           </nav>
 
-          {/* Right: Audio Mini Pill, EPK, Cart, & Mobile Hamburger (Uniform height & organized styling) */}
+          {/* Right: Audio Mini Pill, Cart, & Mobile Hamburger */}
           <div className="flex items-center gap-2 shrink-0">
             {/* Quick Play Trigger (Desktop/Tablet) */}
             <motion.button
@@ -143,8 +143,8 @@ export default function Navbar({
               onClick={togglePlay}
               className={`hidden sm:inline-flex items-center gap-1.5 h-8 px-3 rounded-full border text-xs font-mono transition-all cursor-pointer ${
                 isPlaying
-                  ? 'bg-purple-600/25 border-purple-500/50 text-purple-200 shadow-md shadow-purple-600/30'
-                  : 'bg-white/[0.04] border-white/[0.1] text-slate-300 hover:border-purple-400/40 hover:text-white'
+                  ? 'bg-purple-600/30 border-purple-500/60 text-purple-200 shadow-md shadow-purple-600/30'
+                  : 'bg-[#12131e] border-white/[0.12] text-slate-200 hover:border-purple-400/50 hover:text-white shadow-sm'
               }`}
               title={isPlaying ? `Pause: ${currentTrack?.title || 'Preview'}` : `Play: ${currentTrack?.title || 'Studio Preview'}`}
             >
@@ -165,7 +165,7 @@ export default function Navbar({
             {/* Merch Cart Button */}
             <button
               onClick={openCart}
-              className="relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.1] text-slate-300 hover:text-white hover:border-purple-400/40 transition-all active:scale-90 cursor-pointer"
+              className="relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#12131e] border border-white/[0.12] text-slate-200 hover:text-white hover:border-purple-400/50 transition-all active:scale-90 cursor-pointer shadow-sm"
               aria-label="Shopping Cart"
               title="View Cart"
             >

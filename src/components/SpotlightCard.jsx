@@ -51,8 +51,8 @@ export default function SpotlightCard({
       }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       style={{ transformStyle: 'preserve-3d' }}
-      className={`relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0d12]/80 backdrop-blur-xl transition-colors duration-300 ${
-        isHovered ? 'border-purple-500/40 shadow-xl shadow-purple-500/10' : ''
+      className={`relative overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0b0c14] shadow-2xl shadow-black/90 transition-colors duration-300 ${
+        isHovered ? 'border-purple-500/50 shadow-purple-500/10' : ''
       } ${className}`}
     >
       {/* Dynamic radial spotlight tracking mouse */}

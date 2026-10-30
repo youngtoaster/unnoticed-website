@@ -190,7 +190,7 @@ export default function HeroSection({
               <div
                 className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out ${
                   backdrop.scope === 'hero'
-                    ? 'fixed inset-0 w-screen h-screen'
+                    ? 'absolute inset-0 w-full h-full'
                     : 'w-full max-w-3xl h-[200px] sm:h-[260px] md:h-[320px] rounded-2xl'
                 }`}
                 style={{
@@ -337,228 +337,230 @@ export default function HeroSection({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-20 text-center"
+        className="w-full relative z-20 bg-[#060608] border-t border-white/[0.08] pt-8 sm:pt-12 pb-16 sm:pb-20 text-center shadow-[0_-25px_50px_rgba(0,0,0,0.9)]"
       >
-        {/* Subtle section label */}
-        <div className="flex items-center justify-center gap-2 mb-6 sm:mb-8">
-          <span className="h-[1px] w-6 bg-purple-500/30" />
-          <span className="text-[9.5px] font-mono uppercase tracking-[0.25em] text-purple-400">
-            Audio Studio & Transmission Hub
-          </span>
-          <span className="h-[1px] w-6 bg-purple-500/30" />
-        </div>
-
-        {/* Primary Action Row (Sleek, Proportional Scaling) */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 mb-8 sm:mb-10 w-full px-2">
-          {/* Main Play Button with controlled Magnet */}
-          <div className="relative shrink-0">
-            <Magnet padding={20} magnetStrength={2}>
-              <button
-                onClick={() => {
-                  if (currentTrack?.id !== featuredTrack.id) {
-                    onSelectTrack(featuredTrack);
-                  } else {
-                    togglePlay();
-                  }
-                }}
-                className="flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/25 border border-purple-400/30 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
-              >
-                {isFeaturedPlaying ? (
-                  <Pause className="w-3.5 h-3.5 fill-white" />
-                ) : (
-                  <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
-                )}
-                <span>{isFeaturedPlaying ? 'Pause Preview' : `Listen: ${featuredTrack.title}`}</span>
-                <span className="flex items-center gap-0.5 h-2.5 ml-1">
-                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-1' : 'h-1'}`} />
-                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-2' : 'h-1.5'}`} />
-                  <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2 animate-equalizer-3' : 'h-1'}`} />
-                </span>
-              </button>
-            </Magnet>
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+          {/* Subtle section label with solid background */}
+          <div className="flex items-center justify-center gap-2 mb-6 sm:mb-8">
+            <span className="h-[1px] w-6 bg-purple-500/30" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-purple-300 px-3.5 py-1 rounded-full bg-[#0d0e17] border border-purple-500/30 shadow-md">
+              Audio Studio & Transmission Hub
+            </span>
+            <span className="h-[1px] w-6 bg-purple-500/30" />
           </div>
 
-          {/* Quick Jump Pills */}
-          <a
-            href="#music"
-            className="px-4 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0"
-          >
-            <Headphones className="w-3.5 h-3.5 text-purple-400" />
-            <span>Music & Lyrics</span>
-          </a>
-
-          <a
-            href="#media"
-            className="px-4 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0"
-          >
-            <Film className="w-3.5 h-3.5 text-purple-400" />
-            <span>Media Archive</span>
-          </a>
-        </div>
-
-        {/* Clean, Balanced 3-Card Bento Grid */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-          {/* Card 1: Artist Persona & Origin */}
-          <SpotlightCard
-            tilt={false}
-            className="p-5 flex flex-col justify-between"
-            spotlightColor="rgba(168, 85, 247, 0.18)"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5" /> Metamorphosis
-                </span>
+          {/* Primary Action Row with Solid Opaque Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 mb-8 sm:mb-10 w-full px-2">
+            {/* Main Play Button with controlled Magnet */}
+            <div className="relative shrink-0">
+              <Magnet padding={20} magnetStrength={2}>
                 <button
-                  onClick={() => setIdentityMode(identityMode === 'unnoticed' ? 'ty' : 'unnoticed')}
-                  className="px-2 py-0.5 rounded text-[10px] font-mono border border-purple-500/30 bg-purple-500/10 text-purple-300 hover:text-white transition-colors active:scale-95"
+                  onClick={() => {
+                    if (currentTrack?.id !== featuredTrack.id) {
+                      onSelectTrack(featuredTrack);
+                    } else {
+                      togglePlay();
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/25 border border-purple-400/30 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
                 >
-                  Flip Persona ⟳
+                  {isFeaturedPlaying ? (
+                    <Pause className="w-3.5 h-3.5 fill-white" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                  )}
+                  <span>{isFeaturedPlaying ? 'Pause Preview' : `Listen: ${featuredTrack.title}`}</span>
+                  <span className="flex items-center gap-0.5 h-2.5 ml-1">
+                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-1' : 'h-1'}`} />
+                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-2' : 'h-1.5'}`} />
+                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2 animate-equalizer-3' : 'h-1'}`} />
+                  </span>
                 </button>
-              </div>
-
-              <AnimatePresence mode="wait">
-                {identityMode === 'unnoticed' ? (
-                  <motion.div
-                    key="unnoticed"
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <h3 className="font-display text-lg font-bold text-white mb-0.5">
-                      <DecryptedText text="UNNOTICED" speed={40} />
-                    </h3>
-                    <p className="text-[11px] text-purple-300 font-mono mb-2">
-                      Current Era • The Man Unseen
-                    </p>
-                    <p className="text-xs text-slate-300 leading-relaxed font-light">
-                      Stripped of industry posturing. Highlighting emotional truth, nocturnal storytelling, and raw existential weight.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="ty"
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <h3 className="font-display text-lg font-bold text-white mb-0.5">
-                      <DecryptedText text="TY SCIULLO" speed={40} />
-                    </h3>
-                    <p className="text-[11px] text-purple-300 font-mono mb-2">
-                      2016–2023 • The Roots
-                    </p>
-                    <p className="text-xs text-slate-300 leading-relaxed font-light">
-                      Emerging from McKees Rocks with early recordings like 'Cold Night', laying the foundation for what was to come.
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              </Magnet>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-purple-400" /> Origin
-              </span>
-              <span className="text-white font-medium">McKees Rocks, PA</span>
-            </div>
-          </SpotlightCard>
+            {/* Quick Jump Pills (Solid Opaque Luxury Backgrounds) */}
+            <a
+              href="#music"
+              className="px-4 py-2.5 rounded-full bg-[#0e0f18] hover:bg-[#181928] text-white border border-white/[0.14] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 shadow-lg shadow-black/60"
+            >
+              <Headphones className="w-3.5 h-3.5 text-purple-400" />
+              <span>Music & Lyrics</span>
+            </a>
 
-          {/* Card 2: Key Streaming Telemetry */}
-          <SpotlightCard
-            tilt={false}
-            className="p-5 flex flex-col justify-between"
-            spotlightColor="rgba(168, 85, 247, 0.18)"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
-                  <Radio className="w-3.5 h-3.5" /> Streaming Reach
-                </span>
-                <span className="text-[10px] font-mono text-slate-400">
-                  Global Metrics
-                </span>
+            <a
+              href="#media"
+              className="px-4 py-2.5 rounded-full bg-[#0e0f18] hover:bg-[#181928] text-white border border-white/[0.14] text-xs font-semibold active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 shadow-lg shadow-black/60"
+            >
+              <Film className="w-3.5 h-3.5 text-purple-400" />
+              <span>Media Archive</span>
+            </a>
+          </div>
+
+          {/* Clean, Balanced 3-Card Bento Grid */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+            {/* Card 1: Artist Persona & Origin */}
+            <SpotlightCard
+              tilt={false}
+              className="p-5 flex flex-col justify-between"
+              spotlightColor="rgba(168, 85, 247, 0.18)"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5" /> Metamorphosis
+                  </span>
+                  <button
+                    onClick={() => setIdentityMode(identityMode === 'unnoticed' ? 'ty' : 'unnoticed')}
+                    className="px-2.5 py-1 rounded-lg text-[10px] font-mono border border-purple-500/30 bg-[#12131e] text-purple-200 hover:bg-purple-600/30 hover:text-white transition-colors active:scale-95 cursor-pointer shadow-sm"
+                  >
+                    Flip Persona ⟳
+                  </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {identityMode === 'unnoticed' ? (
+                    <motion.div
+                      key="unnoticed"
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h3 className="font-display text-lg font-bold text-white mb-0.5">
+                        <DecryptedText text="UNNOTICED" speed={40} />
+                      </h3>
+                      <p className="text-[11px] text-purple-300 font-mono mb-2">
+                        Current Era • The Man Unseen
+                      </p>
+                      <p className="text-xs text-slate-300 leading-relaxed font-light">
+                        Stripped of industry posturing. Highlighting emotional truth, nocturnal storytelling, and raw existential weight.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="ty"
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h3 className="font-display text-lg font-bold text-white mb-0.5">
+                        <DecryptedText text="TY SCIULLO" speed={40} />
+                      </h3>
+                      <p className="text-[11px] text-purple-300 font-mono mb-2">
+                        2016–2023 • The Roots
+                      </p>
+                      <p className="text-xs text-slate-300 leading-relaxed font-light">
+                        Emerging from McKees Rocks with early recordings like 'Cold Night', laying the foundation for what was to come.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="space-y-3 my-2">
-                <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
-                  <span className="text-xs text-slate-400">Monthly Listeners</span>
-                  <span className="font-display text-xl font-black text-white">
-                    <ShinyText text={artistInfo.stats?.monthlyListeners || '142,500'} speed={3.5} />
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-purple-400" /> Origin
+                </span>
+                <span className="text-white font-medium">McKees Rocks, PA</span>
+              </div>
+            </SpotlightCard>
+
+            {/* Card 2: Key Streaming Telemetry */}
+            <SpotlightCard
+              tilt={false}
+              className="p-5 flex flex-col justify-between"
+              spotlightColor="rgba(168, 85, 247, 0.18)"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
+                    <Radio className="w-3.5 h-3.5" /> Streaming Reach
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Global Metrics
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
-                  <span className="text-xs text-slate-400">Catalog Streams</span>
-                  <span className="font-display text-xl font-black text-white">
-                    <ShinyText text={artistInfo.stats?.totalStreams || '4.2M'} speed={3} />
-                  </span>
+
+                <div className="space-y-3 my-2">
+                  <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
+                    <span className="text-xs text-slate-400">Monthly Listeners</span>
+                    <span className="font-display text-xl font-black text-white">
+                      <ShinyText text={artistInfo.stats?.monthlyListeners || '142,500'} speed={3.5} />
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-2">
+                    <span className="text-xs text-slate-400">Catalog Streams</span>
+                    <span className="font-display text-xl font-black text-white">
+                      <ShinyText text={artistInfo.stats?.totalStreams || '4.2M'} speed={3} />
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span>Core Audience</span>
-              <span className="text-purple-300">18–34 Demographics</span>
-            </div>
-          </SpotlightCard>
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Core Audience</span>
+                <span className="text-purple-300">18–34 Demographics</span>
+              </div>
+            </SpotlightCard>
 
-          {/* Card 3: Quick Navigation Hub */}
-          <SpotlightCard
-            tilt={false}
-            className="p-5 flex flex-col justify-between"
-            spotlightColor="rgba(168, 85, 247, 0.18)"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> Navigation Hub
-                </span>
-                <span className="text-[10px] font-mono text-slate-400">
-                  Direct Jump
-                </span>
+            {/* Card 3: Quick Navigation Hub */}
+            <SpotlightCard
+              tilt={false}
+              className="p-5 flex flex-col justify-between"
+              spotlightColor="rgba(168, 85, 247, 0.18)"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-mono tracking-wider text-purple-400 uppercase flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" /> Navigation Hub
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Direct Jump
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 my-1 text-xs">
+                  <a
+                    href="#music"
+                    className="p-2.5 rounded-xl bg-[#12131e] hover:bg-[#1a1c2b] border border-white/[0.1] hover:border-purple-500/40 text-slate-100 transition-all flex items-center gap-2 shadow-sm"
+                  >
+                    <Headphones className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="font-medium">Lyrics</span>
+                  </a>
+                  <a
+                    href="#bio"
+                    className="p-2.5 rounded-xl bg-[#12131e] hover:bg-[#1a1c2b] border border-white/[0.1] hover:border-purple-500/40 text-slate-100 transition-all flex items-center gap-2 shadow-sm"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="font-medium">Story</span>
+                  </a>
+                  <a
+                    href="#tour"
+                    className="p-2.5 rounded-xl bg-[#12131e] hover:bg-[#1a1c2b] border border-white/[0.1] hover:border-purple-500/40 text-slate-100 transition-all flex items-center gap-2 shadow-sm"
+                  >
+                    <Ticket className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="font-medium">Tour</span>
+                  </a>
+                  <a
+                    href="#store"
+                    className="p-2.5 rounded-xl bg-[#12131e] hover:bg-[#1a1c2b] border border-white/[0.1] hover:border-purple-500/40 text-slate-100 transition-all flex items-center gap-2 shadow-sm"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="font-medium">Store</span>
+                  </a>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 my-1 text-xs">
-                <a
-                  href="#music"
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-purple-600/20 border border-white/[0.06] hover:border-purple-500/30 text-slate-200 transition-all flex items-center gap-2"
-                >
-                  <Headphones className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-medium">Lyrics</span>
-                </a>
-                <a
-                  href="#bio"
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-purple-600/20 border border-white/[0.06] hover:border-purple-500/30 text-slate-200 transition-all flex items-center gap-2"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-medium">Story</span>
-                </a>
-                <a
-                  href="#tour"
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-purple-600/20 border border-white/[0.06] hover:border-purple-500/30 text-slate-200 transition-all flex items-center gap-2"
-                >
-                  <Ticket className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-medium">Tour</span>
-                </a>
-                <a
-                  href="#store"
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-purple-600/20 border border-white/[0.06] hover:border-purple-500/30 text-slate-200 transition-all flex items-center gap-2"
-                >
-                  <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-medium">Store</span>
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Electronic Press Kit</span>
+                <a href="#epk" className="text-purple-300 hover:text-white transition-colors">
+                  View EPK →
                 </a>
               </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span>Electronic Press Kit</span>
-              <a href="#epk" className="text-purple-300 hover:text-white transition-colors">
-                View EPK →
-              </a>
-            </div>
-          </SpotlightCard>
+            </SpotlightCard>
+          </div>
         </div>
 
       </motion.div>

@@ -142,7 +142,7 @@ export default function MusicSection({
         </div>
 
         {/* View Switcher Tabs (Planes-Style Sliding Segmented Control) */}
-        <div className="flex items-center p-1 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md self-start md:self-auto overflow-x-auto no-scrollbar max-w-full">
+        <div className="flex items-center p-1 rounded-full bg-[#0e0f18] border border-white/[0.12] self-start md:self-auto overflow-x-auto no-scrollbar max-w-full shadow-lg shadow-black">
           {[
             { id: 'tracks', label: `Studio Tracks (${tracks.length})` },
             { id: 'spotifyEmbed', label: 'Spotify Player' },
@@ -364,7 +364,7 @@ export default function MusicSection({
               className="space-y-6"
             >
               {/* Top Navigation & Track Stepper Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 sm:p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 sm:p-4 rounded-2xl bg-[#0e0f18] border border-white/[0.12] shadow-xl shadow-black">
                 {/* Back to Discography Button */}
                 <Magnet padding={25}>
                   <button
@@ -412,7 +412,7 @@ export default function MusicSection({
                 <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
                   <SpotlightCard
                     spotlightColor="rgba(168, 85, 247, 0.25)"
-                    className="p-6 relative overflow-hidden border-purple-500/40 bg-[#0c0d16]/90 shadow-2xl shadow-purple-950/50"
+                    className="p-6 relative overflow-hidden border-purple-500/40 bg-[#0c0d16] shadow-2xl shadow-purple-950/50"
                   >
                     {/* Glowing Backlight */}
                     <div className="absolute top-0 right-0 w-48 h-48 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none -z-10" />

@@ -100,7 +100,7 @@ export default function TourSection() {
                   <div className="flex items-start sm:items-center gap-3.5 sm:gap-6 min-w-0">
                     
                     {/* Date Capsule */}
-                    <div className="flex flex-col items-center justify-center w-16 sm:w-24 py-2.5 sm:py-3 rounded-2xl bg-white/[0.04] border border-white/[0.08] shrink-0 text-center">
+                    <div className="flex flex-col items-center justify-center w-16 sm:w-24 py-2.5 sm:py-3 rounded-2xl bg-[#10121b] border border-white/[0.12] shrink-0 text-center shadow-md">
                       <span className="text-[10px] sm:text-[11px] font-mono font-bold text-cyan-400 uppercase tracking-widest">
                         {show.date.split(' ')[0]}
                       </span>

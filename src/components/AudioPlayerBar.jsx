@@ -150,7 +150,7 @@ export default function AudioPlayerBar({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            className="hidden md:flex flex-col fixed bottom-24 right-6 w-[440px] max-h-[640px] z-40 rounded-3xl border border-white/[0.12] bg-[#0c0d16]/96 backdrop-blur-3xl shadow-2xl shadow-black/90 overflow-hidden"
+            className="hidden md:flex flex-col fixed bottom-24 right-6 w-[440px] max-h-[640px] z-40 rounded-3xl border border-white/[0.14] bg-[#0c0d16] shadow-2xl shadow-black overflow-hidden"
           >
             {/* Ambient glowing rim */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-purple-600/15 rounded-full blur-[80px] pointer-events-none -z-10" />
@@ -327,7 +327,7 @@ export default function AudioPlayerBar({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="fixed inset-0 z-50 md:hidden bg-[#090a12]/98 backdrop-blur-3xl p-5 flex flex-col justify-between overflow-hidden safe-bottom"
+            className="fixed inset-0 z-50 md:hidden bg-[#090a12] p-5 flex flex-col justify-between overflow-hidden safe-bottom"
           >
             {/* Ambient lighting in mobile sheet */}
             <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none -z-10" />
@@ -667,7 +667,7 @@ export default function AudioPlayerBar({
                   setIsMobileExpanded(true);
                 }
               }}
-              className="relative overflow-hidden rounded-2xl sm:rounded-full border border-white/[0.14] bg-[#090a12]/92 backdrop-blur-2xl shadow-2xl shadow-black/90 px-3.5 py-2.5 sm:px-5 sm:py-2.5 cursor-pointer md:cursor-default"
+              className="relative overflow-hidden rounded-2xl sm:rounded-full border border-white/[0.16] bg-[#090a12] shadow-2xl shadow-black px-3.5 py-2.5 sm:px-5 sm:py-2.5 cursor-pointer md:cursor-default"
             >
               {/* High-Tech Glowing Progress Track */}
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/[0.08] cursor-pointer group">

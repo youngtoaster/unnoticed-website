@@ -17,23 +17,23 @@ export const SECTIONS_VISIBILITY = {
 };
 
 export const FEATURED_RELEASE = {
-  popupEnabled: true,
-  sectionEnabled: true,
-  title: "Calling for Help",
-  artist: "UNNOTICED",
-  releaseType: "Lead Studio Master",
-  releaseDate: "2024 Cut",
-  badgeText: "WORLD PREMIERE // NOW STREAMING",
-  tagline: "Atmospheric basslines dissecting nocturnal solitude. Stream the newest official master cut.",
-  cover: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
-  audioUrl: "https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8",
-  sampleStartTime: 12,
-  sampleDuration: 28,
-  lyricsExcerpt: "Praying for a signal just to know that I'm alive...",
-  spotifyUrl: "https://open.spotify.com/artist/5ETABaJMvhYJpsxQku2IQe",
-  appleMusicUrl: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
-  youtubeUrl: "https://www.youtube.com/@UnnoticedOfficial",
-  soundcloudUrl: "https://soundcloud.com/tysciullo"
+  "popupEnabled": true,
+  "sectionEnabled": true,
+  "title": "Calling for Help",
+  "artist": "UNNOTICED",
+  "releaseType": "Lead Studio Master",
+  "releaseDate": "2024 Cut",
+  "badgeText": "WORLD PREMIERE // NOW STREAMING",
+  "tagline": "Atmospheric basslines dissecting nocturnal solitude. Stream the newest official master cut.",
+  "cover": "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+  "audioUrl": "https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8",
+  "sampleStartTime": 12,
+  "sampleDuration": 28,
+  "lyricsExcerpt": "Praying for a signal just to know that I'm alive...",
+  "spotifyUrl": "https://open.spotify.com/artist/5ETABaJMvhYJpsxQku2IQe",
+  "appleMusicUrl": "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+  "youtubeUrl": "https://www.youtube.com/@UnnoticedOfficial",
+  "soundcloudUrl": "https://soundcloud.com/tysciullo"
 };
 
 export const ARTIST_INFO = {
@@ -87,13 +87,19 @@ export const ARTIST_INFO = {
   "quoteAuthor": "Tyler Sciullo (UNNOTICED)",
   "heroSubtitle": "Once Known As Ty Sciullo • Now A Man Unseen",
   "theme": {
-    "id": "violet",
-    "name": "Electric Violet",
-    "primary": "#a855f7",
-    "secondary": "#6366f1",
-    "accent": "#06b6d4",
-    "glow": "#a855f7",
-    "syncNeon": true
+    "id": "mono",
+    "name": "Monochrome Silver",
+    "primary": "#e2e8f0",
+    "secondary": "#94a3b8",
+    "accent": "#cbd5e1",
+    "glow": "#cbd5e1",
+    "syncNeon": true,
+    "tag": "High-Fashion Ice Chrome",
+    "swatches": [
+      "#e2e8f0",
+      "#94a3b8",
+      "#cbd5e1"
+    ]
   },
   "tourBadge": {
     "enabled": true,
@@ -101,7 +107,7 @@ export const ARTIST_INFO = {
     "link": "#tour"
   },
   "neonSign": {
-    "color": "#a855f7",
+    "color": "#e2e8f0",
     "font": "font-display",
     "size": "text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]",
     "fontSizeRem": 4.25,

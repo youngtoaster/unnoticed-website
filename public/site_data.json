@@ -1,5 +1,5 @@
 {
-  "_lastUpdated": 1793332395623,
+  "_lastUpdated": 1793363526700,
   "artistInfo": {
     "name": "UNNOTICED",
     "previousName": "Ty Sciullo",
@@ -45,17 +45,25 @@
       ]
     },
     "bio": "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
+    "heroBio": "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
+    "showHeroBio": true,
     "quote": "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all.",
     "quoteAuthor": "Tyler Sciullo (UNNOTICED)",
     "heroSubtitle": "Once Known As Ty Sciullo • Now A Man Unseen",
     "theme": {
-      "id": "violet",
-      "name": "Electric Violet",
-      "primary": "#a855f7",
-      "secondary": "#6366f1",
-      "accent": "#06b6d4",
-      "glow": "#a855f7",
-      "syncNeon": true
+      "id": "mono",
+      "name": "Monochrome Silver",
+      "primary": "#e2e8f0",
+      "secondary": "#94a3b8",
+      "accent": "#cbd5e1",
+      "glow": "#cbd5e1",
+      "syncNeon": true,
+      "tag": "High-Fashion Ice Chrome",
+      "swatches": [
+        "#e2e8f0",
+        "#94a3b8",
+        "#cbd5e1"
+      ]
     },
     "tourBadge": {
       "enabled": true,
@@ -63,7 +71,7 @@
       "link": "#tour"
     },
     "neonSign": {
-      "color": "#a855f7",
+      "color": "#e2e8f0",
       "font": "font-display",
       "size": "text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]",
       "fontSizeRem": 4.25,
@@ -721,7 +729,9 @@
     "gallery": true,
     "social": true,
     "newsletter": true,
-    "featuredRelease": true
+    "featuredRelease": true,
+    "heroBackdrop": true,
+    "transmissionHub": true
   },
   "featuredRelease": {
     "popupEnabled": true,
@@ -743,5 +753,5 @@
     "soundcloudUrl": "https://soundcloud.com/tysciullo"
   },
   "autoGitPush": true,
-  "commitMessage": "content: test live auto-sync to GitHub"
+  "commitMessage": "content: auto-sync update from admin [8:32:06 AM]"
 }

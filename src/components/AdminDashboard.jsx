@@ -6,7 +6,7 @@ import {
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
-  AlignLeft, AlignCenter, AlignRight, Compass
+  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -267,11 +267,20 @@ export default function AdminDashboard({ onReturnToSite }) {
     merchProducts, galleryImages, socialPosts, epkData,
     sectionsVisibility, toggleSectionVisibility, clearSection, resetSectionToDefault,
     syncStatus, syncToServerDisk,
+    gitStatus, isPushingGit, pushToGitHub, refreshGitStatus,
     updateData, reorderCollection, logoutAdmin, resetToDefaults, exportBackup, importBackup
   } = useSiteData();
 
   const [activeTab, setActiveTab] = useState('tracks');
   const [toastMessage, setToastMessage] = useState(null);
+  const [customCommitMsg, setCustomCommitMsg] = useState('');
+  const [githubTokenInput, setGithubTokenInput] = useState(() => {
+    try {
+      return localStorage.getItem('unnoticed_github_token') || '';
+    } catch {
+      return '';
+    }
+  });
   const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(null); // { title, collectionKey, count }
@@ -567,6 +576,7 @@ export default function AdminDashboard({ onReturnToSite }) {
     { id: 'gallery', label: 'Gallery Slides', icon: ImageIcon, count: galleryImages.length },
     { id: 'social', label: 'Social Feed', icon: Instagram, count: socialPosts.length },
     { id: 'epk', label: 'EPK & Press', icon: Shield, count: null },
+    { id: 'github', label: 'GitHub Cloud Sync', icon: GitBranch, count: null },
   ];
 
   return (
@@ -598,6 +608,10 @@ export default function AdminDashboard({ onReturnToSite }) {
               <CheckCircle2 className="w-3 h-3 text-purple-400" />
               <span>Admin Logged In (Device Remembered)</span>
             </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-mono text-cyan-300">
+              <GitBranch className="w-3 h-3 text-cyan-400" />
+              <span>GitHub: {gitStatus?.branch || 'main'} {gitStatus?.lastCommit?.hash ? `(${gitStatus.lastCommit.hash})` : ''}</span>
+            </div>
           </div>
           <h1 className="font-display text-3xl sm:text-4xl font-black text-white tracking-tight mt-1.5">
             UNNOTICED CMS // ADMIN
@@ -609,6 +623,29 @@ export default function AdminDashboard({ onReturnToSite }) {
 
         {/* Global Toolbar Actions */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Direct Push to GitHub Button */}
+          <button
+            onClick={async () => {
+              const res = await pushToGitHub();
+              if (res.success) {
+                showToast(res.message || 'Pushed all CMS content to GitHub repository!');
+              } else {
+                showToast('GitHub Sync: ' + (res.error || 'Check local server status'));
+              }
+            }}
+            disabled={isPushingGit}
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            title="Commit & push all CMS content to GitHub so it stays consistent everywhere"
+          >
+            <GitBranch className={`w-3.5 h-3.5 text-white ${isPushingGit ? 'animate-spin' : ''}`} />
+            <span>{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub'}</span>
+            {gitStatus?.lastCommit?.hash && (
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/40 text-purple-200">
+                {gitStatus.lastCommit.hash}
+              </span>
+            )}
+          </button>
+
           {/* Multi-Device Disk Sync Button */}
           <button
             onClick={async () => {
@@ -616,7 +653,7 @@ export default function AdminDashboard({ onReturnToSite }) {
               const ok = await syncToServerDisk();
               setIsSavingDisk(false);
               if (ok) {
-                showToast('Synced all changes to server disk for multi-device persistence!');
+                showToast('Synced all changes to server disk & GitHub!');
               } else {
                 showToast('Changes saved locally.');
               }
@@ -3710,6 +3747,174 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </div>
               ))}
             </div>
+          </SpotlightCard>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB: GITHUB CLOUD SYNC & REPOSITORY MANAGEMENT           */}
+      {/* ======================================================== */}
+      {activeTab === 'github' && (
+        <div className="space-y-6">
+          <SectionControlsHeader
+            title="GitHub Cloud Sync & Multi-Device Repository"
+            subtitle="Automatically publish your live CMS changes directly to GitHub so your website stays consistent across every phone, laptop, and deployment."
+            badgeText="Git Version Control"
+            badgeColor="cyan"
+            sectionKey="github"
+            allowDeleteAll={false}
+            allowReset={false}
+          />
+
+          {/* Repository Status Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <SpotlightCard className="p-5 flex flex-col justify-between" spotlightColor="rgba(6, 182, 212, 0.2)">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono text-cyan-300 font-semibold uppercase">Target Repository</span>
+                  <GitBranch className="w-4 h-4 text-cyan-400" />
+                </div>
+                <h4 className="font-display text-lg font-bold text-white mb-1">
+                  youngtoaster/unnoticed-website
+                </h4>
+                <p className="text-xs text-slate-400 font-mono truncate">
+                  {gitStatus?.remoteUrl || 'https://github.com/youngtoaster/unnoticed-website.git'}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-slate-400">
+                <span>Branch: <strong className="text-white">{gitStatus?.branch || 'main'}</strong></span>
+                <span className="inline-flex items-center gap-1 text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Connected</span>
+                </span>
+              </div>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-5 flex flex-col justify-between" spotlightColor="rgba(168, 85, 247, 0.2)">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono text-purple-300 font-semibold uppercase">Latest Git Commit</span>
+                  <GitCommit className="w-4 h-4 text-purple-400" />
+                </div>
+                <h4 className="font-mono text-sm font-bold text-purple-300 mb-1">
+                  {gitStatus?.lastCommit?.hash ? `Commit ${gitStatus.lastCommit.hash}` : 'Tracking main'}
+                </h4>
+                <p className="text-xs text-slate-300 line-clamp-2">
+                  {gitStatus?.lastCommit?.message || 'Latest CMS updates'}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/[0.08] text-xs font-mono text-slate-400 flex items-center justify-between">
+                <span>Timestamp:</span>
+                <span className="text-slate-300">{gitStatus?.lastCommit?.relativeDate || 'Recent'}</span>
+              </div>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-5 flex flex-col justify-between" spotlightColor="rgba(16, 185, 129, 0.2)">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono text-emerald-300 font-semibold uppercase">Sync Automation</span>
+                  <Zap className="w-4 h-4 text-emerald-400" />
+                </div>
+                <h4 className="font-display text-lg font-bold text-white mb-1">
+                  Auto-Push Active
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Every edit made across Music, Bio, Merch, Tour, or Theme writes to disk and auto-commits to GitHub.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/[0.08] text-xs font-mono text-emerald-300 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>Live multi-device consistency</span>
+              </div>
+            </SpotlightCard>
+          </div>
+
+          {/* Manual GitHub Push Console */}
+          <SpotlightCard className="p-6 sm:p-7 space-y-4" spotlightColor="rgba(168, 85, 247, 0.2)">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+              <div>
+                <h3 className="font-display text-xl font-bold text-white flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-purple-400" />
+                  <span>Publish All Content to GitHub (main)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Stages `public/site_data.json` and `src/data/artistData.js`, commits, and pushes directly to GitHub repository.
+                </p>
+              </div>
+
+              <button
+                onClick={async () => {
+                  const res = await pushToGitHub(customCommitMsg || undefined);
+                  if (res.success) {
+                    showToast(res.message || 'Pushed all CMS content to GitHub repository!');
+                    setCustomCommitMsg('');
+                  } else {
+                    showToast('Sync error: ' + (res.error || 'Check local server status'));
+                  }
+                }}
+                disabled={isPushingGit}
+                className="px-6 py-3 rounded-2xl theme-primary-btn font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl disabled:opacity-50 cursor-pointer shrink-0"
+              >
+                <GitBranch className={`w-4 h-4 ${isPushingGit ? 'animate-spin' : ''}`} />
+                <span>{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub Now ↗'}</span>
+              </button>
+            </div>
+
+            <div>
+              <label className="text-xs font-mono text-slate-400 block mb-1">
+                Custom Git Commit Message (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Added new track Calling for Help, updated 2026 tour dates..."
+                value={customCommitMsg}
+                onChange={(e) => setCustomCommitMsg(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 placeholder:text-slate-600 font-mono"
+              />
+            </div>
+          </SpotlightCard>
+
+          {/* Remote Admin Mobile/Cloud Access (GitHub Personal Access Token) */}
+          <SpotlightCard className="p-6 sm:p-7 space-y-4" spotlightColor="rgba(6, 182, 212, 0.15)">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div>
+                <h4 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-cyan-400" />
+                  <span>Remote & Mobile Deployment Mode (GitHub Token)</span>
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  When editing from your phone or outside localhost, save a GitHub Personal Access Token to commit directly via the GitHub API.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="password"
+                placeholder="ghp_xxxxxxxxxxxx (GitHub Personal Access Token with repo scope)"
+                value={githubTokenInput}
+                onChange={(e) => setGithubTokenInput(e.target.value)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-cyan-400"
+              />
+              <button
+                onClick={() => {
+                  if (githubTokenInput.trim()) {
+                    localStorage.setItem('unnoticed_github_token', githubTokenInput.trim());
+                    showToast('GitHub Personal Access Token saved for remote syncing!');
+                  } else {
+                    localStorage.removeItem('unnoticed_github_token');
+                    showToast('GitHub token removed. Using local Git server.');
+                  }
+                }}
+                className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0 shadow-md shadow-cyan-600/30"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>Save Token</span>
+              </button>
+            </div>
+            <p className="text-[11px] font-mono text-slate-500">
+              * On your desktop local dev server, Git push works automatically without entering any token.
+            </p>
           </SpotlightCard>
         </div>
       )}

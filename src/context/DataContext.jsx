@@ -76,6 +76,25 @@ export function DataProvider({ children }) {
 
   // Multi-device synchronization state indicator
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+  const [gitStatus, setGitStatus] = useState({
+    isGit: false,
+    branch: 'main',
+    remoteUrl: 'https://github.com/youngtoaster/unnoticed-website.git',
+    lastCommit: null,
+    hasUncommitted: false
+  });
+  const [isPushingGit, setIsPushingGit] = useState(false);
+
+  // Check live git status
+  const refreshGitStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/git-sync');
+      if (res.ok) {
+        const info = await res.json();
+        setGitStatus((prev) => ({ ...prev, ...info }));
+      }
+    } catch {}
+  }, []);
 
   // CROSS-DEVICE CLOUD/NETWORK HYDRATION ON MOUNT:
   // Checks server endpoint /site_data.json to ensure content persists across every device
@@ -133,10 +152,11 @@ export function DataProvider({ children }) {
     };
 
     syncFromNetwork();
+    refreshGitStatus();
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshGitStatus]);
 
   // Dynamic CSS variables injection for Global Site Color Theme
   useEffect(() => {
@@ -218,17 +238,22 @@ export function DataProvider({ children }) {
       }
 
       // Multi-device persistence bridge:
-      // Writes to server disk so all other devices loading the site receive the updates
+      // Writes to server disk AND triggers auto-commit/push to GitHub so the repo stays 100% consistent everywhere
       try {
         setSyncStatus('syncing');
         fetch('/api/sync-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            ...payload,
+            autoGitPush: true,
+            commitMessage: `content: auto-sync update from admin [${new Date().toLocaleTimeString()}]`
+          })
         })
           .then((r) => {
             if (r.ok) {
               setSyncStatus('synced');
+              refreshGitStatus();
             } else {
               setSyncStatus('error');
             }
@@ -243,7 +268,7 @@ export function DataProvider({ children }) {
 
       return payload;
     });
-  }, []);
+  }, [refreshGitStatus]);
 
   // Force Push to Server Disk manually
   const syncToServerDisk = useCallback(async () => {
@@ -251,7 +276,8 @@ export function DataProvider({ children }) {
     try {
       const payload = {
         ...data,
-        _lastUpdated: Date.now()
+        _lastUpdated: Date.now(),
+        autoGitPush: true
       };
       const res = await fetch('/api/sync-data', {
         method: 'POST',
@@ -260,6 +286,7 @@ export function DataProvider({ children }) {
       });
       if (res.ok) {
         setSyncStatus('synced');
+        refreshGitStatus();
         return true;
       }
       setSyncStatus('error');
@@ -268,7 +295,107 @@ export function DataProvider({ children }) {
       setSyncStatus('error');
       return false;
     }
-  }, [data]);
+  }, [data, refreshGitStatus]);
+
+  // Universal Push to GitHub:
+  // Directly commits and pushes content to GitHub origin main (via local Git CLI or GitHub REST API)
+  const pushToGitHub = useCallback(async (customMsg = null) => {
+    setIsPushingGit(true);
+    setSyncStatus('syncing');
+
+    const payload = {
+      ...data,
+      _lastUpdated: Date.now()
+    };
+
+    // 1. First attempt: Push via local Git CLI endpoint (/api/git-sync)
+    try {
+      const res = await fetch('/api/git-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload,
+          commitMessage: customMsg || `content: sync CMS updates from site admin [${new Date().toLocaleDateString()}]`
+        })
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        setIsPushingGit(false);
+        setSyncStatus('synced');
+        refreshGitStatus();
+        return { success: true, method: 'local-git', ...result };
+      }
+    } catch (localErr) {
+      console.warn('Local git endpoint unreachable, checking GitHub API fallback:', localErr);
+    }
+
+    // 2. Fallback attempt: Push directly to GitHub REST API (for remote/production deployments)
+    const storedToken = localStorage.getItem('unnoticed_github_token');
+    if (storedToken) {
+      try {
+        const owner = 'youngtoaster';
+        const repo = 'unnoticed-website';
+        const filePath = 'public/site_data.json';
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+        // Get current file sha
+        let sha = null;
+        try {
+          const getRes = await fetch(apiUrl, {
+            headers: {
+              Authorization: `token ${storedToken}`,
+              Accept: 'application/vnd.github.v3+json'
+            }
+          });
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            sha = fileData.sha;
+          }
+        } catch {}
+
+        // Base64 encode JSON
+        const jsonString = JSON.stringify(payload, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(jsonString)));
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${storedToken}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            message: customMsg || `content: CMS update via GitHub API [${new Date().toISOString()}]`,
+            content: encodedContent,
+            sha: sha || undefined,
+            branch: 'main'
+          })
+        });
+
+        if (putRes.ok) {
+          const putData = await putRes.json();
+          setIsPushingGit(false);
+          setSyncStatus('synced');
+          return {
+            success: true,
+            method: 'github-api',
+            hash: putData.commit?.sha?.slice(0, 7),
+            message: 'Pushed directly to GitHub repository via GitHub REST API'
+          };
+        }
+      } catch (apiErr) {
+        console.error('GitHub API push failed:', apiErr);
+      }
+    }
+
+    setIsPushingGit(false);
+    setSyncStatus('error');
+    return {
+      success: false,
+      error: 'Could not connect to local Git server or GitHub API.'
+    };
+  }, [data, refreshGitStatus]);
 
   // Section Visibility Controls (Turn ON/OFF from Public Site)
   const toggleSectionVisibility = useCallback((sectionKey) => {
@@ -442,6 +569,10 @@ export function DataProvider({ children }) {
         importBackup,
         syncStatus,
         syncToServerDisk,
+        gitStatus,
+        isPushingGit,
+        pushToGitHub,
+        refreshGitStatus,
         toggleSectionVisibility,
         setSectionVisibility,
         clearSection,

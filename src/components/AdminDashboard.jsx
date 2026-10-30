@@ -595,20 +595,20 @@ export default function AdminDashboard({ onReturnToSite }) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full font-semibold text-xs shadow-2xl flex items-center gap-2 border ${
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full font-semibold text-xs shadow-2xl flex items-center gap-2 border backdrop-blur-xl ${
               (typeof toastMessage === 'object' && toastMessage?.type === 'error') ||
               (typeof toastMessage === 'string' && (toastMessage.toLowerCase().includes('error') || toastMessage.toLowerCase().includes('failed') || toastMessage.toLowerCase().includes('could not')))
-                ? 'bg-rose-950/95 text-rose-200 border-rose-500/60 shadow-rose-950/50'
-                : 'bg-purple-600 text-white border-purple-400 shadow-purple-900/50'
+                ? 'bg-[#1a080c]/95 text-rose-200 border-rose-500/60 shadow-rose-950/60'
+                : 'bg-[#10121d]/95 text-purple-200 border-purple-500/40 shadow-2xl shadow-black ring-1 ring-white/10'
             }`}
           >
             {(typeof toastMessage === 'object' && toastMessage?.type === 'error') ||
             (typeof toastMessage === 'string' && (toastMessage.toLowerCase().includes('error') || toastMessage.toLowerCase().includes('failed') || toastMessage.toLowerCase().includes('could not'))) ? (
               <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             ) : (
-              <Check className="w-4 h-4 text-white shrink-0" />
+              <Check className="w-4 h-4 text-purple-400 shrink-0" />
             )}
-            <span>{typeof toastMessage === 'object' ? toastMessage.text : toastMessage}</span>
+            <span className="text-slate-100 font-semibold">{typeof toastMessage === 'object' ? toastMessage.text : toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1376,13 +1376,14 @@ export default function AdminDashboard({ onReturnToSite }) {
               </h3>
               
               <MediaUploadOrLink
-                currentValue={featuredRelease?.cover || ''}
-                onSelect={(val) => {
+                label="Cover Artwork"
+                value={featuredRelease?.cover || ''}
+                onChange={(val) => {
                   updateFeaturedRelease({ cover: val });
                   showToast('Updated featured release artwork');
                 }}
                 type="image"
-                title="Select Album Cover"
+                placeholder="Paste direct image URL or upload image file..."
               />
 
               {featuredRelease?.cover && (
@@ -1408,13 +1409,14 @@ export default function AdminDashboard({ onReturnToSite }) {
               </h3>
 
               <MediaUploadOrLink
-                currentValue={featuredRelease?.audioUrl || ''}
-                onSelect={(val) => {
+                label="Master Audio Track"
+                value={featuredRelease?.audioUrl || ''}
+                onChange={(val) => {
                   updateFeaturedRelease({ audioUrl: val });
                   showToast('Updated featured release audio file');
                 }}
                 type="audio"
-                title="Select Audio Master"
+                placeholder="Paste MP3/WAV URL or upload audio file..."
               />
 
               {featuredRelease?.audioUrl && (

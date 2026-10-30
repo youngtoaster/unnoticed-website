@@ -142,24 +142,41 @@ a.bg-purple-500 * {
 
 /* Bulletproof Contrast Protection when Active Theme is Light / White / Silver */
 [data-theme-light="true"] .theme-primary-btn,
+[data-theme-light="true"] button.theme-primary-btn,
+[data-theme-light="true"] a.theme-primary-btn,
 [data-theme-light="true"] button.bg-purple-600,
 [data-theme-light="true"] button.bg-purple-500,
 [data-theme-light="true"] a.bg-purple-600,
 [data-theme-light="true"] a.bg-purple-500 {
   color: #050608 !important;
   background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(0, 0, 0, 0.18) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.22) !important;
 }
 
 [data-theme-light="true"] .theme-primary-btn *,
+[data-theme-light="true"] button.theme-primary-btn *,
+[data-theme-light="true"] a.theme-primary-btn *,
 [data-theme-light="true"] button.bg-purple-600 *,
 [data-theme-light="true"] button.bg-purple-500 *,
 [data-theme-light="true"] a.bg-purple-600 *,
 [data-theme-light="true"] a.bg-purple-500 * {
   color: #050608 !important;
-  fill: currentColor !important;
-  stroke: currentColor !important;
+  fill: #050608 !important;
+  stroke: #050608 !important;
+}
+
+/* Ensure any pill, badge, or container using bg-purple-600 retains dark contrast when light theme is active */
+[data-theme-light="true"] .bg-purple-600:not(button):not(a),
+[data-theme-light="true"] .bg-purple-500:not(button):not(a) {
+  background-color: #1e1f2f !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme-light="true"] .bg-purple-600:not(button):not(a) *,
+[data-theme-light="true"] .bg-purple-500:not(button):not(a) * {
+  color: #f8fafc !important;
 }
 
 /* Tame overblown white shadows and highlights across the entire site */

@@ -425,30 +425,31 @@ export default function MusicSection({
                   {/* ======================================================== */}
                   {/* COLUMN 1: PROMINENT VINYL ARTWORK & AUDIO STUDIO DECK     */}
                   {/* ======================================================== */}
-                  <div className="lg:w-[340px] xl:w-[380px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-y-auto custom-scrollbar">
+                  <div className="lg:w-[350px] xl:w-[390px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden">
                     <div>
                       {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY */}
-                      <div className="relative w-full max-w-[280px] xl:max-w-[320px] mx-auto pt-2 pb-4 flex items-center justify-center">
-                        {/* Vinyl Disc Sliding Out From Behind Sleeve */}
+                      {/* Disc slides out prominently without horizontal jumping during playback */}
+                      <div className="relative w-full max-w-[300px] xl:max-w-[340px] mx-auto pt-2 pb-3 flex items-center justify-center">
+                        {/* Vinyl Disc Sliding Out Prominently Behind Sleeve */}
                         <motion.div
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { rotate: 360, x: 38 }
-                              : { rotate: 0, x: 26 }
+                              ? { rotate: 360 }
+                              : { rotate: 0 }
                           }
                           transition={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { rotate: { duration: 4, repeat: Infinity, ease: 'linear' }, x: { duration: 0.5 } }
+                              ? { duration: 4.5, repeat: Infinity, ease: 'linear' }
                               : { duration: 0.5 }
                           }
-                          className="absolute w-44 h-44 sm:w-52 sm:h-52 xl:w-56 xl:h-56 rounded-full bg-[#0d0e14] border-[7px] border-[#151620] shadow-2xl flex items-center justify-center pointer-events-none z-0"
+                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 translate-x-14 sm:translate-x-18"
                           style={{
                             boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
                             backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
                           }}
                         >
                           {/* Vinyl Center Label */}
-                          <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+                          <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
                             <img
                               src={focusedTrack.cover}
                               alt="Vinyl Center"
@@ -459,8 +460,8 @@ export default function MusicSection({
                           </div>
                         </motion.div>
 
-                        {/* Main High-Res Album Jacket / Sleeve */}
-                        <div className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 xl:w-56 xl:h-56 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16]">
+                        {/* Main High-Res Album Jacket / Sleeve (Balanced offset for extended vinyl disc) */}
+                        <div className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16] -translate-x-8 sm:-translate-x-10">
                           <img
                             src={focusedTrack.cover}
                             alt={focusedTrack.title}
@@ -509,7 +510,7 @@ export default function MusicSection({
                       </div>
 
                       {/* Track Identity Header */}
-                      <div className="text-center mt-3 mb-2">
+                      <div className="text-center mt-3 mb-1">
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-mono uppercase font-semibold mb-1.5">
                           <Sparkles className="w-3 h-3 text-cyan-400" />
                           <span>Studio Discography Master</span>
@@ -522,19 +523,13 @@ export default function MusicSection({
                         <p className="text-xs text-slate-300 font-mono mt-0.5">
                           <span className="text-white font-semibold">UNNOTICED</span> {focusedTrack.featuring && <span className="text-purple-300 font-normal">• feat. {focusedTrack.featuring}</span>}
                         </p>
-
-                        {/* Hi-Res Lossless Specs Pill */}
-                        <div className="mt-2.5 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-slate-300">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>24-Bit / 48kHz Digital Master</span>
-                        </div>
                       </div>
                     </div>
 
-                    {/* Audio Controls & DSP Destination Action Row */}
+                    {/* Audio Controls & DSP Destination Action Row (Fixed Heights to Prevent Any UI Jumping) */}
                     <div className="space-y-2.5 pt-3 border-t border-white/[0.08] mt-auto">
                       <motion.button
-                        whileTap={{ scale: 0.96 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => {
                           if (currentTrack?.id !== focusedTrack.id) {
                             onSelectTrack(focusedTrack);
@@ -542,13 +537,13 @@ export default function MusicSection({
                             togglePlay();
                           }
                         }}
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/35 border border-white/20 active:scale-95 transition-all cursor-pointer"
+                        className="w-full h-11 sm:h-12 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/35 border border-white/20 active:scale-95 transition-all cursor-pointer"
                       >
                         {isPlaying && currentTrack?.id === focusedTrack.id ? (
                           <>
-                            <Pause className="w-4 h-4 fill-white" />
+                            <Pause className="w-4 h-4 fill-white shrink-0" />
                             <span>Pause Studio Preview</span>
-                            <span className="flex items-center gap-0.5 h-3 ml-1">
+                            <span className="flex items-center gap-0.5 h-3 ml-1 shrink-0">
                               <span className="w-0.5 h-2.5 bg-white rounded-full animate-equalizer-1" />
                               <span className="w-0.5 h-3.5 bg-white rounded-full animate-equalizer-2" />
                               <span className="w-0.5 h-2 bg-white rounded-full animate-equalizer-3" />
@@ -556,7 +551,7 @@ export default function MusicSection({
                           </>
                         ) : (
                           <>
-                            <Play className="w-4 h-4 fill-white ml-0.5" />
+                            <Play className="w-4 h-4 fill-white ml-0.5 shrink-0" />
                             <span>Play Studio Preview ({focusedTrack.duration})</span>
                           </>
                         )}
@@ -567,7 +562,7 @@ export default function MusicSection({
                           href={focusedTrack.spotifyUrl || artistInfo.socials?.spotify}
                           target="_blank"
                           rel="noreferrer"
-                          className="py-2.5 px-3 rounded-xl bg-[#1ed760]/15 hover:bg-[#1ed760]/25 border border-[#1ed760]/40 text-[#1ed760] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
+                          className="h-10 px-3 rounded-xl bg-[#1ed760]/15 hover:bg-[#1ed760]/25 border border-[#1ed760]/40 text-[#1ed760] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
                         >
                           <SpotifyIcon className="w-4 h-4 fill-current shrink-0" />
                           <span className="truncate">Spotify</span>
@@ -578,7 +573,7 @@ export default function MusicSection({
                           href={focusedTrack.appleMusicUrl || artistInfo.socials?.appleMusic}
                           target="_blank"
                           rel="noreferrer"
-                          className="py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
+                          className="h-10 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
                         >
                           <Music className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                           <span className="truncate">Apple Music</span>
@@ -587,11 +582,11 @@ export default function MusicSection({
                       </div>
 
                       <div className="pt-2 flex items-center justify-between text-[10px] font-mono text-slate-400 px-1">
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1.5">
                           <Sparkles className="w-3 h-3 text-amber-400" />
                           Genius Insights: <strong className="text-amber-300 font-bold">{annotatedLines.length}</strong>
                         </span>
-                        <span>McKees Rocks, PA</span>
+                        <span className="text-slate-500 font-mono text-[9.5px]">Official Studio Master</span>
                       </div>
                     </div>
                   </div>

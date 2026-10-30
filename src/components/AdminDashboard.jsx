@@ -6,7 +6,7 @@ import {
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
-  AlignLeft, AlignCenter, AlignRight
+  AlignLeft, AlignCenter, AlignRight, Compass
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -159,11 +159,12 @@ const FONT_OPTIONS = [
 ];
 
 const SIZE_PRESETS = [
-  { label: 'Compact (3.25rem)', rem: 3.25, tailwind: 'text-2xl sm:text-4xl md:text-5xl lg:text-5xl' },
-  { label: 'Stage Medium (4.5rem)', rem: 4.5, tailwind: 'text-3xl sm:text-5xl md:text-6xl lg:text-6xl' },
+  { label: 'Compact Club (3.0rem)', rem: 3.0, tailwind: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl' },
+  { label: 'Clean Modern (3.75rem)', rem: 3.75, tailwind: 'text-2xl sm:text-4xl md:text-5xl lg:text-6xl' },
+  { label: 'Comfortable Stage (4.25rem • Default)', rem: 4.25, tailwind: 'text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]' },
   { label: 'Hero Bold (5.25rem)', rem: 5.25, tailwind: 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]' },
   { label: 'Stadium Big (7.5rem)', rem: 7.5, tailwind: 'text-4xl sm:text-7xl md:text-8xl lg:text-[7.5rem]' },
-  { label: 'Monumental (10rem+)', rem: 10, tailwind: 'text-5xl sm:text-8xl md:text-9xl lg:text-[10rem]' },
+  { label: 'Monumental (10rem)', rem: 10, tailwind: 'text-5xl sm:text-8xl md:text-9xl lg:text-[10rem]' },
 ];
 
 // Curated Aesthetic Color Themes for the Entire Website
@@ -286,8 +287,8 @@ export default function AdminDashboard({ onReturnToSite }) {
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
     font: 'font-display',
-    size: 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]',
-    fontSizeRem: 5.25,
+    size: 'text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]',
+    fontSizeRem: 4.25,
     align: 'center',
     fontWeight: 'font-black',
     flicker: true,
@@ -1588,6 +1589,110 @@ export default function AdminDashboard({ onReturnToSite }) {
             </div>
           </SpotlightCard>
 
+          {/* ================= TOP NAVIGATION BAR BRANDING & BADGES ================= */}
+          <SpotlightCard className="p-6 space-y-5" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+              <div>
+                <span className="text-[10px] font-mono tracking-widest text-purple-400 uppercase font-bold">
+                  HEADER NAVIGATION BAR // BRAND CONTROLS
+                </span>
+                <h3 className="font-display text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                  <Compass className="w-4 h-4 text-purple-400" />
+                  <span>Top Navigation Brand & Badges</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Customize the brand moniker pill and subtitle tagline in the sticky top navbar, or toggle them off.
+                </p>
+              </div>
+
+              {/* Real-Time Live Mini Preview of Navbar Brand */}
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.14] bg-[#07080e] shadow-lg shrink-0">
+                <span className="text-[9px] font-mono text-slate-500 uppercase">Live Header:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-black text-xs text-white">
+                    {artistInfo.name || 'UNNOTICED'}
+                  </span>
+                  {artistInfo.showNavbarMoniker !== false && (
+                    <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8px] font-mono tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 uppercase font-semibold">
+                      {artistInfo.navbarMoniker ?? artistInfo.previousName ?? 'Ty Sciullo'}
+                    </span>
+                  )}
+                </div>
+                {artistInfo.showNavbarTagline !== false && (
+                  <span className="text-[8.5px] text-slate-400 font-mono hidden md:inline">
+                    • {artistInfo.navbarTagline || 'Official Artist Experience'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Moniker Badge (Ty Sciullo) */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-white block">Navbar Moniker Pill</span>
+                    <span className="text-[10px] font-mono text-slate-400">Pill badge displayed next to artist title</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={artistInfo.showNavbarMoniker !== false}
+                      onChange={(e) => updateData({ artistInfo: { ...artistInfo, showNavbarMoniker: e.target.checked } })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-mono text-slate-400 block mb-1">Badge Text</label>
+                  <input
+                    type="text"
+                    value={artistInfo.navbarMoniker ?? artistInfo.previousName ?? 'Ty Sciullo'}
+                    onChange={(e) => updateData({ artistInfo: { ...artistInfo, navbarMoniker: e.target.value } })}
+                    placeholder="e.g. Ty Sciullo"
+                    disabled={artistInfo.showNavbarMoniker === false}
+                    className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-mono text-purple-300 focus:outline-none focus:border-purple-400 disabled:opacity-40"
+                  />
+                </div>
+              </div>
+
+              {/* Subtitle Tagline (Official Artist Experience) */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-white block">Navbar Subtitle Tagline</span>
+                    <span className="text-[10px] font-mono text-slate-400">Micro-tagline beneath brand in header</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={artistInfo.showNavbarTagline !== false}
+                      onChange={(e) => updateData({ artistInfo: { ...artistInfo, showNavbarTagline: e.target.checked } })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-mono text-slate-400 block mb-1">Tagline Text</label>
+                  <input
+                    type="text"
+                    value={artistInfo.navbarTagline ?? 'Official Artist Experience'}
+                    onChange={(e) => updateData({ artistInfo: { ...artistInfo, navbarTagline: e.target.value } })}
+                    placeholder="e.g. Official Artist Experience"
+                    disabled={artistInfo.showNavbarTagline === false}
+                    className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-mono text-slate-300 focus:outline-none focus:border-purple-400 disabled:opacity-40"
+                  />
+                </div>
+              </div>
+
+            </div>
+          </SpotlightCard>
+
           {/* ================= PLANES NEON SIGN TITLE CONTROLS ================= */}
           <SpotlightCard className="p-6 space-y-6" tilt={false}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-2">
@@ -1677,7 +1782,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                 <span>•</span>
                 <span>Font: <strong className="text-white">{FONT_OPTIONS.find(f => f.id === neonConfig.font)?.name || 'Syne'}</strong></span>
                 <span>•</span>
-                <span>Scale: <strong className="text-fuchsia-400">{neonConfig.fontSizeRem || 5.25}rem</strong></span>
+                <span>Scale: <strong className="text-fuchsia-400">{neonConfig.fontSizeRem || 4.25}rem</strong></span>
                 <span>•</span>
                 <span>Align: <strong className="text-white uppercase">{neonConfig.align || 'center'}</strong></span>
               </div>
@@ -1882,7 +1987,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                       <span>Artist Title Sizing & Scale Control</span>
                     </label>
                     <span className="text-xs font-mono font-bold text-fuchsia-300 bg-fuchsia-950/60 px-2 py-0.5 rounded border border-fuchsia-500/40">
-                      {neonConfig.fontSizeRem || 5.25}rem (~{Math.round((neonConfig.fontSizeRem || 5.25) * 16)}px)
+                      {neonConfig.fontSizeRem || 4.25}rem (~{Math.round((neonConfig.fontSizeRem || 4.25) * 16)}px)
                     </span>
                   </div>
 
@@ -1893,7 +1998,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                       min="2.5"
                       max="12"
                       step="0.25"
-                      value={neonConfig.fontSizeRem || 5.25}
+                      value={neonConfig.fontSizeRem || 4.25}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
                         updateData({
@@ -1911,9 +2016,9 @@ export default function AdminDashboard({ onReturnToSite }) {
                     />
                     <div className="flex justify-between text-[9px] font-mono text-slate-500">
                       <span>2.5rem (Compact)</span>
-                      <span>5.25rem (Default)</span>
-                      <span>8.0rem (Stadium)</span>
-                      <span>12.0rem (Monumental)</span>
+                      <span>4.25rem (Comfortable Default)</span>
+                      <span>7.5rem (Stadium)</span>
+                      <span>10.0rem (Monumental)</span>
                     </div>
                   </div>
 
@@ -1922,7 +2027,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                     <span className="text-[10px] font-mono text-slate-400 block mb-1.5">Quick Scale Presets</span>
                     <div className="flex flex-wrap gap-1.5">
                       {SIZE_PRESETS.map((preset) => {
-                        const isSelected = Math.abs((neonConfig.fontSizeRem || 5.25) - preset.rem) < 0.15;
+                        const isSelected = Math.abs((neonConfig.fontSizeRem || 4.25) - preset.rem) < 0.15;
                         return (
                           <button
                             key={preset.rem}

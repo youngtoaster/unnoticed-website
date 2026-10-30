@@ -349,8 +349,8 @@ export default function HeroSection({
                 delay={0.2}
                 flicker={neonConfig.flicker ?? true}
                 onIgnitionProgress={setIgnitionState}
-                style={neonConfig.fontSizeRem ? { fontSize: `clamp(2.5rem, 8.5vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
-                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
+                style={neonConfig.fontSizeRem ? { fontSize: `clamp(2rem, 5.2vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
+                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
               >
                 {artistInfo.name || 'UNNOTICED'}
               </NeonSign>

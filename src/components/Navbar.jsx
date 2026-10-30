@@ -98,34 +98,24 @@ export default function Navbar({
           {/* Left: Brand Identity */}
           <button
             onClick={handleLogoClick}
-            className="flex items-center gap-2 text-left group cursor-pointer focus:outline-none shrink-0"
+            className="flex items-center text-left group cursor-pointer focus:outline-none shrink-0 py-0.5"
           >
-            <div
-              className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full p-[1.5px] shadow-md"
-              style={{
-                background: `linear-gradient(to top right, ${theme.primary}, ${theme.secondary}, ${theme.accent})`,
-                boxShadow: `0 0 10px ${theme.primary}40`
-              }}
-            >
-              <div className="w-full h-full rounded-full bg-[#08090f] flex items-center justify-center overflow-hidden">
-                <span className="font-display font-black text-xs text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, #ffffff, ${theme.accent})` }}>
-                  U
-                </span>
-              </div>
-            </div>
-
             <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <span className="font-display font-black tracking-wider text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">
-                  UNNOTICED
+                  {artistInfo.name || 'UNNOTICED'}
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-mono tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 uppercase font-semibold">
-                  Ty Sciullo
-                </span>
+                {artistInfo.showNavbarMoniker !== false && (
+                  <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-mono tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 uppercase font-semibold">
+                    {artistInfo.navbarMoniker ?? artistInfo.previousName ?? 'Ty Sciullo'}
+                  </span>
+                )}
               </div>
-              <p className="text-[9.5px] text-slate-400 font-mono tracking-wide hidden sm:block">
-                Official Artist Experience
-              </p>
+              {artistInfo.showNavbarTagline !== false && (
+                <p className="text-[9.5px] text-slate-400 font-mono tracking-wide hidden sm:block">
+                  {artistInfo.navbarTagline || 'Official Artist Experience'}
+                </p>
+              )}
             </div>
           </button>
 

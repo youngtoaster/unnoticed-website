@@ -12,7 +12,8 @@ export default function HeroSection({
   currentTrack,
   isPlaying,
   togglePlay,
-  onSelectTrack
+  onSelectTrack,
+  canIgnite = true
 }) {
   const { artistInfo, tracks, siteTheme, sectionsVisibility, toggleSectionVisibility } = useSiteData();
   const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
@@ -82,14 +83,14 @@ export default function HeroSection({
   // When ignition reaches full completion on page load, add a pre-detonation tension pause:
   // All letters lock in solid, voltage hums for 220ms, then the light pulse DETONATES!
   useEffect(() => {
-    if (ignitionState.isFullyLit && !hasTriggeredInitialRef.current) {
+    if (canIgnite && ignitionState.isFullyLit && !hasTriggeredInitialRef.current) {
       hasTriggeredInitialRef.current = true;
       const timer = setTimeout(() => {
         triggerExplosion();
       }, 240);
       return () => clearTimeout(timer);
     }
-  }, [ignitionState.isFullyLit, triggerExplosion]);
+  }, [canIgnite, ignitionState.isFullyLit, triggerExplosion]);
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -124,21 +125,21 @@ export default function HeroSection({
   // Held completely pitch dark (0) until the light pulse detonates,
   // revealing only through the expanding wavefront of the pulse,
   // then settling at targetOpacity once the pulse is fully scattered.
-  const currentBackdropOpacity = isIlluminated
-    ? (hasRevealed || explosionActive
-        ? targetOpacity
-        : 0)
-    : targetOpacity;
+  const currentBackdropOpacity = !canIgnite
+    ? 0
+    : isIlluminated
+      ? (hasRevealed || explosionActive ? targetOpacity : 0)
+      : targetOpacity;
 
-  const currentBackdropBrightness = isIlluminated
-    ? (hasRevealed
-        ? 1.05
-        : (explosionActive ? 1.5 : 0))
-    : 1;
+  const currentBackdropBrightness = !canIgnite
+    ? 0
+    : isIlluminated
+      ? (hasRevealed ? 1.05 : (explosionActive ? 1.5 : 0))
+      : 1;
 
   // Mask / light cones radiating directly behind each ignited letter during ignition
   const letterBloomOverlay = useMemo(() => {
-    if (!isIlluminated || !explosionActive) {
+    if (!canIgnite || !isIlluminated || !explosionActive) {
       return null;
     }
     const gasColor = neonConfig.color || theme?.primary || '#a855f7';
@@ -146,7 +147,7 @@ export default function HeroSection({
       const pct = 14 + (idx / Math.max(1, ignitionState.totalCount - 1)) * 72;
       return `radial-gradient(ellipse at ${pct}% 45%, ${gasColor}66 0%, ${gasColor}20 35%, transparent 68%)`;
     }).join(', ');
-  }, [isIlluminated, explosionActive, ignitionState, neonConfig.color, theme?.primary]);
+  }, [canIgnite, isIlluminated, explosionActive, ignitionState, neonConfig.color, theme?.primary]);
 
   const align = neonConfig.align || 'center';
   const gasColor = neonConfig.color || theme?.primary || '#a855f7';
@@ -178,8 +179,8 @@ export default function HeroSection({
     'self-center';
 
   // Dynamic caption illumination (lights up progressively as the neon sign ignites)
-  const isCaptionLit = ignitionState.isFullyLit;
-  const captionProgress = ignitionState.progress;
+  const isCaptionLit = canIgnite && ignitionState.isFullyLit;
+  const captionProgress = canIgnite ? ignitionState.progress : 0;
   const captionShadow = isCaptionLit
     ? `0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 20px ${gasColor}, 0 0 35px ${gasColor}aa`
     : (captionProgress > 0
@@ -344,7 +345,13 @@ export default function HeroSection({
               opacity: 0
             } : false}
             animate={
-              explosionActive
+              !canIgnite
+                ? {
+                    clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
+                    opacity: 0,
+                    filter: `brightness(0) blur(${blurAmount})`
+                  }
+                : explosionActive
                 ? {
                     clipPath: FACETED_WAVEFRONT_KEYFRAMES,
                     opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
@@ -437,8 +444,8 @@ export default function HeroSection({
           {artistInfo.tourBadge?.enabled !== false && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+              animate={canIgnite ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
               className={`mb-4 sm:mb-5 ${tourBadgeAlignClass}`}
             >
             <motion.a
@@ -528,7 +535,13 @@ export default function HeroSection({
                   opacity: 0
                 } : false}
                 animate={
-                  explosionActive
+                  !canIgnite
+                    ? {
+                        clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
+                        opacity: 0,
+                        filter: `brightness(0) blur(${blurAmount})`
+                      }
+                    : explosionActive
                     ? {
                         clipPath: FACETED_WAVEFRONT_KEYFRAMES,
                         opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
@@ -619,6 +632,7 @@ export default function HeroSection({
                 color={gasColor}
                 delay={0.2}
                 flicker={neonConfig.flicker ?? true}
+                canIgnite={canIgnite}
                 onIgnitionProgress={setIgnitionState}
                 style={neonConfig.fontSizeRem ? { fontSize: `clamp(2rem, 5.2vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
                 className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
@@ -630,7 +644,7 @@ export default function HeroSection({
             {/* Subtitle badge with Dynamic Neon Illumination - Lights up with neon sign */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={canIgnite ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className={`flex items-center ${subtitleJustifyClass} gap-2 sm:gap-2.5 mt-2.5 sm:mt-3 w-full max-w-xl px-2`}
             >
@@ -674,7 +688,7 @@ export default function HeroSection({
           {/* Bio Teaser - Dynamic Alignment & Balanced Scale */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={canIgnite ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2 whitespace-pre-line ${bioAlignClass}`}
           >
@@ -692,8 +706,12 @@ export default function HeroSection({
               const el = document.querySelector(target);
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            animate={{ y: [0, 4, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            initial={{ opacity: 0 }}
+            animate={canIgnite ? { opacity: 1, y: [0, 4, 0] } : { opacity: 0 }}
+            transition={canIgnite ? {
+              opacity: { duration: 0.5, delay: 0.5 },
+              y: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
+            } : { duration: 0.2 }}
             className="group flex flex-col items-center gap-1.5 text-slate-400 hover:text-purple-300 transition-colors cursor-pointer py-1"
             aria-label="Scroll to explore archive"
           >
@@ -712,7 +730,10 @@ export default function HeroSection({
 
           {/* Quick Stage Art Live View Toggle */}
           {backdrop.image && (
-            <button
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={canIgnite ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
               onClick={() => {
                 if (toggleSectionVisibility) {
                   toggleSectionVisibility('heroBackdrop');
@@ -736,7 +757,7 @@ export default function HeroSection({
                   <span>Stage Art: <strong className="text-slate-400">Hidden</strong></span>
                 </>
               )}
-            </button>
+            </motion.button>
           )}
         </div>
 

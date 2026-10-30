@@ -21,13 +21,33 @@ import NewReleaseOverlay from './components/NewReleaseOverlay';
 import FeaturedReleaseSection from './components/FeaturedReleaseSection';
 
 function AppContent() {
-  const { tracks, merchProducts, isAdminAuthenticated, sectionsVisibility } = useSiteData();
+  const { tracks, merchProducts, isAdminAuthenticated, sectionsVisibility, featuredRelease } = useSiteData();
   const [currentTrack, setCurrentTrack] = useState(tracks && tracks[0] ? tracks[0] : null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [activeView, setActiveView] = useState('main'); // 'main' | 'epk' | 'admin'
   const [cartOpen, setCartOpen] = useState(false);
   const [adminLoginOpen, setAdminLoginOpen] = useState(false);
+
+  // Coordinate hero lighting & reveal animations with New Release Takeover:
+  // When the takeover modal is active on load, hold hero animations until the user clicks off / dismisses it.
+  const [isTakeoverActive, setIsTakeoverActive] = useState(() => {
+    try {
+      const rel = featuredRelease;
+      if (!rel || rel.popupEnabled === false) return false;
+      const sessionKey = `unnoticed_seen_release_${rel.title || 'release'}_v1`;
+      return !sessionStorage.getItem(sessionKey);
+    } catch {
+      return false;
+    }
+  });
+
+  // If featuredRelease updates (e.g. admin toggles popupEnabled off), release the hold immediately
+  useEffect(() => {
+    if (featuredRelease && featuredRelease.popupEnabled === false) {
+      setIsTakeoverActive(false);
+    }
+  }, [featuredRelease?.popupEnabled]);
 
   // Keep currentTrack synchronized if tracks change or on initial load
   useEffect(() => {
@@ -205,7 +225,7 @@ function AppContent() {
           />
 
           {/* New Release High-Velocity Slam-In Overlay Takeover */}
-          <NewReleaseOverlay />
+          <NewReleaseOverlay onDismiss={() => setIsTakeoverActive(false)} />
 
           {/* View routing: Admin Dashboard vs EPK vs Main Experience */}
       {activeView === 'admin' ? (
@@ -233,6 +253,7 @@ function AppContent() {
                 isPlaying={isPlaying}
                 togglePlay={togglePlay}
                 onSelectTrack={onSelectTrack}
+                canIgnite={!isTakeoverActive}
               />
 
               {/* 1B. New Release Showcase: Promoted Song/Album directly below Artist Hero */}

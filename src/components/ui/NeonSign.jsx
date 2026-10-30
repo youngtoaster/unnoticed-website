@@ -21,6 +21,7 @@ export function NeonSign({
   delay = 0.2,
   flicker = true,
   className = '',
+  canIgnite = true,
   onIgnitionProgress,
   ...props
 }) {
@@ -67,6 +68,11 @@ export function NeonSign({
   // Initial Random Ignition Sequence:
   // Randomizes the order of characters and simulates high-voltage transformer sputtering
   useEffect(() => {
+    if (!canIgnite) {
+      setIgnitedIndices([]);
+      setSputteringMap({});
+      return;
+    }
     if (shouldReduceMotion || !isInView) return;
 
     // Collect all non-space character indices
@@ -128,11 +134,11 @@ export function NeonSign({
     });
 
     return () => timeouts.forEach(clearTimeout);
-  }, [isInView, characters, delay, shouldReduceMotion]);
+  }, [isInView, characters, delay, shouldReduceMotion, canIgnite]);
 
   // Occasional random tube brown-out / micro-voltage flicker after ignition
   useEffect(() => {
-    if (!flicker || shouldReduceMotion || !isInView) return;
+    if (!flicker || shouldReduceMotion || !isInView || !canIgnite || ignitedIndices.length === 0) return;
 
     let brownoutTimeout;
     const interval = setInterval(() => {
@@ -154,7 +160,7 @@ export function NeonSign({
       clearInterval(interval);
       if (brownoutTimeout) clearTimeout(brownoutTimeout);
     };
-  }, [flicker, characters, isInView, shouldReduceMotion]);
+  }, [flicker, characters, isInView, shouldReduceMotion, canIgnite, ignitedIndices.length]);
 
   // Neon shadows calculated dynamically based on gas color
   const litShadow = useMemo(() => {

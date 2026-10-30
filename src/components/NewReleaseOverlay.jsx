@@ -21,7 +21,7 @@ function formatTime(seconds) {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
+export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onDismiss }) {
   const { featuredRelease } = useSiteData();
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -58,20 +58,25 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
     }
     if (release.popupEnabled === false) {
       setIsOpen(false);
+      if (onDismiss) onDismiss();
       return;
     }
 
     // Check session storage to avoid annoyance on repetitive soft reloads
     const sessionKey = `unnoticed_seen_release_${release.title}_v1`;
     const seen = sessionStorage.getItem(sessionKey);
-    if (!seen) {
-      // Delay slightly for smooth page entrance
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 550);
-      return () => clearTimeout(timer);
+    if (seen) {
+      setIsOpen(false);
+      if (onDismiss) onDismiss();
+      return;
     }
-  }, [forceOpen, release.popupEnabled, release.title]);
+
+    // Delay slightly for smooth page entrance
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [forceOpen, release.popupEnabled, release.title, onDismiss]);
 
   // Audio sample playback handling
   useEffect(() => {
@@ -197,6 +202,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
     setIsOpen(false);
     sessionStorage.setItem(`unnoticed_seen_release_${release.title}_v1`, 'true');
     if (onCloseForce) onCloseForce();
+    if (onDismiss) onDismiss();
   };
 
   const handleTogglePlay = () => {

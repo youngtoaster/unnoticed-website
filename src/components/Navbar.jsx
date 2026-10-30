@@ -215,18 +215,13 @@ export default function Navbar({
           >
             {/* Top Bar inside Menu */}
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-md shadow-purple-600/50">
-                  U
-                </div>
-                <div>
-                  <h4 className="font-display font-black text-white text-base tracking-wider">
-                    UNNOTICED
-                  </h4>
-                  <p className="text-[10px] text-purple-300 font-mono">
-                    Formerly Ty Sciullo • McKees Rocks, PA
-                  </p>
-                </div>
+              <div>
+                <h4 className="font-display font-black text-white text-base tracking-wider">
+                  {artistInfo.name || 'UNNOTICED'}
+                </h4>
+                <p className="text-[10px] text-purple-300 font-mono">
+                  {artistInfo.tagline || 'Formerly Ty Sciullo • McKees Rocks, PA'}
+                </p>
               </div>
 
               <button

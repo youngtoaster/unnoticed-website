@@ -168,19 +168,19 @@ export default function StreamingHubSection() {
                 <span className="leading-snug">{platform.metrics}</span>
               </div>
 
-              {/* Description - Locked to consistent 64px min-height across all 4 cards */}
-              <p className="min-h-[64px] text-xs text-slate-300 leading-relaxed font-light mb-4">
+              {/* Description - Locked to consistent 68px height across all 4 cards */}
+              <p className="h-[68px] text-xs text-slate-300 leading-relaxed font-light mb-4 line-clamp-3 overflow-hidden">
                 {platform.description}
               </p>
             </div>
 
             {/* Launch Action Button - Guaranteed strictly pixel-aligned at the bottom */}
-            <div className="mt-auto pt-4 border-t border-white/[0.08]">
+            <div className="mt-auto pt-4 border-t border-white/[0.08] shrink-0">
               <a
                 href={platform.url}
                 target="_blank"
                 rel="noreferrer"
-                className={`w-full h-11 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer ${platform.buttonClass}`}
+                className={`w-full h-11 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer shrink-0 ${platform.buttonClass}`}
               >
                 <span>Listen on {platform.name}</span>
                 <ExternalLink className="w-3.5 h-3.5" />

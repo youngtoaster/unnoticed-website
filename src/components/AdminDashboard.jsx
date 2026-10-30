@@ -6,12 +6,13 @@ import {
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
-  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit
+  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import MediaUploadOrLink from './MediaUploadOrLink';
+import NewReleaseOverlay from './NewReleaseOverlay';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
 import NeonSign from './ui/NeonSign';
@@ -265,6 +266,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const {
     artistInfo, tracks, biography, videos, tourDates, pastTours,
     merchProducts, galleryImages, socialPosts, epkData,
+    featuredRelease, updateFeaturedRelease,
     sectionsVisibility, toggleSectionVisibility, clearSection, resetSectionToDefault,
     syncStatus, syncToServerDisk,
     gitStatus, isPushingGit, pushToGitHub, refreshGitStatus,
@@ -272,6 +274,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   } = useSiteData();
 
   const [activeTab, setActiveTab] = useState('tracks');
+  const [testOverlayOpen, setTestOverlayOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [customCommitMsg, setCustomCommitMsg] = useState('');
   const [githubTokenInput, setGithubTokenInput] = useState(() => {
@@ -293,6 +296,8 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [quickLinkInput, setQuickLinkInput] = useState('');
   const [quickLinkResult, setQuickLinkResult] = useState(null);
   const [isQuickFetching, setIsQuickFetching] = useState(false);
+  const [sampleAuditionPlaying, setSampleAuditionPlaying] = useState(false);
+  const sampleAuditionRef = useRef(null);
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -568,6 +573,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const tabs = [
     { id: 'tracks', label: 'Music & Audio', icon: Music, count: tracks.length },
     { id: 'lyrics', label: 'Genius Lyrics', icon: FileText, count: tracks.length },
+    { id: 'showcase', label: 'Release Showcase', icon: Disc3, count: null },
     { id: 'theme', label: 'Site Color Theme', icon: Palette, count: null },
     { id: 'profile', label: 'Profile & Bio', icon: Sparkles, count: biography.length },
     { id: 'videos', label: 'Videos & Visuals', icon: Youtube, count: videos.length },
@@ -1195,6 +1201,428 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB: NEW RELEASE SHOWCASE & ON-LOAD TAKEOVER ================= */}
+      {activeTab === 'showcase' && (
+        <div className="space-y-6">
+          {/* Test Modal Overlay Simulation */}
+          {testOverlayOpen && (
+            <NewReleaseOverlay forceOpen={true} onCloseForce={() => setTestOverlayOpen(false)} />
+          )}
+
+          {/* Hidden sample audition audio element */}
+          <audio
+            ref={sampleAuditionRef}
+            src={featuredRelease?.audioUrl || 'https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8'}
+            onEnded={() => setSampleAuditionPlaying(false)}
+          />
+
+          {/* Section Header with Live Test Action */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] relative overflow-hidden">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] font-mono text-purple-300 font-bold uppercase tracking-wider">
+                  Home Screen Promotion Engine
+                </span>
+              </div>
+              <h2 className="font-display text-2xl font-black text-white tracking-tight">
+                New Release Showcase & On-Load Takeover
+              </h2>
+              <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+                Configure your promoted single or album. Control the high-velocity animated slam-in overlay with audio preview on site load, and the hero showcase card embedded right below the artist title.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setTestOverlayOpen(true)}
+                className="px-5 py-2.5 rounded-xl font-bold text-xs theme-primary-btn flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xl"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-300 animate-pulse" />
+                <span>🚀 Test Slam-In Animation</span>
+              </button>
+            </div>
+          </div>
+
+          {/* TOGGLES: POPUP TAKEOVER & HERO CARD */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Toggle 1: Site Load Slam-In Popup */}
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${featuredRelease?.popupEnabled !== false ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  <h3 className="text-sm font-display font-bold text-white">
+                    On-Site Load Slam-In Takeover
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  When enabled, visitors will see the album sleeve slam in with extreme velocity and hear the audio sample when opening the site.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const nextVal = featuredRelease?.popupEnabled === false ? true : false;
+                  updateFeaturedRelease({ popupEnabled: nextVal });
+                  showToast(nextVal ? 'Slam-In Takeover enabled on site load' : 'Slam-In Takeover disabled');
+                }}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  featuredRelease?.popupEnabled !== false ? 'bg-purple-600' : 'bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    featuredRelease?.popupEnabled !== false ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Toggle 2: Hero Section Showcase Card */}
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${featuredRelease?.sectionEnabled !== false ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  <h3 className="text-sm font-display font-bold text-white">
+                    Hero Section Showcase Card
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Renders the full song player deck, 3D vinyl sleeve, lyrics pull-quote, and stream buttons directly below the artist name section.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const nextVal = featuredRelease?.sectionEnabled === false ? true : false;
+                  updateFeaturedRelease({ sectionEnabled: nextVal });
+                  showToast(nextVal ? 'Hero Showcase card visible' : 'Hero Showcase card hidden');
+                }}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  featuredRelease?.sectionEnabled !== false ? 'bg-purple-600' : 'bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    featuredRelease?.sectionEnabled !== false ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* MEDIA ASSETS: ARTWORK & MASTER AUDIO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Artwork Card */}
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-purple-400" />
+                Cover Artwork (Image Upload or Link)
+              </h3>
+              
+              <MediaUploadOrLink
+                currentValue={featuredRelease?.cover || ''}
+                onSelect={(val) => {
+                  updateFeaturedRelease({ cover: val });
+                  showToast('Updated featured release artwork');
+                }}
+                type="image"
+                title="Select Album Cover"
+              />
+
+              {featuredRelease?.cover && (
+                <div className="pt-2 flex items-center gap-4">
+                  <img
+                    src={featuredRelease.cover}
+                    alt="Preview"
+                    className="w-16 h-16 rounded-xl object-cover border border-white/20 shadow-md"
+                  />
+                  <div className="text-xs text-slate-400 space-y-0.5">
+                    <span className="text-white font-mono block font-bold">Active Sleeve Artwork</span>
+                    <span>Synchronized with 3D vinyl disc on homepage.</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Audio Track Card */}
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Music className="w-4 h-4 text-cyan-400" />
+                Song Audio Track (MP3/WAV Upload or Link)
+              </h3>
+
+              <MediaUploadOrLink
+                currentValue={featuredRelease?.audioUrl || ''}
+                onSelect={(val) => {
+                  updateFeaturedRelease({ audioUrl: val });
+                  showToast('Updated featured release audio file');
+                }}
+                type="audio"
+                title="Select Audio Master"
+              />
+
+              {featuredRelease?.audioUrl && (
+                <div className="pt-2 text-xs text-slate-400">
+                  <span className="text-emerald-400 font-mono font-bold block">✓ Audio Source Linked</span>
+                  <span className="truncate block font-mono text-[11px] text-slate-500 mt-0.5">{featuredRelease.audioUrl}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* AUDIO SAMPLE TIMING SCRUBBER */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.06]">
+              <div>
+                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-amber-400" />
+                  Site Load Sample Clip Timing & Audition
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Pick the exact high-energy chorus, hook, or bass drop to play during the on-load slam-in takeover.
+                </p>
+              </div>
+
+              {/* In-Dashboard Audition Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const audio = sampleAuditionRef.current;
+                  if (!audio) return;
+                  if (sampleAuditionPlaying) {
+                    audio.pause();
+                    setSampleAuditionPlaying(false);
+                  } else {
+                    const start = featuredRelease?.sampleStartTime || 0;
+                    const dur = featuredRelease?.sampleDuration || 30;
+                    audio.currentTime = start;
+                    audio.play().then(() => {
+                      setSampleAuditionPlaying(true);
+                      const checkTimer = () => {
+                        if (audio.currentTime >= start + dur) {
+                          audio.pause();
+                          setSampleAuditionPlaying(false);
+                          audio.removeEventListener('timeupdate', checkTimer);
+                        }
+                      };
+                      audio.addEventListener('timeupdate', checkTimer);
+                    }).catch((err) => {
+                      console.warn(err);
+                      showToast('Could not play sample audio preview');
+                    });
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0"
+              >
+                {sampleAuditionPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                <span>{sampleAuditionPlaying ? 'Stop Audition' : `Audition Clip (${featuredRelease?.sampleStartTime || 12}s - ${(featuredRelease?.sampleStartTime || 12) + (featuredRelease?.sampleDuration || 28)}s)`}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              {/* Sample Start Time */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <label className="text-slate-300 font-bold">Sample Start Time (Drop Point):</label>
+                  <span className="text-purple-300 font-bold">{featuredRelease?.sampleStartTime || 12} seconds</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="180"
+                  step="1"
+                  value={featuredRelease?.sampleStartTime || 12}
+                  onChange={(e) => updateFeaturedRelease({ sampleStartTime: parseInt(e.target.value) || 0 })}
+                  className="w-full accent-purple-400 cursor-pointer h-2 bg-white/[0.08] rounded-lg"
+                />
+                <p className="text-[11px] text-slate-500 font-mono">
+                  The audio will immediately seek to this timestamp upon modal impact.
+                </p>
+              </div>
+
+              {/* Sample Duration */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <label className="text-slate-300 font-bold">Sample Duration:</label>
+                  <span className="text-cyan-300 font-bold">{featuredRelease?.sampleDuration || 28} seconds</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="60"
+                  step="1"
+                  value={featuredRelease?.sampleDuration || 28}
+                  onChange={(e) => updateFeaturedRelease({ sampleDuration: parseInt(e.target.value) || 28 })}
+                  className="w-full accent-cyan-400 cursor-pointer h-2 bg-white/[0.08] rounded-lg"
+                />
+                <p className="text-[11px] text-slate-500 font-mono">
+                  How long the preview loops before wrapping back to the drop point.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* RELEASE METADATA & EDITORIAL INTEL */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <FileText className="w-4 h-4 text-purple-400" />
+              Track Metadata & Editorial Content
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Song / Album Title</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.title || ''}
+                  onChange={(e) => updateFeaturedRelease({ title: e.target.value })}
+                  placeholder="Calling for Help"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Artist Display Name</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.artist || 'UNNOTICED'}
+                  onChange={(e) => updateFeaturedRelease({ artist: e.target.value })}
+                  placeholder="UNNOTICED"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Release Type</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.releaseType || 'Lead Studio Master'}
+                  onChange={(e) => updateFeaturedRelease({ releaseType: e.target.value })}
+                  placeholder="Lead Studio Master / New Single"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Release Cut / Date Tag</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.releaseDate || '2024 Cut'}
+                  onChange={(e) => updateFeaturedRelease({ releaseDate: e.target.value })}
+                  placeholder="2024 Cut"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Banner Pill Text</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.badgeText || 'WORLD PREMIERE // NOW STREAMING'}
+                  onChange={(e) => updateFeaturedRelease({ badgeText: e.target.value })}
+                  placeholder="WORLD PREMIERE // NOW STREAMING"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div className="md:col-span-3">
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Tagline / Editorial Overview</label>
+                <textarea
+                  rows={2}
+                  value={featuredRelease?.tagline || ''}
+                  onChange={(e) => updateFeaturedRelease({ tagline: e.target.value })}
+                  placeholder="Atmospheric basslines dissecting nocturnal solitude. Stream the official studio master cut."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div className="md:col-span-3">
+                <label className="block text-xs font-mono text-slate-400 mb-1.5 font-bold">Lyrics Pull-Quote Excerpt</label>
+                <input
+                  type="text"
+                  value={featuredRelease?.lyricsExcerpt || ''}
+                  onChange={(e) => updateFeaturedRelease({ lyricsExcerpt: e.target.value })}
+                  placeholder='Praying for a signal just to know that I am alive...'
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* STREAMING DESTINATION PLATFORMS */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Radio className="w-4 h-4 text-emerald-400" />
+              DSP Streaming Destination URLs
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-mono text-emerald-400 mb-1.5 font-bold">Spotify Track/Album URL</label>
+                <input
+                  type="url"
+                  value={featuredRelease?.spotifyUrl || ''}
+                  onChange={(e) => updateFeaturedRelease({ spotifyUrl: e.target.value })}
+                  placeholder="https://open.spotify.com/..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-emerald-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-rose-400 mb-1.5 font-bold">Apple Music Track/Album URL</label>
+                <input
+                  type="url"
+                  value={featuredRelease?.appleMusicUrl || ''}
+                  onChange={(e) => updateFeaturedRelease({ appleMusicUrl: e.target.value })}
+                  placeholder="https://music.apple.com/..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-rose-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-red-400 mb-1.5 font-bold">YouTube Music / Video URL</label>
+                <input
+                  type="url"
+                  value={featuredRelease?.youtubeUrl || ''}
+                  onChange={(e) => updateFeaturedRelease({ youtubeUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-amber-400 mb-1.5 font-bold">SoundCloud Stream URL</label>
+                <input
+                  type="url"
+                  value={featuredRelease?.soundcloudUrl || ''}
+                  onChange={(e) => updateFeaturedRelease({ soundcloudUrl: e.target.value })}
+                  placeholder="https://soundcloud.com/..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-amber-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SAVE CONFIRMATION BAR */}
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-purple-950/20 border border-purple-500/30">
+            <span className="text-xs font-mono text-purple-300">
+              ⚡ All showcase adjustments save instantly to disk and auto-push to GitHub.
+            </span>
+            <button
+              type="button"
+              onClick={() => showToast('Release Showcase saved and synchronized successfully!')}
+              className="px-6 py-2.5 rounded-xl font-bold text-xs theme-primary-btn transition-all active:scale-95 cursor-pointer shadow-lg"
+            >
+              Save & Synchronize
+            </button>
           </div>
         </div>
       )}

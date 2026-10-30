@@ -17,6 +17,8 @@ import Footer from './components/Footer';
 import AdminDashboard from './components/AdminDashboard';
 import AdminLoginModal from './components/AdminLoginModal';
 import ClickSpark from './components/reactbits/ClickSpark';
+import NewReleaseOverlay from './components/NewReleaseOverlay';
+import FeaturedReleaseSection from './components/FeaturedReleaseSection';
 
 function AppContent() {
   const { tracks, merchProducts, isAdminAuthenticated, sectionsVisibility } = useSiteData();
@@ -192,17 +194,20 @@ function AppContent() {
         {/* Interactive Fluid Particle & Light Trails Canvas */}
         <FluidCanvas isPlaying={isPlaying} />
 
-      {/* Secret Admin Login Modal */}
-      <AdminLoginModal
-        isOpen={adminLoginOpen}
-        onClose={() => setAdminLoginOpen(false)}
-        onSuccess={() => {
-          setAdminLoginOpen(false);
-          setActiveView('admin');
-        }}
-      />
+          {/* Secret Admin Login Modal */}
+          <AdminLoginModal
+            isOpen={adminLoginOpen}
+            onClose={() => setAdminLoginOpen(false)}
+            onSuccess={() => {
+              setAdminLoginOpen(false);
+              setActiveView('admin');
+            }}
+          />
 
-      {/* View routing: Admin Dashboard vs EPK vs Main Experience */}
+          {/* New Release High-Velocity Slam-In Overlay Takeover */}
+          <NewReleaseOverlay />
+
+          {/* View routing: Admin Dashboard vs EPK vs Main Experience */}
       {activeView === 'admin' ? (
         <AdminDashboard onReturnToSite={() => setActiveView('main')} />
       ) : (
@@ -229,6 +234,9 @@ function AppContent() {
                 togglePlay={togglePlay}
                 onSelectTrack={onSelectTrack}
               />
+
+              {/* 1B. New Release Showcase: Promoted Song/Album directly below Artist Hero */}
+              <FeaturedReleaseSection onSelectTrack={onSelectTrack} />
 
               {/* 2. Music: Discography Studio Cuts & Inspect Lyrics Pop-Up */}
               {sectionsVisibility?.music !== false && (

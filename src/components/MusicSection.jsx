@@ -434,18 +434,22 @@ export default function MusicSection({
                         <motion.div
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { rotate: 360, x: 80 }
-                              : { rotate: 0, x: 0 }
+                              ? { rotate: 360, x: 125, scale: 1, opacity: 1 }
+                              : { rotate: 0, x: 0, scale: 0.92, opacity: 0 }
                           }
                           transition={
                             isPlaying && currentTrack?.id === focusedTrack.id
                               ? {
                                   rotate: { duration: 4.5, repeat: Infinity, ease: 'linear' },
-                                  x: { type: 'spring', stiffness: 120, damping: 18 }
+                                  x: { type: 'spring', stiffness: 120, damping: 18 },
+                                  opacity: { duration: 0.25 },
+                                  scale: { type: 'spring', stiffness: 120, damping: 18 }
                                 }
                               : {
-                                  rotate: { duration: 0.4 },
-                                  x: { type: 'spring', stiffness: 140, damping: 20 }
+                                  rotate: { duration: 0.3 },
+                                  x: { type: 'spring', stiffness: 140, damping: 20 },
+                                  opacity: { duration: 0.2 },
+                                  scale: { type: 'spring', stiffness: 140, damping: 20 }
                                 }
                           }
                           className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
@@ -470,7 +474,7 @@ export default function MusicSection({
                         <motion.div
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { x: -46 }
+                              ? { x: -60 }
                               : { x: 0 }
                           }
                           transition={{ type: 'spring', stiffness: 120, damping: 18 }}
@@ -534,7 +538,7 @@ export default function MusicSection({
                           {focusedTrack.title}
                         </h3>
 
-                        <p className="text-xs text-slate-300 font-mono mt-0.5">
+                        <p className="text-xs text-slate-300 font-mono mt-0.5 min-h-[18px] flex items-center justify-center">
                           <span className="text-white font-semibold">UNNOTICED</span>{' '}
                           {focusedTrack.featuring && !focusedTrack.featuring.toLowerCase().includes('unnoticed') && (
                             <span className="text-purple-300 font-normal">
@@ -546,7 +550,7 @@ export default function MusicSection({
                     </div>
 
                     {/* Audio Controls & DSP Destination Action Row (Fixed Heights to Prevent Any UI Jumping) */}
-                    <div className="space-y-2.5 pt-3 border-t border-white/[0.08] mt-auto">
+                    <div className="space-y-2.5 pt-3 border-t border-white/[0.08] mt-auto shrink-0">
                       <motion.button
                         whileTap={{ scale: 0.97 }}
                         onClick={() => {
@@ -556,7 +560,7 @@ export default function MusicSection({
                             togglePlay();
                           }
                         }}
-                        className="w-full h-11 sm:h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 active:scale-95 transition-all cursor-pointer theme-primary-btn"
+                        className="w-full h-11 sm:h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 active:scale-95 transition-all cursor-pointer theme-primary-btn overflow-hidden"
                       >
                         {isPlaying && currentTrack?.id === focusedTrack.id ? (
                           <>
@@ -576,12 +580,12 @@ export default function MusicSection({
                         )}
                       </motion.button>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2 shrink-0">
                         <a
                           href={focusedTrack.spotifyUrl || artistInfo.socials?.spotify}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-10 px-3 rounded-xl bg-[#1ed760]/15 hover:bg-[#1ed760]/25 border border-[#1ed760]/40 text-[#1ed760] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
+                          className="h-10 px-3 rounded-xl bg-[#1ed760]/15 hover:bg-[#1ed760]/25 border border-[#1ed760]/40 text-[#1ed760] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 shrink-0"
                         >
                           <SpotifyIcon className="w-4 h-4 fill-current shrink-0" />
                           <span className="truncate">Spotify</span>
@@ -592,7 +596,7 @@ export default function MusicSection({
                           href={focusedTrack.appleMusicUrl || artistInfo.socials?.appleMusic}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-10 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
+                          className="h-10 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 shrink-0"
                         >
                           <Music className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                           <span className="truncate">Apple Music</span>
@@ -600,12 +604,11 @@ export default function MusicSection({
                         </a>
                       </div>
 
-                      <div className="pt-2 flex items-center justify-between text-[10px] font-mono text-slate-400 px-1">
+                      <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-slate-400 px-1 shrink-0">
                         <span className="flex items-center gap-1.5">
                           <Sparkles className="w-3 h-3 text-amber-400" />
                           Genius Insights: <strong className="text-amber-300 font-bold">{annotatedLines.length}</strong>
                         </span>
-                        <span className="text-slate-500 font-mono text-[9.5px]">Official Studio Master</span>
                       </div>
                     </div>
                   </div>

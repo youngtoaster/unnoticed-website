@@ -10,7 +10,28 @@ export const SECTIONS_VISIBILITY = {
   "store": true,
   "gallery": true,
   "social": true,
-  "newsletter": true
+  "newsletter": true,
+  "featuredRelease": true
+};
+
+export const FEATURED_RELEASE = {
+  popupEnabled: true,
+  sectionEnabled: true,
+  title: "Calling for Help",
+  artist: "UNNOTICED",
+  releaseType: "Lead Studio Master",
+  releaseDate: "2024 Cut",
+  badgeText: "WORLD PREMIERE // NOW STREAMING",
+  tagline: "Atmospheric basslines dissecting nocturnal solitude. Stream the newest official master cut.",
+  cover: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+  audioUrl: "https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8",
+  sampleStartTime: 12,
+  sampleDuration: 28,
+  lyricsExcerpt: "Praying for a signal just to know that I'm alive...",
+  spotifyUrl: "https://open.spotify.com/artist/5ETABaJMvhYJpsxQku2IQe",
+  appleMusicUrl: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+  youtubeUrl: "https://www.youtube.com/@UnnoticedOfficial",
+  soundcloudUrl: "https://soundcloud.com/tysciullo"
 };
 
 export const ARTIST_INFO = {

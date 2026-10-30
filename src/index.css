@@ -122,37 +122,74 @@
 }
 
 .theme-primary-btn:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
 }
 
-.theme-primary-btn * {
-  color: inherit !important;
-  fill: currentColor;
-}
-
-/* Ensure buttons using purple-600 background never have invisible white-on-white text */
+.theme-primary-btn,
+.theme-primary-btn *,
 button.bg-purple-600,
+button.bg-purple-600 *,
 button.bg-purple-500,
+button.bg-purple-500 *,
 a.bg-purple-600,
-a.bg-purple-500 {
+a.bg-purple-600 *,
+a.bg-purple-500,
+a.bg-purple-500 * {
   color: var(--theme-on-primary, #ffffff) !important;
+  fill: currentColor;
+  stroke: currentColor;
 }
 
-button.bg-purple-600 svg,
-button.bg-purple-500 svg,
-a.bg-purple-600 svg,
-a.bg-purple-500 svg {
-  stroke: var(--theme-on-primary, #ffffff) !important;
+/* Bulletproof Contrast Protection when Active Theme is Light / White / Silver */
+[data-theme-light="true"] .theme-primary-btn,
+[data-theme-light="true"] button.bg-purple-600,
+[data-theme-light="true"] button.bg-purple-500,
+[data-theme-light="true"] a.bg-purple-600,
+[data-theme-light="true"] a.bg-purple-500 {
+  color: #050608 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.18) !important;
 }
 
-/* Tame overblown white shadows and highlights when theme primary is light or white */
+[data-theme-light="true"] .theme-primary-btn *,
+[data-theme-light="true"] button.bg-purple-600 *,
+[data-theme-light="true"] button.bg-purple-500 *,
+[data-theme-light="true"] a.bg-purple-600 *,
+[data-theme-light="true"] a.bg-purple-500 * {
+  color: #050608 !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Tame overblown white shadows and highlights across the entire site */
+[data-theme-light="true"] [class*="shadow-purple-600"],
+[data-theme-light="true"] [class*="shadow-purple-500"],
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/40,
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/30,
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/50,
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/60,
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/20,
 :root[style*="--theme-is-light: 1"] .shadow-purple-600\/10 {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Shockwave Impact Keyframes for New Release Slam-in Takeover */
+@keyframes shockwave-ring {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.9;
+    border-width: 8px;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+.animate-shockwave {
+  animation: shockwave-ring 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @layer base {

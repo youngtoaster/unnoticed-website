@@ -10,7 +10,8 @@ import {
   GALLERY_IMAGES as DEFAULT_GALLERY,
   SOCIAL_POSTS as DEFAULT_SOCIAL,
   EPK_DATA as DEFAULT_EPK,
-  SECTIONS_VISIBILITY as DEFAULT_SECTIONS_VISIBILITY
+  SECTIONS_VISIBILITY as DEFAULT_SECTIONS_VISIBILITY,
+  FEATURED_RELEASE as DEFAULT_FEATURED_RELEASE
 } from '../data/artistData';
 
 const DataContext = createContext(null);
@@ -43,6 +44,7 @@ export function DataProvider({ children }) {
           socialPosts: parsed.socialPosts || DEFAULT_SOCIAL,
           epkData: parsed.epkData || DEFAULT_EPK,
           sectionsVisibility: parsed.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
+          featuredRelease: parsed.featuredRelease || DEFAULT_FEATURED_RELEASE,
         };
       }
     } catch (err) {
@@ -62,6 +64,7 @@ export function DataProvider({ children }) {
       socialPosts: DEFAULT_SOCIAL,
       epkData: DEFAULT_EPK,
       sectionsVisibility: DEFAULT_SECTIONS_VISIBILITY,
+      featuredRelease: DEFAULT_FEATURED_RELEASE,
     };
   });
 
@@ -130,6 +133,7 @@ export function DataProvider({ children }) {
                   socialPosts: remoteData.socialPosts || prev.socialPosts,
                   epkData: remoteData.epkData || prev.epkData,
                   sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
+                  featuredRelease: remoteData.featuredRelease || prev.featuredRelease,
                   _lastUpdated: remoteData._lastUpdated || Date.now(),
                 };
                 try {
@@ -182,7 +186,9 @@ export function DataProvider({ children }) {
 
     const getLuminance = (hex) => {
       if (!hex) return 0.3;
-      const clean = hex.replace('#', '');
+      let clean = String(hex).trim().toLowerCase();
+      if (clean === 'white' || clean === '#fff' || clean === '#ffffff') return 1.0;
+      clean = clean.replace('#', '');
       let r, g, b;
       if (clean.length === 3) {
         r = parseInt(clean[0] + clean[0], 16) / 255;
@@ -200,14 +206,16 @@ export function DataProvider({ children }) {
 
     const primaryHex = theme.primary || '#a855f7';
     const lum = getLuminance(primaryHex);
-    const isLight = lum > 0.6;
+    // Lower threshold to 0.52 to catch all pastels, silvers, and lights
+    const isLight = lum > 0.52;
     const onPrimary = isLight ? '#06070a' : '#ffffff';
     const shadowRgb = isLight ? '0, 0, 0' : hexToRgb(primaryHex);
     const btnShadow = isLight
-      ? '0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 0 10px rgba(255, 255, 255, 0.12)'
-      : `0 10px 25px -5px rgba(${hexToRgb(primaryHex)}, 0.4)`;
+      ? '0 4px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7)'
+      : `0 10px 25px -5px rgba(${hexToRgb(primaryHex)}, 0.45)`;
 
     const root = document.documentElement;
+    root.setAttribute('data-theme-light', isLight ? 'true' : 'false');
     root.style.setProperty('--theme-primary', primaryHex);
     root.style.setProperty('--theme-primary-rgb', hexToRgb(primaryHex));
     root.style.setProperty('--theme-secondary', theme.secondary || '#6366f1');
@@ -545,10 +553,22 @@ export function DataProvider({ children }) {
     }
   };
 
+  const updateFeaturedRelease = useCallback((updates) => {
+    updateData((prev) => ({
+      ...prev,
+      featuredRelease: {
+        ...(prev.featuredRelease || DEFAULT_FEATURED_RELEASE),
+        ...(typeof updates === 'function' ? updates(prev.featuredRelease || DEFAULT_FEATURED_RELEASE) : updates)
+      }
+    }));
+  }, [updateData]);
+
   return (
     <DataContext.Provider
       value={{
         ...data,
+        featuredRelease: data.featuredRelease || DEFAULT_FEATURED_RELEASE,
+        updateFeaturedRelease,
         siteTheme: data.artistInfo?.theme || {
           id: 'violet',
           name: 'Electric Violet',

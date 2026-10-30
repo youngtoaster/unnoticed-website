@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';
@@ -28,6 +28,30 @@ export default function HeroSection({
     isFullyLit: false,
     ignitedIndices: []
   });
+
+  // Light Explosion Shockwave & Background Reveal State
+  const [explosionActive, setExplosionActive] = useState(false);
+  const [hasRevealed, setHasRevealed] = useState(false);
+  const [explosionKey, setExplosionKey] = useState(0);
+  const hasTriggeredInitialRef = useRef(false);
+
+  // Trigger huge explosion of light when the neon sign lights up into full ignition
+  const triggerExplosion = useCallback(() => {
+    setExplosionActive(true);
+    setExplosionKey((prev) => prev + 1);
+    setTimeout(() => {
+      setHasRevealed(true);
+      setExplosionActive(false);
+    }, 1600);
+  }, []);
+
+  // When ignition reaches full completion on page load, detonate the light explosion
+  useEffect(() => {
+    if (ignitionState.isFullyLit && !hasTriggeredInitialRef.current) {
+      hasTriggeredInitialRef.current = true;
+      triggerExplosion();
+    }
+  }, [ignitionState.isFullyLit, triggerExplosion]);
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -145,14 +169,166 @@ export default function HeroSection({
       {/* ======================================================== */}
       <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between items-center px-4 sm:px-6 pt-20 sm:pt-24 pb-6 sm:pb-8 overflow-hidden z-10">
 
+        {/* ======================================================== */}
+        {/* HUGE EXPLOSION OF LIGHT EXPANDING OUTWARDS FROM TITLE     */}
+        {/* Detonates when neon light turns on to reveal background   */}
+        {/* ======================================================== */}
+        <AnimatePresence>
+          {explosionActive && (
+            <div
+              key={`explosion-fx-${explosionKey}`}
+              className="absolute inset-0 pointer-events-none z-30 overflow-hidden flex items-center justify-center"
+            >
+              {/* 1. Full Viewport Blinding Detonation Flash */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.7, 0] }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className="absolute inset-0 bg-radial from-white via-purple-500/25 to-transparent mix-blend-screen"
+              />
+
+              {/* 2. Primary Blinding Light Shockwave Ring (Expanding Wavefront) */}
+              <motion.div
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{
+                  scale: [0, 0.35, 1.4, 3.2, 5.5],
+                  opacity: [0, 1, 0.95, 0.45, 0]
+                }}
+                transition={{
+                  duration: 1.5,
+                  ease: [0.16, 1, 0.3, 1],
+                  times: [0, 0.15, 0.45, 0.75, 1]
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-96 sm:h-96 rounded-full border-[14px] sm:border-[22px] md:border-[30px] border-white pointer-events-none"
+                style={{
+                  boxShadow: `0 0 60px #ffffff, 0 0 120px ${gasColor}, 0 0 220px ${gasColor}, 0 0 300px #ffffff, inset 0 0 90px ${gasColor}`,
+                  mixBlendMode: 'screen',
+                }}
+              />
+
+              {/* 3. Secondary High-Velocity Ionized Plasma Ripple Ring */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{
+                  scale: [0, 0.6, 2.0, 4.4],
+                  opacity: [0, 0.85, 0.4, 0]
+                }}
+                transition={{
+                  duration: 1.35,
+                  delay: 0.06,
+                  ease: 'easeOut',
+                  times: [0, 0.25, 0.65, 1]
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-88 sm:h-88 rounded-full border-[6px] sm:border-[10px] pointer-events-none"
+                style={{
+                  borderColor: gasColor,
+                  boxShadow: `0 0 80px ${gasColor}, 0 0 160px ${gasColor}`,
+                  mixBlendMode: 'color-dodge',
+                }}
+              />
+
+              {/* 4. Central Nova Flare Burst */}
+              <motion.div
+                initial={{ scale: 0.2, opacity: 0 }}
+                animate={{
+                  scale: [0.2, 1.6, 2.8],
+                  opacity: [0, 1, 0]
+                }}
+                transition={{ duration: 0.85, ease: 'easeOut' }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle, #ffffff 0%, #ffffff 20%, ${gasColor} 50%, transparent 75%)`,
+                  filter: 'blur(16px)',
+                  mixBlendMode: 'screen',
+                }}
+              />
+
+              {/* 5. Horizontal Anamorphic Lens Flare Beam across Title */}
+              <motion.div
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{
+                  scaleX: [0, 1.4, 0],
+                  opacity: [0, 1, 0]
+                }}
+                transition={{ duration: 0.75, ease: 'easeInOut' }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-2.5 sm:h-3.5 rounded-full pointer-events-none"
+                style={{
+                  background: `linear-gradient(to right, transparent, #ffffff, ${gasColor}, #ffffff, transparent)`,
+                  boxShadow: `0 0 40px #ffffff, 0 0 90px ${gasColor}`,
+                  filter: 'blur(2px)',
+                  mixBlendMode: 'screen',
+                }}
+              />
+
+              {/* 6. Volumetric Radial Starburst Light Rays */}
+              <motion.div
+                initial={{ scale: 0.3, opacity: 0, rotate: 0 }}
+                animate={{
+                  scale: [0.3, 1.8, 3.4],
+                  opacity: [0, 0.75, 0],
+                  rotate: [0, 45]
+                }}
+                transition={{ duration: 1.4, ease: 'easeOut' }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
+                style={{
+                  background: `conic-gradient(from 0deg, transparent 0deg, ${gasColor}60 12deg, transparent 24deg, #ffffff70 36deg, transparent 48deg, ${gasColor}60 60deg, transparent 72deg, #ffffff70 84deg, transparent 96deg, ${gasColor}60 108deg, transparent 120deg, #ffffff70 132deg, transparent 144deg, ${gasColor}60 156deg, transparent 168deg, #ffffff70 180deg, transparent 192deg, ${gasColor}60 204deg, transparent 216deg, #ffffff70 228deg, transparent 240deg, ${gasColor}60 252deg, transparent 264deg, #ffffff70 276deg, transparent 288deg, ${gasColor}60 300deg, transparent 312deg, #ffffff70 324deg, transparent 336deg, ${gasColor}60 348deg, transparent 360deg)`,
+                  filter: 'blur(10px)',
+                  mixBlendMode: 'color-dodge',
+                }}
+              />
+            </div>
+          )}
+        </AnimatePresence>
+
         {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
-        {/* Spans the entire hero section viewport edge-to-edge behind all elements */}
+        {/* Revealed dynamically by the expanding explosion of light */}
         {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
-          <div
-            className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out"
+          <motion.div
+            key={`hero-bg-${explosionKey}`}
+            initial={!hasRevealed && isIlluminated ? {
+              clipPath: 'circle(0% at 50% 48%)',
+              opacity: 0
+            } : false}
+            animate={
+              explosionActive
+                ? {
+                    clipPath: [
+                      'circle(0% at 50% 48%)',
+                      'circle(28% at 50% 48%)',
+                      'circle(85% at 50% 48%)',
+                      'circle(170% at 50% 48%)'
+                    ],
+                    opacity: [0, targetOpacity * 0.85, targetOpacity, targetOpacity],
+                    filter: [
+                      `brightness(3.2) blur(0px)`,
+                      `brightness(2.4) blur(1px)`,
+                      `brightness(1.5) blur(${blurAmount})`,
+                      `brightness(1.05) blur(${blurAmount})`
+                    ]
+                  }
+                : hasRevealed || !isIlluminated
+                ? {
+                    clipPath: 'circle(170% at 50% 48%)',
+                    opacity: targetOpacity,
+                    filter: `brightness(1.05) blur(${blurAmount})`
+                  }
+                : {
+                    clipPath: 'circle(0% at 50% 48%)',
+                    opacity: 0,
+                    filter: `brightness(0) blur(${blurAmount})`
+                  }
+            }
+            transition={
+              explosionActive
+                ? {
+                    duration: 1.45,
+                    ease: [0.16, 1, 0.3, 1],
+                    times: [0, 0.22, 0.55, 1]
+                  }
+                : { duration: 0.3 }
+            }
+            className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden"
             style={{
-              opacity: currentBackdropOpacity,
-              filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
               maskImage: backdrop.vignette
                 ? 'radial-gradient(ellipse 95% 90% at 50% 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.6) 80%, transparent 100%)'
                 : 'none',
@@ -173,7 +349,7 @@ export default function HeroSection({
             />
 
             {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
-            {letterBloomOverlay && (
+            {letterBloomOverlay && !hasRevealed && (
               <div
                 className="absolute inset-0 pointer-events-none transition-all duration-200"
                 style={{
@@ -188,7 +364,7 @@ export default function HeroSection({
               <div
                 className="absolute inset-0 pointer-events-none transition-opacity duration-700"
                 style={{
-                  opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
+                  opacity: (ignitionState.isFullyLit || hasRevealed) ? 1 : (ignitionState.progress * 0.4),
                   background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
                   mixBlendMode: 'color-dodge'
                 }}
@@ -198,7 +374,7 @@ export default function HeroSection({
             {/* Smooth bottom & top ambient fades into deep black background */}
             <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/70 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#060608]/75 to-transparent pointer-events-none" />
-          </div>
+          </motion.div>
         )}
 
         {/* Top spacer to balance the bottom scroll prompt so the middle is dead-center */}
@@ -295,11 +471,52 @@ export default function HeroSection({
 
             {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
             {backdrop.enabled && backdrop.image && backdrop.scope !== 'hero' && (
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out w-full max-w-4xl h-[260px] sm:h-[320px] md:h-[380px]"
+              <motion.div
+                key={`title-bg-${explosionKey}`}
+                initial={!hasRevealed && isIlluminated ? {
+                  clipPath: 'circle(0% at 50% 50%)',
+                  opacity: 0
+                } : false}
+                animate={
+                  explosionActive
+                    ? {
+                        clipPath: [
+                          'circle(0% at 50% 50%)',
+                          'circle(35% at 50% 50%)',
+                          'circle(90% at 50% 50%)',
+                          'circle(180% at 50% 50%)'
+                        ],
+                        opacity: [0, targetOpacity * 0.85, targetOpacity, targetOpacity],
+                        filter: [
+                          `brightness(3.2) blur(0px)`,
+                          `brightness(2.4) blur(1px)`,
+                          `brightness(1.5) blur(${blurAmount})`,
+                          `brightness(1.05) blur(${blurAmount})`
+                        ]
+                      }
+                    : hasRevealed || !isIlluminated
+                    ? {
+                        clipPath: 'circle(180% at 50% 50%)',
+                        opacity: targetOpacity,
+                        filter: `brightness(1.05) blur(${blurAmount})`
+                      }
+                    : {
+                        clipPath: 'circle(0% at 50% 50%)',
+                        opacity: 0,
+                        filter: `brightness(0) blur(${blurAmount})`
+                      }
+                }
+                transition={
+                  explosionActive
+                    ? {
+                        duration: 1.45,
+                        ease: [0.16, 1, 0.3, 1],
+                        times: [0, 0.22, 0.55, 1]
+                      }
+                    : { duration: 0.3 }
+                }
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden w-full max-w-4xl h-[260px] sm:h-[320px] md:h-[380px]"
                 style={{
-                  opacity: currentBackdropOpacity,
-                  filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
                   maskImage: backdrop.vignette
                     ? 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.55) 60%, transparent 95%)'
                     : 'radial-gradient(ellipse 85% 80% at 50% 50%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.7) 75%, transparent 100%)',
@@ -320,7 +537,7 @@ export default function HeroSection({
                 />
 
                 {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
-                {letterBloomOverlay && (
+                {letterBloomOverlay && !hasRevealed && (
                   <div
                     className="absolute inset-0 pointer-events-none transition-all duration-200"
                     style={{
@@ -335,17 +552,22 @@ export default function HeroSection({
                   <div
                     className="absolute inset-0 pointer-events-none transition-opacity duration-700"
                     style={{
-                      opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
+                      opacity: (ignitionState.isFullyLit || hasRevealed) ? 1 : (ignitionState.progress * 0.4),
                       background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
                       mixBlendMode: 'color-dodge'
                     }}
                   />
                 )}
-              </div>
+              </motion.div>
             )}
 
             {/* Neon Title: Tubes are mounted immediately on page load, then randomly sputter & spark into light */}
-            <div className={`w-full flex ${titleJustifyClass} py-1 px-1 overflow-visible`}>
+            {/* Clicking title triggers power surge re-ignition & massive explosion of light */}
+            <div
+              onClick={triggerExplosion}
+              className={`w-full flex ${titleJustifyClass} py-1 px-1 overflow-visible cursor-pointer select-none group/title transition-transform duration-200 active:scale-[0.99]`}
+              title="Click to detonate light explosion and re-illuminate backdrop"
+            >
               <NeonSign
                 as="h1"
                 color={gasColor}

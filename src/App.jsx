@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DataProvider, useSiteData } from './context/DataContext';
 import FluidCanvas from './components/FluidCanvas';
 import Navbar from './components/Navbar';
@@ -41,6 +41,20 @@ function AppContent() {
       return false;
     }
   });
+
+  const handleTakeoverDismiss = useCallback(() => {
+    setIsTakeoverActive(false);
+  }, []);
+
+  // Safety fallback: Ensure hero section ALWAYS ignites even if overlay is blocked, muted, or slow to close
+  useEffect(() => {
+    if (isTakeoverActive) {
+      const safetyTimer = setTimeout(() => {
+        setIsTakeoverActive(false);
+      }, 3500);
+      return () => clearTimeout(safetyTimer);
+    }
+  }, [isTakeoverActive]);
 
   // If featuredRelease updates (e.g. admin toggles popupEnabled off), release the hold immediately
   useEffect(() => {
@@ -225,7 +239,7 @@ function AppContent() {
           />
 
           {/* New Release High-Velocity Slam-In Overlay Takeover */}
-          <NewReleaseOverlay onDismiss={() => setIsTakeoverActive(false)} />
+          <NewReleaseOverlay onDismiss={handleTakeoverDismiss} />
 
           {/* View routing: Admin Dashboard vs EPK vs Main Experience */}
       {activeView === 'admin' ? (

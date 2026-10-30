@@ -160,7 +160,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
               {/* Dedicated rotating vinyl body: separated DOM layer prevents CSS spin transform from overriding Framer Motion translateX */}
               <div
                 className={`w-full h-full rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center ${
-                  isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                  isPlaying ? 'animate-vinyl-spin' : ''
                 }`}
                 style={{
                   boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.95)',

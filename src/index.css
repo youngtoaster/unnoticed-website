@@ -378,6 +378,21 @@ a.bg-purple-500 * {
   padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
 }
 
+/* 3D Vinyl Record Spin Animation */
+@keyframes vinylSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-vinyl-spin {
+  animation: vinylSpin 5s linear infinite;
+  will-change: transform;
+}
+
 /* Horizontal scroll with hidden scrollbar for mobile pills */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

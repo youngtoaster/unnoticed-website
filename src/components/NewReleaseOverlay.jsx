@@ -50,6 +50,11 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
   const sampleStart = release.sampleStartTime || 0;
   const sampleDuration = release.sampleDuration || 30;
 
+  const onDismissRef = useRef(onDismiss);
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
+
   // Evaluate initial open status on site load
   useEffect(() => {
     if (forceOpen) {
@@ -58,7 +63,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
     }
     if (release.popupEnabled === false) {
       setIsOpen(false);
-      if (onDismiss) onDismiss();
+      if (onDismissRef.current) onDismissRef.current();
       return;
     }
 
@@ -67,7 +72,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
     const seen = sessionStorage.getItem(sessionKey);
     if (seen) {
       setIsOpen(false);
-      if (onDismiss) onDismiss();
+      if (onDismissRef.current) onDismissRef.current();
       return;
     }
 
@@ -76,7 +81,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
       setIsOpen(true);
     }, 280);
     return () => clearTimeout(timer);
-  }, [forceOpen, release.popupEnabled, release.title, onDismiss]);
+  }, [forceOpen, release.popupEnabled, release.title]);
 
   // Audio sample playback handling
   useEffect(() => {
@@ -202,7 +207,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
     setIsOpen(false);
     sessionStorage.setItem(`unnoticed_seen_release_${release.title}_v1`, 'true');
     if (onCloseForce) onCloseForce();
-    if (onDismiss) onDismiss();
+    if (onDismissRef.current) onDismissRef.current();
   };
 
   const handleTogglePlay = () => {
@@ -336,7 +341,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                   {/* Dedicated rotating vinyl body: separated DOM layer prevents CSS spin transform from overriding Framer Motion translateX */}
                   <div
                     className={`w-full h-full rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center ${
-                      isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                      isPlaying ? 'animate-vinyl-spin' : ''
                     }`}
                     style={{
                       boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95)',

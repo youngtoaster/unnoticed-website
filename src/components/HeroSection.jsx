@@ -92,6 +92,19 @@ export default function HeroSection({
     }
   }, [canIgnite, ignitionState.isFullyLit, triggerExplosion]);
 
+  // Guaranteed ignition safety fallback: ensures backdrop and hero reveal never stay locked dark
+  useEffect(() => {
+    if (canIgnite && !hasTriggeredInitialRef.current && !hasRevealed) {
+      const fallbackTimer = setTimeout(() => {
+        if (!hasTriggeredInitialRef.current) {
+          hasTriggeredInitialRef.current = true;
+          triggerExplosion();
+        }
+      }, 2800);
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [canIgnite, hasRevealed, triggerExplosion]);
+
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
     font: 'font-display',

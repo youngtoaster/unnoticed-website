@@ -771,31 +771,68 @@ export default function AdminDashboard({ onReturnToSite }) {
         )}
       </AnimatePresence>
 
-      {/* CMS Navigation Tabs Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-8 border-b border-white/[0.06]">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all active:scale-95 cursor-pointer ${
-                isActive
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                  : 'bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
-              }`}
+      {/* CMS Navigation Tabs Bar - Wrapped Grid Layout: 100% Visible On All Devices */}
+      <div className="mb-8 p-3 sm:p-4 rounded-3xl bg-[#0b0c14]/90 border border-white/[0.1] shadow-2xl backdrop-blur-md">
+        {/* Top Header of Nav Bar: Active Module Name + Mobile Selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3 border-b border-white/[0.08]">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-purple-400 font-bold flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5" />
+              <span>CMS Sections ({tabs.length})</span>
+            </span>
+            <span className="text-slate-500 text-xs hidden sm:inline">•</span>
+            <span className="text-xs text-white font-semibold flex items-center gap-1.5">
+              <span>Editing:</span>
+              <strong className="text-purple-300 font-bold px-2 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/30">
+                {tabs.find((t) => t.id === activeTab)?.label || 'Section'}
+              </strong>
+            </span>
+          </div>
+
+          {/* Quick Jump Mobile Dropdown */}
+          <div className="sm:hidden w-full">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="w-full h-11 px-4 rounded-xl bg-[#12131d] border border-purple-500/40 text-white font-bold text-xs focus:outline-none focus:border-purple-400 cursor-pointer shadow-lg"
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-              {tab.count !== null && (
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${isActive ? 'bg-purple-800 text-purple-200' : 'bg-white/[0.08] text-slate-400'}`}>
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          );
-        })}
+              {tabs.map((tab) => (
+                <option key={tab.id} value={tab.id} className="bg-[#0b0c14] text-white">
+                  {tab.label} {tab.count !== null ? `(${tab.count})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Desktop & Tablet Wrapped Navigation Grid: Every Single Tab is 100% Visible with Zero Scrolling Required */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/40 border border-purple-300/40 ring-2 ring-purple-500/30'
+                    : 'bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/[0.18]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-purple-400'}`} />
+                <span>{tab.label}</span>
+                {tab.count !== null && (
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold shrink-0 ${
+                    isActive ? 'bg-black/40 text-purple-200' : 'bg-white/[0.08] text-slate-400'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ================= TAB 1: TRACKS & DISCOGRAPHY ================= */}

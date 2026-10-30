@@ -35,21 +35,57 @@ export default function HeroSection({
   const [explosionKey, setExplosionKey] = useState(0);
   const hasTriggeredInitialRef = useRef(false);
 
+  // Faceted Anamorphic Supersonic Wavefront Keyframes
+  // Replaces the boring geometric circle with a sleek cybernetic 12-vertex polygonal shockwave
+  // that bursts laterally across the wide "UNNOTICED" title and surges outward into the full screen.
+  const FACETED_WAVEFRONT_KEYFRAMES = useMemo(() => [
+    // 0% - Collapsed central ignition node (Zero image revealed)
+    'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%)',
+    // 18% - Razor-sharp lateral laser swath slicing directly across the letters
+    'polygon(50% 38%, 66% 43%, 84% 48%, 98% 50%, 84% 52%, 66% 57%, 50% 62%, 34% 57%, 16% 52%, 2% 50%, 16% 48%, 34% 43%)',
+    // 48% - Supersonic faceted diamond-hex energy burst surging outwards across the screen
+    'polygon(50% 12%, 74% 22%, 98% 38%, 122% 50%, 98% 62%, 74% 78%, 50% 88%, 26% 78%, 2% 62%, -22% 50%, 2% 38%, 26% 22%)',
+    // 78% - Shattered supersonic wave sweeping into the outer corners
+    'polygon(50% -28%, 86% -12%, 126% 18%, 150% 50%, 126% 82%, 86% 112%, 50% 128%, 14% 112%, -26% 82%, -50% 50%, -26% 18%, 14% -12%)',
+    // 100% - Fully scattered and dissipated beyond all screen boundaries (100% visible)
+    'polygon(50% -75%, 125% -55%, 175% 0%, 195% 50%, 175% 100%, 125% 155%, 50% 175%, -25% 155%, -75% 100%, -95% 50%, -75% 0%, -25% -55%)'
+  ], []);
+
+  // 28 Anamorphic Scattered Light Sparks radiating outwards on detonation
+  const shockwaveSparks = useMemo(() => {
+    return Array.from({ length: 28 }).map((_, i) => {
+      const angle = (i / 28) * 360;
+      const rad = (angle * Math.PI) / 180;
+      // Stretched horizontally to match the anamorphic aspect ratio of the title
+      const distanceX = (Math.cos(rad) * (260 + (i % 5) * 80)) * 1.55;
+      const distanceY = (Math.sin(rad) * (140 + (i % 4) * 60));
+      const size = 3 + (i % 4) * 2;
+      const duration = 0.85 + (i % 6) * 0.15;
+      const delay = (i % 5) * 0.03;
+      return { id: i, distanceX, distanceY, size, duration, delay };
+    });
+  }, []);
+
   // Trigger huge explosion of light when the neon sign lights up into full ignition
   const triggerExplosion = useCallback(() => {
+    setHasRevealed(false);
     setExplosionActive(true);
     setExplosionKey((prev) => prev + 1);
     setTimeout(() => {
       setHasRevealed(true);
       setExplosionActive(false);
-    }, 1600);
+    }, 1750);
   }, []);
 
-  // When ignition reaches full completion on page load, detonate the light explosion
+  // When ignition reaches full completion on page load, add a pre-detonation tension pause:
+  // All letters lock in solid, voltage hums for 220ms, then the light pulse DETONATES!
   useEffect(() => {
     if (ignitionState.isFullyLit && !hasTriggeredInitialRef.current) {
       hasTriggeredInitialRef.current = true;
-      triggerExplosion();
+      const timer = setTimeout(() => {
+        triggerExplosion();
+      }, 240);
+      return () => clearTimeout(timer);
     }
   }, [ignitionState.isFullyLit, triggerExplosion]);
 
@@ -82,27 +118,24 @@ export default function HeroSection({
   const blurAmount = backdrop.blurEnabled ? `${(backdrop.blur ?? 6) * 0.4}px` : '0px';
 
   // Dynamic progressive illumination:
-  // Starts pitch black screen (opacity 0), reveals incrementally with each striking letter,
-  // reaches full configured opacity and ambient neon bloom once the entire title is fully lit.
+  // Held completely pitch dark (0) until the light pulse detonates,
+  // revealing only through the expanding wavefront of the pulse,
+  // then settling at targetOpacity once the pulse is fully scattered.
   const currentBackdropOpacity = isIlluminated
-    ? (ignitionState.isFullyLit
+    ? (hasRevealed || explosionActive
         ? targetOpacity
-        : (ignitionState.progress > 0
-            ? targetOpacity * (0.12 + 0.88 * Math.pow(ignitionState.progress, 0.95))
-            : 0))
+        : 0)
     : targetOpacity;
 
   const currentBackdropBrightness = isIlluminated
-    ? (ignitionState.isFullyLit
+    ? (hasRevealed
         ? 1.05
-        : (ignitionState.progress > 0
-            ? 0.15 + (0.85 * ignitionState.progress)
-            : 0))
+        : (explosionActive ? 1.5 : 0))
     : 1;
 
   // Mask / light cones radiating directly behind each ignited letter during ignition
   const letterBloomOverlay = useMemo(() => {
-    if (!isIlluminated || ignitionState.isFullyLit || ignitionState.ignitedIndices.length === 0) {
+    if (!isIlluminated || !explosionActive) {
       return null;
     }
     const gasColor = neonConfig.color || theme?.primary || '#a855f7';
@@ -110,7 +143,7 @@ export default function HeroSection({
       const pct = 14 + (idx / Math.max(1, ignitionState.totalCount - 1)) * 72;
       return `radial-gradient(ellipse at ${pct}% 45%, ${gasColor}66 0%, ${gasColor}20 35%, transparent 68%)`;
     }).join(', ');
-  }, [isIlluminated, ignitionState, neonConfig.color, theme?.primary]);
+  }, [isIlluminated, explosionActive, ignitionState, neonConfig.color, theme?.primary]);
 
   const align = neonConfig.align || 'center';
   const gasColor = neonConfig.color || theme?.primary || '#a855f7';
@@ -182,138 +215,149 @@ export default function HeroSection({
               {/* 1. Full Viewport Blinding Detonation Flash */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.7, 0] }}
-                transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="absolute inset-0 bg-radial from-white via-purple-500/25 to-transparent mix-blend-screen"
+                animate={{ opacity: [0, 0.85, 0] }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="absolute inset-0 bg-radial from-white via-purple-500/30 to-transparent mix-blend-screen"
               />
 
-              {/* 2. Primary Blinding Light Shockwave Ring (Expanding Wavefront) */}
+              {/* 2. Primary Anamorphic Cyber-Diamond Wavefront (Faceted Supersonic Blast) */}
               <motion.div
-                initial={{ scale: 0, opacity: 1 }}
+                initial={{ scale: 0, opacity: 0, rotate: 0 }}
                 animate={{
-                  scale: [0, 0.35, 1.4, 3.2, 5.5],
-                  opacity: [0, 1, 0.95, 0.45, 0]
+                  scale: [0, 0.45, 1.5, 3.4, 5.8],
+                  opacity: [0, 1, 0.95, 0.45, 0],
+                  rotate: [0, -3, 2, 0]
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 1.65,
                   ease: [0.16, 1, 0.3, 1],
                   times: [0, 0.15, 0.45, 0.75, 1]
                 }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-96 sm:h-96 rounded-full border-[14px] sm:border-[22px] md:border-[30px] border-white pointer-events-none"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[180px] sm:w-[500px] sm:h-[250px] md:w-[680px] md:h-[300px] pointer-events-none"
                 style={{
-                  boxShadow: `0 0 60px #ffffff, 0 0 120px ${gasColor}, 0 0 220px ${gasColor}, 0 0 300px #ffffff, inset 0 0 90px ${gasColor}`,
+                  clipPath: 'polygon(50% 0%, 76% 16%, 98% 50%, 76% 84%, 50% 100%, 24% 84%, 2% 50%, 24% 16%)',
+                  background: `radial-gradient(ellipse at center, transparent 48%, ${gasColor} 68%, #ffffff 84%, transparent 92%)`,
+                  filter: `drop-shadow(0 0 35px #ffffff) drop-shadow(0 0 75px ${gasColor})`,
                   mixBlendMode: 'screen',
                 }}
               />
 
-              {/* 3. Secondary High-Velocity Ionized Plasma Ripple Ring */}
+              {/* 3. Secondary Faceted Supersonic Mach-Cone Ripple (Offset Delay) */}
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{
-                  scale: [0, 0.6, 2.0, 4.4],
-                  opacity: [0, 0.85, 0.4, 0]
+                  scale: [0, 0.65, 2.2, 4.8],
+                  opacity: [0, 0.9, 0.45, 0]
                 }}
                 transition={{
-                  duration: 1.35,
-                  delay: 0.06,
+                  duration: 1.45,
+                  delay: 0.05,
                   ease: 'easeOut',
-                  times: [0, 0.25, 0.65, 1]
+                  times: [0, 0.2, 0.65, 1]
                 }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-88 sm:h-88 rounded-full border-[6px] sm:border-[10px] pointer-events-none"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[160px] sm:w-[440px] sm:h-[220px] md:w-[580px] md:h-[260px] pointer-events-none border-[7px] sm:border-[12px]"
                 style={{
                   borderColor: gasColor,
-                  boxShadow: `0 0 80px ${gasColor}, 0 0 160px ${gasColor}`,
+                  borderRadius: '45% 45% 45% 45% / 25% 25% 25% 25%',
+                  boxShadow: `0 0 50px #ffffff, 0 0 110px ${gasColor}, inset 0 0 45px ${gasColor}`,
                   mixBlendMode: 'color-dodge',
                 }}
               />
 
-              {/* 4. Central Nova Flare Burst */}
-              <motion.div
-                initial={{ scale: 0.2, opacity: 0 }}
-                animate={{
-                  scale: [0.2, 1.6, 2.8],
-                  opacity: [0, 1, 0]
-                }}
-                transition={{ duration: 0.85, ease: 'easeOut' }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none"
-                style={{
-                  background: `radial-gradient(circle, #ffffff 0%, #ffffff 20%, ${gasColor} 50%, transparent 75%)`,
-                  filter: 'blur(16px)',
-                  mixBlendMode: 'screen',
-                }}
-              />
-
-              {/* 5. Horizontal Anamorphic Lens Flare Beam across Title */}
+              {/* 4. Horizontal Anamorphic Laser Blade Slicing Across Title */}
               <motion.div
                 initial={{ scaleX: 0, opacity: 0 }}
                 animate={{
-                  scaleX: [0, 1.4, 0],
+                  scaleX: [0, 1.6, 0],
                   opacity: [0, 1, 0]
                 }}
-                transition={{ duration: 0.75, ease: 'easeInOut' }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-2.5 sm:h-3.5 rounded-full pointer-events-none"
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-3 sm:h-4 rounded-full pointer-events-none"
                 style={{
-                  background: `linear-gradient(to right, transparent, #ffffff, ${gasColor}, #ffffff, transparent)`,
+                  background: `linear-gradient(to right, transparent 0%, ${gasColor} 20%, #ffffff 50%, ${gasColor} 80%, transparent 100%)`,
                   boxShadow: `0 0 40px #ffffff, 0 0 90px ${gasColor}`,
-                  filter: 'blur(2px)',
+                  filter: 'blur(1px)',
                   mixBlendMode: 'screen',
                 }}
               />
 
-              {/* 6. Volumetric Radial Starburst Light Rays */}
+              {/* 5. Volumetric Celestial Radial Light Starburst */}
               <motion.div
-                initial={{ scale: 0.3, opacity: 0, rotate: 0 }}
+                initial={{ scale: 0.2, opacity: 0, rotate: 0 }}
                 animate={{
-                  scale: [0.3, 1.8, 3.4],
-                  opacity: [0, 0.75, 0],
-                  rotate: [0, 45]
+                  scale: [0.2, 1.8, 3.6],
+                  opacity: [0, 0.8, 0],
+                  rotate: [0, 35]
                 }}
-                transition={{ duration: 1.4, ease: 'easeOut' }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
                 style={{
-                  background: `conic-gradient(from 0deg, transparent 0deg, ${gasColor}60 12deg, transparent 24deg, #ffffff70 36deg, transparent 48deg, ${gasColor}60 60deg, transparent 72deg, #ffffff70 84deg, transparent 96deg, ${gasColor}60 108deg, transparent 120deg, #ffffff70 132deg, transparent 144deg, ${gasColor}60 156deg, transparent 168deg, #ffffff70 180deg, transparent 192deg, ${gasColor}60 204deg, transparent 216deg, #ffffff70 228deg, transparent 240deg, ${gasColor}60 252deg, transparent 264deg, #ffffff70 276deg, transparent 288deg, ${gasColor}60 300deg, transparent 312deg, #ffffff70 324deg, transparent 336deg, ${gasColor}60 348deg, transparent 360deg)`,
-                  filter: 'blur(10px)',
-                  mixBlendMode: 'color-dodge',
+                  background: `conic-gradient(from 0deg, transparent 0deg, ${gasColor}70 8deg, transparent 16deg, #ffffff80 24deg, transparent 32deg, ${gasColor}70 45deg, transparent 58deg, #ffffff80 68deg, transparent 80deg, ${gasColor}70 95deg, transparent 110deg, #ffffff80 125deg, transparent 140deg, ${gasColor}70 160deg, transparent 175deg, #ffffff80 190deg, transparent 205deg, ${gasColor}70 225deg, transparent 240deg, #ffffff80 255deg, transparent 270deg, ${gasColor}70 295deg, transparent 310deg, #ffffff80 325deg, transparent 340deg, ${gasColor}70 355deg, transparent 360deg)`,
+                  filter: 'blur(8px)',
+                  mixBlendMode: 'screen',
                 }}
               />
+
+              {/* 6. Scattered Anamorphic Ember Sparks Radiating in 360 Degrees */}
+              {shockwaveSparks.map((spark) => (
+                <motion.div
+                  key={spark.id}
+                  initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                  animate={{
+                    x: [0, spark.distanceX * 0.4, spark.distanceX],
+                    y: [0, spark.distanceY * 0.4, spark.distanceY],
+                    scale: [0, 1.6, 0],
+                    opacity: [0, 1, 0]
+                  }}
+                  transition={{
+                    duration: spark.duration,
+                    delay: spark.delay,
+                    ease: 'easeOut'
+                  }}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+                  style={{
+                    width: `${spark.size}px`,
+                    height: `${spark.size}px`,
+                    backgroundColor: '#ffffff',
+                    boxShadow: `0 0 10px #ffffff, 0 0 20px ${gasColor}`,
+                    mixBlendMode: 'screen',
+                  }}
+                />
+              ))}
             </div>
           )}
         </AnimatePresence>
 
         {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
-        {/* Revealed dynamically by the expanding explosion of light */}
+        {/* Revealed dynamically by the expanding faceted light pulse, showing only covered areas */}
         {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
           <motion.div
             key={`hero-bg-${explosionKey}`}
             initial={!hasRevealed && isIlluminated ? {
-              clipPath: 'circle(0% at 50% 48%)',
+              clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
               opacity: 0
             } : false}
             animate={
               explosionActive
                 ? {
-                    clipPath: [
-                      'circle(0% at 50% 48%)',
-                      'circle(28% at 50% 48%)',
-                      'circle(85% at 50% 48%)',
-                      'circle(170% at 50% 48%)'
-                    ],
-                    opacity: [0, targetOpacity * 0.85, targetOpacity, targetOpacity],
+                    clipPath: FACETED_WAVEFRONT_KEYFRAMES,
+                    opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
                     filter: [
-                      `brightness(3.2) blur(0px)`,
-                      `brightness(2.4) blur(1px)`,
-                      `brightness(1.5) blur(${blurAmount})`,
-                      `brightness(1.05) blur(${blurAmount})`
+                      `brightness(3.5) blur(0px) contrast(1.4)`,
+                      `brightness(2.7) blur(1px) contrast(1.25)`,
+                      `brightness(1.8) blur(${blurAmount}) contrast(1.1)`,
+                      `brightness(1.25) blur(${blurAmount}) contrast(1.02)`,
+                      `brightness(1.05) blur(${blurAmount}) contrast(1)`
                     ]
                   }
                 : hasRevealed || !isIlluminated
                 ? {
-                    clipPath: 'circle(170% at 50% 48%)',
+                    clipPath: 'polygon(-25% -25%, 125% -25%, 125% 125%, -25% 125%)',
                     opacity: targetOpacity,
                     filter: `brightness(1.05) blur(${blurAmount})`
                   }
                 : {
-                    clipPath: 'circle(0% at 50% 48%)',
+                    clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
                     opacity: 0,
                     filter: `brightness(0) blur(${blurAmount})`
                   }
@@ -321,9 +365,9 @@ export default function HeroSection({
             transition={
               explosionActive
                 ? {
-                    duration: 1.45,
+                    duration: 1.75,
                     ease: [0.16, 1, 0.3, 1],
-                    times: [0, 0.22, 0.55, 1]
+                    times: [0, 0.18, 0.48, 0.78, 1]
                   }
                 : { duration: 0.3 }
             }
@@ -474,34 +518,30 @@ export default function HeroSection({
               <motion.div
                 key={`title-bg-${explosionKey}`}
                 initial={!hasRevealed && isIlluminated ? {
-                  clipPath: 'circle(0% at 50% 50%)',
+                  clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
                   opacity: 0
                 } : false}
                 animate={
                   explosionActive
                     ? {
-                        clipPath: [
-                          'circle(0% at 50% 50%)',
-                          'circle(35% at 50% 50%)',
-                          'circle(90% at 50% 50%)',
-                          'circle(180% at 50% 50%)'
-                        ],
-                        opacity: [0, targetOpacity * 0.85, targetOpacity, targetOpacity],
+                        clipPath: FACETED_WAVEFRONT_KEYFRAMES,
+                        opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
                         filter: [
-                          `brightness(3.2) blur(0px)`,
-                          `brightness(2.4) blur(1px)`,
-                          `brightness(1.5) blur(${blurAmount})`,
-                          `brightness(1.05) blur(${blurAmount})`
+                          `brightness(3.5) blur(0px) contrast(1.4)`,
+                          `brightness(2.7) blur(1px) contrast(1.25)`,
+                          `brightness(1.8) blur(${blurAmount}) contrast(1.1)`,
+                          `brightness(1.25) blur(${blurAmount}) contrast(1.02)`,
+                          `brightness(1.05) blur(${blurAmount}) contrast(1)`
                         ]
                       }
                     : hasRevealed || !isIlluminated
                     ? {
-                        clipPath: 'circle(180% at 50% 50%)',
+                        clipPath: 'polygon(-25% -25%, 125% -25%, 125% 125%, -25% 125%)',
                         opacity: targetOpacity,
                         filter: `brightness(1.05) blur(${blurAmount})`
                       }
                     : {
-                        clipPath: 'circle(0% at 50% 50%)',
+                        clipPath: FACETED_WAVEFRONT_KEYFRAMES[0],
                         opacity: 0,
                         filter: `brightness(0) blur(${blurAmount})`
                       }
@@ -509,9 +549,9 @@ export default function HeroSection({
                 transition={
                   explosionActive
                     ? {
-                        duration: 1.45,
+                        duration: 1.75,
                         ease: [0.16, 1, 0.3, 1],
-                        times: [0, 0.22, 0.55, 1]
+                        times: [0, 0.18, 0.48, 0.78, 1]
                       }
                     : { duration: 0.3 }
                 }

@@ -24,10 +24,12 @@
     <script>
       (function() {
         try {
-          var s = localStorage.getItem('unnoticed_artist_data_v2');
+          var s = localStorage.getItem('unnoticed_cms_v1_data') || localStorage.getItem('unnoticed_artist_data_v2');
           if (s) {
             var d = JSON.parse(s);
-            var p = d && d.artistInfo && d.artistInfo.theme ? d.artistInfo.theme.primary : null;
+            var theme = d && d.artistInfo && d.artistInfo.theme ? d.artistInfo.theme : null;
+            var p = theme ? theme.primary : null;
+            var isMono = theme && theme.id === 'mono';
             if (p) {
               var c = p.replace('#','').trim().toLowerCase();
               var r = 0, g = 0, b = 0;
@@ -35,9 +37,10 @@
               else if (c.length === 3) { r = parseInt(c[0]+c[0], 16); g = parseInt(c[1]+c[1], 16); b = parseInt(c[2]+c[2], 16); }
               else if (c.length === 6) { r = parseInt(c.substr(0, 2), 16); g = parseInt(c.substr(2, 2), 16); b = parseInt(c.substr(4, 2), 16); }
               var lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-              if (lum > 0.52) {
+              if (lum > 0.52 || isMono) {
                 document.documentElement.setAttribute('data-theme-light', 'true');
                 document.documentElement.style.setProperty('--theme-on-primary', '#06070a');
+                document.documentElement.style.setProperty('--theme-is-light', '1');
                 document.documentElement.style.setProperty('--theme-btn-shadow', '0 4px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7)');
               }
             }

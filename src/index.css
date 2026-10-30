@@ -147,8 +147,19 @@ a.bg-purple-500 * {
 [data-theme-light="true"] button.bg-purple-600,
 [data-theme-light="true"] button.bg-purple-500,
 [data-theme-light="true"] a.bg-purple-600,
-[data-theme-light="true"] a.bg-purple-500 {
-  color: #050608 !important;
+[data-theme-light="true"] a.bg-purple-500,
+[data-theme-light="true"] button[class*="bg-purple-600"],
+[data-theme-light="true"] button[class*="from-purple-600"],
+:root[style*="--theme-is-light: 1"] .theme-primary-btn,
+:root[style*="--theme-is-light: 1"] button.theme-primary-btn,
+:root[style*="--theme-is-light: 1"] a.theme-primary-btn,
+:root[style*="--theme-is-light: 1"] button.bg-purple-600,
+:root[style*="--theme-is-light: 1"] button.bg-purple-500,
+:root[style*="--theme-is-light: 1"] a.bg-purple-600,
+:root[style*="--theme-is-light: 1"] a.bg-purple-500,
+:root[style*="--theme-is-light: 1"] button[class*="bg-purple-600"],
+:root[style*="--theme-is-light: 1"] button[class*="from-purple-600"] {
+  color: #08090e !important;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 45%, #cbd5e1 100%) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
   border: 1px solid rgba(0, 0, 0, 0.25) !important;
@@ -162,12 +173,35 @@ a.bg-purple-500 * {
 [data-theme-light="true"] button.bg-purple-600 *,
 [data-theme-light="true"] button.bg-purple-500 *,
 [data-theme-light="true"] a.bg-purple-600 *,
-[data-theme-light="true"] a.bg-purple-500 * {
-  color: #050608 !important;
-  fill: #050608 !important;
-  stroke: #050608 !important;
+[data-theme-light="true"] a.bg-purple-500 *,
+[data-theme-light="true"] button[class*="bg-purple-600"] *,
+[data-theme-light="true"] button[class*="from-purple-600"] *,
+:root[style*="--theme-is-light: 1"] .theme-primary-btn *,
+:root[style*="--theme-is-light: 1"] button.theme-primary-btn *,
+:root[style*="--theme-is-light: 1"] a.theme-primary-btn *,
+:root[style*="--theme-is-light: 1"] button.bg-purple-600 *,
+:root[style*="--theme-is-light: 1"] button.bg-purple-500 *,
+:root[style*="--theme-is-light: 1"] a.bg-purple-600 *,
+:root[style*="--theme-is-light: 1"] a.bg-purple-500 *,
+:root[style*="--theme-is-light: 1"] button[class*="bg-purple-600"] *,
+:root[style*="--theme-is-light: 1"] button[class*="from-purple-600"] * {
+  color: #08090e !important;
+  fill: #08090e !important;
+  stroke: #08090e !important;
   font-weight: 800 !important;
   text-shadow: none !important;
+}
+
+/* High-contrast toggle switches when light theme is active */
+[data-theme-light="true"] button[class*="bg-purple-600"] > span.bg-white,
+:root[style*="--theme-is-light: 1"] button[class*="bg-purple-600"] > span.bg-white {
+  background-color: #08090e !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme-light="true"] button[class*="bg-purple-600"],
+:root[style*="--theme-is-light: 1"] button[class*="bg-purple-600"] {
+  border-color: rgba(0, 0, 0, 0.25) !important;
 }
 
 /* Ensure any pill, badge, or container using bg-purple maintains dark luxury contrast without being blown out */

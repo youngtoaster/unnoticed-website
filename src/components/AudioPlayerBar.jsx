@@ -151,7 +151,7 @@ export default function AudioPlayerBar({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            className="hidden md:flex flex-col fixed bottom-24 right-6 w-[440px] max-h-[640px] z-40 rounded-3xl border border-white/[0.14] bg-[#0c0d16] shadow-2xl shadow-black overflow-hidden"
+            className="hidden md:flex flex-col fixed bottom-24 right-6 w-[380px] sm:w-[410px] max-h-[520px] z-40 rounded-2xl border border-white/[0.14] bg-[#0c0d16] shadow-2xl shadow-black overflow-hidden"
           >
             {/* Ambient glowing rim */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-purple-600/15 rounded-full blur-[80px] pointer-events-none -z-10" />
@@ -237,7 +237,7 @@ export default function AudioPlayerBar({
             {/* Lyrics Stream List */}
             <div
               ref={lyricsContainerRef}
-              className="p-5 overflow-y-auto space-y-3.5 flex-1 max-h-[460px] select-none text-left"
+              className="p-3.5 sm:p-4 overflow-y-auto space-y-2 flex-1 max-h-[380px] select-none text-left"
             >
               {trackLyrics.map((line, idx) => {
                 const isActive = idx === activeLineIndex;

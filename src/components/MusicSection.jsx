@@ -117,6 +117,17 @@ export default function MusicSection({
     setTimeout(() => setCopiedQuote(false), 2000);
   };
 
+  // Keyboard navigation & Escape key listener to exit inspect lyrics view
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && focusedTrack) {
+        setFocusedTrack(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [focusedTrack]);
+
   const isCurrentTrackPlaying = isPlaying && currentTrack?.id === selectedTrackForLyrics?.id;
 
   return (
@@ -405,20 +416,20 @@ export default function MusicSection({
                 </div>
               </div>
 
-              {/* Two-Column Focused Track Showcase */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Two-Column Focused Track Showcase (Scaled for Comfortable Viewing) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                 
-                {/* Left Column: Focused Track Hero Card (5 Cols, Sticky) */}
-                <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+                {/* Left Column: Focused Track Hero Card (4 Cols, Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-3">
                   <SpotlightCard
                     spotlightColor="rgba(168, 85, 247, 0.25)"
-                    className="p-6 relative overflow-hidden border-purple-500/40 bg-[#0c0d16] shadow-2xl shadow-purple-950/50"
+                    className="p-4 sm:p-5 relative overflow-hidden border-purple-500/40 bg-[#0c0d16] shadow-xl shadow-purple-950/40"
                   >
                     {/* Glowing Backlight */}
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none -z-10" />
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-purple-600/20 rounded-full blur-[70px] pointer-events-none -z-10" />
 
-                    {/* High-Res Artwork Showcase */}
-                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 border border-white/[0.15] shadow-2xl">
+                    {/* High-Res Artwork Showcase - Compact Proportions */}
+                    <div className="relative w-full max-w-[220px] sm:max-w-[240px] lg:max-w-none aspect-square mx-auto rounded-xl overflow-hidden mb-3.5 border border-white/[0.12] shadow-xl">
                       <img
                         src={focusedTrack.cover}
                         alt={focusedTrack.title}
@@ -428,48 +439,48 @@ export default function MusicSection({
                       {/* Vinyl Spin Overlay when Playing */}
                       {isPlaying && currentTrack?.id === focusedTrack.id && (
                         <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center">
-                          <Disc className="w-16 h-16 text-purple-400 animate-spin" />
+                          <Disc className="w-12 h-12 text-purple-400 animate-spin" />
                         </div>
                       )}
 
-                      <div className="absolute top-3 left-3">
-                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-white border border-white/20">
-                          {focusedTrack.releaseYear} Master Cut
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-white border border-white/20">
+                          {focusedTrack.releaseYear} Cut
                         </span>
                       </div>
 
-                      <div className="absolute bottom-3 right-3">
-                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-slate-300">
+                      <div className="absolute bottom-2.5 right-2.5">
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-slate-300">
                           {focusedTrack.duration}
                         </span>
                       </div>
                     </div>
 
                     {/* Title & Metadata */}
-                    <div className="mb-6">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
+                    <div className="mb-3.5">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[9px] font-mono px-2 py-0.2 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
                           Now In Focus
                         </span>
                         {isPlaying && currentTrack?.id === focusedTrack.id && (
-                          <span className="flex items-center gap-0.5 h-3">
-                            <span className="w-0.5 h-3 bg-purple-400 animate-pulse rounded-full" />
-                            <span className="w-0.5 h-3.5 bg-cyan-400 animate-bounce rounded-full" />
-                            <span className="w-0.5 h-2.5 bg-purple-300 animate-pulse rounded-full" />
+                          <span className="flex items-center gap-0.5 h-2.5">
+                            <span className="w-0.5 h-2.5 bg-purple-400 animate-pulse rounded-full" />
+                            <span className="w-0.5 h-3 bg-cyan-400 animate-bounce rounded-full" />
+                            <span className="w-0.5 h-2 bg-purple-300 animate-pulse rounded-full" />
                           </span>
                         )}
                       </div>
 
-                      <h2 className="font-display font-black text-3xl sm:text-4xl text-white tracking-tight">
+                      <h2 className="font-display font-black text-xl sm:text-2xl text-white tracking-tight truncate">
                         {focusedTrack.title}
                       </h2>
-                      <p className="text-sm text-purple-300 font-medium mt-1">
+                      <p className="text-xs text-purple-300 font-medium mt-0.5 truncate">
                         UNNOTICED {focusedTrack.featuring && `(feat. ${focusedTrack.featuring})`}
                       </p>
                     </div>
 
                     {/* Playback & Action Controls */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <motion.button
                         whileTap={{ scale: 0.96 }}
                         onClick={() => {
@@ -479,94 +490,90 @@ export default function MusicSection({
                             togglePlay();
                           }
                         }}
-                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/40 active:scale-95 transition-all cursor-pointer"
+                        className="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 active:scale-95 transition-all cursor-pointer"
                       >
                         {isPlaying && currentTrack?.id === focusedTrack.id ? (
                           <>
-                            <Pause className="w-5 h-5 fill-white" />
-                            <span>Pause Studio Preview</span>
+                            <Pause className="w-4 h-4 fill-white" />
+                            <span>Pause Preview</span>
                           </>
                         ) : (
                           <>
-                            <Play className="w-5 h-5 fill-white ml-0.5" />
-                            <span>Play Studio Preview ({focusedTrack.duration})</span>
+                            <Play className="w-4 h-4 fill-white ml-0.5" />
+                            <span>Play Preview ({focusedTrack.duration})</span>
                           </>
                         )}
                       </motion.button>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <a
                           href={focusedTrack.spotifyUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors active:scale-95"
+                          className="flex-1 py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95"
                         >
-                          <span>Full Song on Spotify</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Spotify</span>
+                          <ExternalLink className="w-3 h-3" />
                         </a>
 
                         <button
                           onClick={() => setFocusedTrack(null)}
-                          className="px-3.5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 text-xs font-mono transition-colors active:scale-95 border border-white/[0.08]"
+                          className="px-3 py-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 text-xs font-mono transition-colors active:scale-95 border border-white/[0.08]"
                           title="Return to Discography"
                         >
-                          Close Focus
+                          Close
                         </button>
                       </div>
                     </div>
 
                     {/* Telemetry Overview Box */}
-                    <div className="mt-6 pt-5 border-t border-white/[0.08] space-y-2 text-xs font-mono text-slate-400">
+                    <div className="mt-3.5 pt-3 border-t border-white/[0.08] space-y-1.5 text-[11px] font-mono text-slate-400">
                       <div className="flex items-center justify-between">
-                        <span>Verified Genius Notes:</span>
-                        <strong className="text-amber-300">{annotatedLines.length} Notes</strong>
+                        <span>Genius Notes:</span>
+                        <strong className="text-amber-300">{annotatedLines.length} Verified</strong>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Audio Resolution:</span>
-                        <strong className="text-slate-200">24-Bit / 48kHz Studio Cut</strong>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Catalog Release:</span>
-                        <strong className="text-slate-200">Official Unnoticed Atelier</strong>
+                        <strong className="text-slate-200">24-Bit / 48kHz Cut</strong>
                       </div>
                     </div>
                   </SpotlightCard>
                 </div>
 
-                {/* Right Column: Overhauled Genius Lyric Experience & Inspector (7 Cols) */}
-                <div className="lg:col-span-7">
+                {/* Right Column: Overhauled Genius Lyric Experience & Inspector (8 Cols) */}
+                <div className="lg:col-span-8">
                   <SpotlightCard
-                    className="p-5 sm:p-8 relative overflow-hidden"
+                    className="p-4 sm:p-6 relative overflow-hidden border-purple-500/30 bg-[#0b0c14]"
                     spotlightColor="rgba(168, 85, 247, 0.2)"
                     tilt={false}
                   >
-                    {/* Designeer-Style Sonic Telemetry Top Bar */}
-                    <div className="flex flex-wrap items-center justify-between pb-5 border-b border-white/[0.08] gap-4 mb-6">
+                    {/* Sonic Telemetry Top Bar */}
+                    <div className="flex flex-wrap items-center justify-between pb-3.5 border-b border-white/[0.08] gap-3 mb-3.5">
                       <div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 font-bold">
-                            <Sparkles className="w-3 h-3 text-amber-400" />
-                            Genius Verified Lyrics
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[9.5px] font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 font-bold">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                            Genius Verified
                           </span>
                           <span className="text-[10px] font-mono text-slate-400">
                             Line-by-Line Breakdown
                           </span>
                         </div>
 
-                        <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
+                        <h3 className="font-display text-lg sm:text-xl font-black text-white">
                           {selectedTrackForLyrics.title}
                         </h3>
 
-                        <p className="text-xs text-purple-300 font-medium mt-0.5">
+                        <p className="text-[11px] text-purple-300 font-medium mt-0.5">
                           Click any highlighted verse below to inspect verified artist meaning
                         </p>
                       </div>
 
-                      {/* Planes-Style Lyric Filter Pills */}
-                      <div className="flex items-center gap-1.5 p-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+                      {/* Lyric Filter Pills */}
+                      <div className="flex items-center gap-1 p-0.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
                         <button
                           onClick={() => setFilterMode('all')}
-                          className={`relative px-3 py-1 rounded-full text-[11px] font-mono font-semibold transition-colors active:scale-95 ${
+                          className={`relative px-2.5 py-1 rounded-full text-[10.5px] font-mono font-semibold transition-colors active:scale-95 ${
                             filterMode === 'all' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                           }`}
                         >
@@ -582,7 +589,7 @@ export default function MusicSection({
 
                         <button
                           onClick={() => setFilterMode('annotated')}
-                          className={`relative px-3 py-1 rounded-full text-[11px] font-mono font-semibold transition-colors active:scale-95 ${
+                          className={`relative px-2.5 py-1 rounded-full text-[10.5px] font-mono font-semibold transition-colors active:scale-95 ${
                             filterMode === 'annotated' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                           }`}
                         >
@@ -593,12 +600,12 @@ export default function MusicSection({
                               transition={{ type: 'spring', stiffness: 450, damping: 30 }}
                             />
                           )}
-                          <span className="relative z-10">Notes Only ({annotatedLines.length})</span>
+                          <span className="relative z-10">Notes ({annotatedLines.length})</span>
                         </button>
 
                         <button
                           onClick={() => setFilterMode(filterMode === 'focus' ? 'all' : 'focus')}
-                          className={`relative px-3 py-1 rounded-full text-[11px] font-mono font-semibold transition-colors active:scale-95 ${
+                          className={`relative px-2.5 py-1 rounded-full text-[10.5px] font-mono font-semibold transition-colors active:scale-95 ${
                             filterMode === 'focus' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                           }`}
                           title="Dim other lines to spotlight selected line"
@@ -611,15 +618,15 @@ export default function MusicSection({
                             />
                           )}
                           <span className="relative z-10 flex items-center gap-1">
-                            {filterMode === 'focus' ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                            {filterMode === 'focus' ? <Eye className="w-2.5 h-2.5" /> : <EyeOff className="w-2.5 h-2.5" />}
                             Focus
                           </span>
                         </button>
                       </div>
                     </div>
 
-                    {/* Interactive Lyrics Typography Display */}
-                    <div className="space-y-3 mb-8">
+                    {/* Interactive Lyrics Typography Display (Sleek Scrollable Container) */}
+                    <div className="max-h-[280px] sm:max-h-[320px] lg:max-h-[340px] overflow-y-auto pr-1.5 space-y-1.5 mb-3.5 select-none">
                       {selectedTrackForLyrics.lyrics?.map((line, idx) => {
                         const isAnnotated = line.annotated;
                         const isSelected = activeAnnotation?.content === line.annotation?.content;
@@ -630,20 +637,20 @@ export default function MusicSection({
                         return (
                           <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 8 }}
+                            initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.03, duration: 0.3 }}
-                            className={`relative rounded-2xl p-3 sm:p-3.5 transition-all duration-300 ${
+                            transition={{ delay: Math.min(idx * 0.02, 0.25), duration: 0.2 }}
+                            className={`relative rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 transition-all duration-200 ${
                               isSelected
-                                ? 'bg-gradient-to-r from-purple-950/50 via-purple-900/30 to-amber-950/20 border border-purple-500/50 shadow-xl shadow-purple-950/40 scale-[1.01]'
+                                ? 'bg-gradient-to-r from-purple-950/60 via-purple-900/40 to-amber-950/20 border border-purple-500/50 shadow-md shadow-purple-950/30'
                                 : filterMode === 'focus' && !isSelected
                                 ? 'opacity-35 blur-[0.4px] hover:opacity-80 hover:blur-none'
-                                : 'hover:bg-white/[0.03] border border-transparent'
+                                : 'hover:bg-white/[0.04] border border-transparent'
                             }`}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              {/* Monospace Line Number & Audio Timestamp */}
-                              <span className="font-mono text-[10px] text-slate-500 select-none mt-1 shrink-0 w-8">
+                            <div className="flex items-center justify-between gap-2.5">
+                              {/* Monospace Line Number */}
+                              <span className="font-mono text-[9px] text-slate-500 select-none shrink-0 w-6">
                                 #{idx < 9 ? `0${idx + 1}` : idx + 1}
                               </span>
 
@@ -651,7 +658,7 @@ export default function MusicSection({
                                 {isAnnotated ? (
                                   <button
                                     onClick={() => handleLyricClick(line)}
-                                    className={`text-left text-sm sm:text-base leading-relaxed tracking-wide transition-all cursor-pointer font-sans ${
+                                    className={`text-left text-xs sm:text-[13px] leading-relaxed tracking-wide transition-all cursor-pointer font-sans block w-full ${
                                       isSelected
                                         ? 'text-white font-bold'
                                         : 'text-amber-200/90 hover:text-white'
@@ -660,13 +667,13 @@ export default function MusicSection({
                                     <span className={`inline relative py-0.5 px-1.5 rounded-md ${
                                       isSelected
                                         ? 'bg-amber-400/25 border-b-2 border-amber-400 shadow-sm shadow-amber-400/30'
-                                        : 'bg-amber-500/10 hover:bg-amber-500/20 border-b-2 border-dashed border-amber-500/50'
+                                        : 'bg-amber-500/10 hover:bg-amber-500/20 border-b border-dashed border-amber-500/50'
                                     }`}>
                                       "{line.text}"
                                     </span>
                                   </button>
                                 ) : (
-                                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+                                  <p className="text-slate-300 text-xs sm:text-[13px] leading-relaxed">
                                     "{line.text}"
                                   </p>
                                 )}
@@ -676,9 +683,9 @@ export default function MusicSection({
                               {isAnnotated && (
                                 <button
                                   onClick={() => handleLyricClick(line)}
-                                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 transition-all active:scale-95 ${
+                                  className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-mono flex items-center gap-1 transition-all active:scale-95 ${
                                     isSelected
-                                      ? 'bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-400/30'
+                                      ? 'bg-amber-400 text-slate-950 font-bold shadow-sm shadow-amber-400/30'
                                       : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30'
                                   }`}
                                 >
@@ -693,45 +700,45 @@ export default function MusicSection({
                     </div>
 
                     {/* ======================================================== */}
-                    {/* GENIUS VERIFIED ARTIST EDITORIAL INSPECTOR (Designeer)  */}
+                    {/* GENIUS VERIFIED ARTIST EDITORIAL INSPECTOR (Scaled View) */}
                     {/* ======================================================== */}
                     <AnimatePresence mode="wait">
                       {activeAnnotation ? (
                         <motion.div
                           key={activeAnnotation.content}
-                          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                          initial={{ opacity: 0, y: 12, scale: 0.99 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -15, scale: 0.98 }}
-                          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                          className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-[#141224] to-[#0d0d16] border border-purple-500/40 shadow-2xl shadow-purple-950/50 relative overflow-hidden text-left"
+                          exit={{ opacity: 0, y: -10, scale: 0.99 }}
+                          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                          className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-b from-[#141224] to-[#0d0d16] border border-purple-500/40 shadow-lg shadow-purple-950/40 relative overflow-hidden text-left"
                         >
                           {/* Glow Ambient Corner */}
-                          <div className="absolute -top-12 -right-12 w-36 h-36 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+                          <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
                           {/* Inspector Header: Verified Artist Badge & Navigation */}
-                          <div className="flex flex-wrap items-center justify-between pb-4 border-b border-white/[0.08] gap-3 mb-4">
-                            <div className="flex items-center gap-3">
+                          <div className="flex flex-wrap items-center justify-between pb-2.5 border-b border-white/[0.08] gap-2 mb-2.5">
+                            <div className="flex items-center gap-2.5">
                               <div className="relative">
                                 <img
                                   src={artistInfo.avatar}
                                   alt="UNNOTICED"
-                                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-400 shadow-md"
+                                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-purple-400 shadow-md"
                                 />
-                                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-purple-600 flex items-center justify-center text-white text-[9px] border border-black">
+                                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-purple-600 flex items-center justify-center text-white text-[7.5px] border border-black">
                                   ✓
                                 </span>
                               </div>
 
                               <div>
                                 <div className="flex items-center gap-1.5">
-                                  <h5 className="font-display font-bold text-white text-sm">
+                                  <h5 className="font-display font-bold text-white text-xs sm:text-sm">
                                     {activeAnnotation.author}
                                   </h5>
-                                  <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-500/30">
+                                  <span className="text-[8.5px] font-mono uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-200 border border-purple-500/30">
                                     {activeAnnotation.badge}
                                   </span>
                                 </div>
-                                <span className="text-[10px] text-slate-400 font-mono">
+                                <span className="text-[9.5px] text-slate-400 font-mono">
                                   Verified Official Commentary
                                 </span>
                               </div>
@@ -739,23 +746,23 @@ export default function MusicSection({
 
                             {/* Prev / Next Annotation Navigation */}
                             {annotatedLines.length > 1 && (
-                              <div className="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-full border border-white/[0.08]">
+                              <div className="flex items-center gap-1 bg-white/[0.04] p-0.5 rounded-full border border-white/[0.08]">
                                 <button
                                   onClick={handlePrevAnnotation}
-                                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors active:scale-90"
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors active:scale-90"
                                   title="Previous Annotation"
                                 >
-                                  <ChevronLeft className="w-3.5 h-3.5" />
+                                  <ChevronLeft className="w-3 h-3" />
                                 </button>
-                                <span className="text-[10px] font-mono text-purple-300 px-1">
+                                <span className="text-[9.5px] font-mono text-purple-300 px-1">
                                   {currentAnnotIndex + 1} / {annotatedLines.length}
                                 </span>
                                 <button
                                   onClick={handleNextAnnotation}
-                                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors active:scale-90"
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors active:scale-90"
                                   title="Next Annotation"
                                 >
-                                  <ChevronRight className="w-3.5 h-3.5" />
+                                  <ChevronRight className="w-3 h-3" />
                                 </button>
                               </div>
                             )}
@@ -763,26 +770,26 @@ export default function MusicSection({
 
                           {/* Selected Lyric Pull-Quote Highlight */}
                           {activeLyricText && (
-                            <div className="mb-4 pl-3.5 border-l-2 border-amber-400 py-0.5">
-                              <span className="text-[10px] font-mono text-amber-400/80 uppercase tracking-widest block mb-0.5">
+                            <div className="mb-2.5 pl-3 border-l-2 border-amber-400 py-0.5 bg-amber-500/[0.03] rounded-r-lg">
+                              <span className="text-[9px] font-mono text-amber-400/80 uppercase tracking-widest block mb-0.5">
                                 Annotated Line:
                               </span>
-                              <p className="font-display italic text-sm sm:text-base text-amber-100 font-semibold leading-relaxed">
+                              <p className="font-display italic text-xs sm:text-sm text-amber-100 font-semibold leading-snug">
                                 "{activeLyricText}"
                               </p>
                             </div>
                           )}
 
                           {/* In-depth Artist Story / Commentary */}
-                          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans mb-5 font-light">
+                          <p className="text-xs text-slate-200 leading-relaxed font-sans mb-3 font-light">
                             {activeAnnotation.content}
                           </p>
 
                           {/* Action Toolbar */}
-                          <div className="pt-3 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <div className="pt-2 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-2 text-xs">
                             <button
                               onClick={() => copyToClipboard(`"${activeLyricText}" — UNNOTICED: ${activeAnnotation.content}`)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white font-mono text-[11px] transition-colors active:scale-95"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white font-mono text-[10px] transition-colors active:scale-95"
                             >
                               {copiedQuote ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                               <span>{copiedQuote ? 'Copied Insight!' : 'Copy Quote'}</span>
@@ -795,20 +802,20 @@ export default function MusicSection({
                                 }
                                 if (!isPlaying) togglePlay();
                               }}
-                              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] shadow-md shadow-purple-600/30 transition-all active:scale-95"
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[10px] shadow-sm shadow-purple-600/30 transition-all active:scale-95"
                             >
-                              <Play className="w-3 h-3 fill-current" />
+                              <Play className="w-2.5 h-2.5 fill-current" />
                               <span>{isCurrentTrackPlaying ? 'Currently Playing' : 'Listen Preview'}</span>
                             </button>
                           </div>
                         </motion.div>
                       ) : (
-                        <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/[0.06] text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-2">
-                          <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
-                          <p className="font-display text-white text-sm font-semibold">
+                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
+                          <p className="font-display text-white text-xs font-semibold">
                             Select Any Underlined Line Above
                           </p>
-                          <p className="max-w-md text-slate-400 leading-relaxed">
+                          <p className="max-w-md text-[11px] text-slate-400 leading-relaxed">
                             Tap any underlined verse to unpack verified artist commentary, songwriting inspirations, and behind-the-scenes stories from UNNOTICED.
                           </p>
                         </div>
@@ -816,7 +823,7 @@ export default function MusicSection({
                     </AnimatePresence>
 
                     {/* Bottom Back Button & Spotify Action */}
-                    <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                    <div className="mt-3.5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
                       <button
                         onClick={() => setFocusedTrack(null)}
                         className="text-xs text-purple-300 font-mono hover:text-white flex items-center gap-1 transition-colors cursor-pointer"

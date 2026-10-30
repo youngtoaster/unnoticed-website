@@ -2,8 +2,9 @@ import React, { useRef, useState, useEffect } from 'react';
 
 export default function Magnet({
   children,
-  padding = 60,
-  magnetStrength = 2.5,
+  padding = 30,
+  magnetStrength = 3,
+  maxOffset = 6,
   disabled = false,
   className = '',
   activeScale = 1.02
@@ -27,9 +28,12 @@ export default function Magnet({
 
       if (distance < rect.width / 2 + padding) {
         setIsHovered(true);
+        // Clamp offset so magnetic translation never overlaps neighboring elements
+        const rawX = distX / magnetStrength;
+        const rawY = distY / magnetStrength;
         setPosition({
-          x: distX / magnetStrength,
-          y: distY / magnetStrength,
+          x: Math.max(-maxOffset, Math.min(maxOffset, rawX)),
+          y: Math.max(-maxOffset, Math.min(maxOffset, rawY)),
         });
       } else {
         setIsHovered(false);

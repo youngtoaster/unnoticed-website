@@ -5,7 +5,8 @@ import {
   ArrowLeft, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
-  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2
+  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
+  AlignLeft, AlignCenter, AlignRight
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -139,6 +140,32 @@ function SectionControlsHeader({
   );
 }
 
+// Expanded Font Library for Neon Sign & Hero Stage
+const FONT_OPTIONS = [
+  { id: 'font-display', name: 'Syne', tag: 'Avant-Garde Display', sample: 'UNNOTICED' },
+  { id: 'font-bebas', name: 'Bebas Neue', tag: 'Monumental Condensed', sample: 'UNNOTICED' },
+  { id: 'font-anton', name: 'Anton', tag: 'Massive Ultra-Impact', sample: 'UNNOTICED' },
+  { id: 'font-orbitron', name: 'Orbitron', tag: 'Futuristic Cyberpunk', sample: 'UNNOTICED' },
+  { id: 'font-righteous', name: 'Righteous', tag: '1980s Neon Tube', sample: 'UNNOTICED' },
+  { id: 'font-audiowide', name: 'Audiowide', tag: 'Synthwave Display', sample: 'UNNOTICED' },
+  { id: 'font-cinzel', name: 'Cinzel', tag: 'Regal Roman Serif', sample: 'UNNOTICED' },
+  { id: 'font-playfair', name: 'Playfair Display', tag: 'High-Fashion Editorial', sample: 'UNNOTICED' },
+  { id: 'font-monoton', name: 'Monoton', tag: 'Multi-Line Neon', sample: 'UNNOTICED' },
+  { id: 'font-unbounded', name: 'Unbounded', tag: 'Wide Modern Grotesk', sample: 'UNNOTICED' },
+  { id: 'font-russo', name: 'Russo One', tag: 'Industrial Heavy', sample: 'UNNOTICED' },
+  { id: 'font-tech', name: 'Space Grotesk', tag: 'Tech Cyber Headline', sample: 'UNNOTICED' },
+  { id: 'font-mono', name: 'JetBrains Mono', tag: 'Cyber Monospace', sample: 'UNNOTICED' },
+  { id: 'font-sans', name: 'Plus Jakarta Sans', tag: 'Clean Ultra-Sans', sample: 'UNNOTICED' },
+];
+
+const SIZE_PRESETS = [
+  { label: 'Compact (3.25rem)', rem: 3.25, tailwind: 'text-2xl sm:text-4xl md:text-5xl lg:text-5xl' },
+  { label: 'Stage Medium (4.5rem)', rem: 4.5, tailwind: 'text-3xl sm:text-5xl md:text-6xl lg:text-6xl' },
+  { label: 'Hero Bold (5.25rem)', rem: 5.25, tailwind: 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]' },
+  { label: 'Stadium Big (7.5rem)', rem: 7.5, tailwind: 'text-4xl sm:text-7xl md:text-8xl lg:text-[7.5rem]' },
+  { label: 'Monumental (10rem+)', rem: 10, tailwind: 'text-5xl sm:text-8xl md:text-9xl lg:text-[10rem]' },
+];
+
 export default function AdminDashboard({ onReturnToSite }) {
   const {
     artistInfo, tracks, biography, videos, tourDates, pastTours,
@@ -166,8 +193,11 @@ export default function AdminDashboard({ onReturnToSite }) {
     color: '#a855f7',
     font: 'font-display',
     size: 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]',
+    fontSizeRem: 5.25,
+    align: 'center',
     fontWeight: 'font-black',
-    flicker: true
+    flicker: true,
+    glowCaption: true
   };
 
   const backdrop = artistInfo?.heroBackdrop || {
@@ -1146,143 +1176,213 @@ export default function AdminDashboard({ onReturnToSite }) {
             {/* LIVE PREVIEW OF NEON SIGN */}
             <div className="p-8 sm:p-12 rounded-2xl bg-black border border-white/[0.12] flex flex-col items-center justify-center text-center overflow-hidden relative group">
               <div className="absolute top-2.5 left-3.5 text-[10px] font-mono text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <Eye className="w-3 h-3 text-fuchsia-400" /> Live Neon Sign Preview
+                <Eye className="w-3 h-3 text-fuchsia-400" /> Live Neon Sign & Subtitle Studio Preview
               </div>
 
-              <div className="py-6 w-full flex justify-center">
+              {/* Main Neon Title with Dynamic Alignment & Custom Scale */}
+              <div className={`py-6 w-full flex ${
+                neonConfig.align === 'left' ? 'justify-start' :
+                neonConfig.align === 'right' ? 'justify-end' :
+                'justify-center'
+              }`}>
                 <NeonSign
-                  key={`${neonConfig.color}-${neonConfig.font}-${neonConfig.size}-${neonConfig.fontWeight}-${neonConfig.flicker}`}
+                  key={`${neonConfig.color}-${neonConfig.font}-${neonConfig.size}-${neonConfig.fontSizeRem}-${neonConfig.fontWeight}-${neonConfig.flicker}-${neonConfig.align}`}
                   as="h2"
                   color={neonConfig.color || '#a855f7'}
                   delay={0.1}
                   flicker={neonConfig.flicker ?? true}
-                  className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} text-4xl sm:text-6xl md:text-7xl tracking-tighter uppercase leading-[0.95] text-center justify-center`}
+                  style={neonConfig.fontSizeRem ? { fontSize: `clamp(2rem, 6.5vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
+                  className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-4xl sm:text-6xl md:text-7xl'} tracking-tight uppercase leading-[0.95]`}
                 >
                   {artistInfo.name || 'UNNOTICED'}
                 </NeonSign>
               </div>
 
-              <span className="text-[10px] font-mono text-slate-500 mt-2">
-                Gas Color: {neonConfig.color || '#a855f7'} • Font: {neonConfig.font || 'font-display'} • Weight: {neonConfig.fontWeight || 'font-black'}
-              </span>
+              {/* Live Preview of Illuminated Subtitle Caption */}
+              <div className={`w-full flex items-center ${
+                neonConfig.align === 'left' ? 'justify-start' :
+                neonConfig.align === 'right' ? 'justify-end' :
+                'justify-center'
+              } gap-2 mt-1 pb-2`}>
+                {(neonConfig.align === 'center' || neonConfig.align === 'right') && (
+                  <div
+                    className="h-[1px] w-10 sm:w-16 transition-all"
+                    style={{
+                      background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
+                      boxShadow: `0 0 6px ${neonConfig.color || '#a855f7'}`
+                    }}
+                  />
+                )}
+                <p
+                  className="font-tech text-xs tracking-[0.2em] uppercase font-bold text-white px-1 select-none"
+                  style={{
+                    textShadow: `0 0 4px #ffffff, 0 0 10px ${neonConfig.color || '#a855f7'}, 0 0 20px ${neonConfig.color || '#a855f7'}`
+                  }}
+                >
+                  {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
+                </p>
+                {(neonConfig.align === 'center' || neonConfig.align === 'left') && (
+                  <div
+                    className="h-[1px] w-10 sm:w-16 transition-all"
+                    style={{
+                      background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
+                      boxShadow: `0 0 6px ${neonConfig.color || '#a855f7'}`
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Status Info Footer */}
+              <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-mono text-slate-400 mt-3 pt-3 border-t border-white/[0.08] w-full">
+                <span>Color: <strong className="text-white">{neonConfig.color || '#a855f7'}</strong></span>
+                <span>•</span>
+                <span>Font: <strong className="text-white">{FONT_OPTIONS.find(f => f.id === neonConfig.font)?.name || 'Syne'}</strong></span>
+                <span>•</span>
+                <span>Scale: <strong className="text-fuchsia-400">{neonConfig.fontSizeRem || 5.25}rem</strong></span>
+                <span>•</span>
+                <span>Align: <strong className="text-white uppercase">{neonConfig.align || 'center'}</strong></span>
+              </div>
             </div>
 
             {/* CONTROLS GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               
-              {/* Color Preset & Picker */}
-              <div className="space-y-3">
-                <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Palette className="w-3.5 h-3.5 text-fuchsia-400" />
-                  <span>Neon Gas Color & Ionization Bloom</span>
-                </label>
+              {/* Left Column: Color & Alignment */}
+              <div className="space-y-4">
+                
+                {/* Hero Title & Stage Alignment Controls */}
+                <div className="space-y-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                  <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <AlignCenter className="w-3.5 h-3.5 text-fuchsia-400" />
+                      Hero Title & Stage Alignment
+                    </span>
+                    <span className="text-[10px] font-mono uppercase text-fuchsia-400 font-bold">
+                      {neonConfig.align || 'center'}
+                    </span>
+                  </label>
 
-                {/* Swatches */}
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { name: 'Electric Violet', hex: '#a855f7' },
-                    { name: 'Hot Magenta', hex: '#ff3ea5' },
-                    { name: 'Cyan Laser', hex: '#06b6d4' },
-                    { name: 'Acid Emerald', hex: '#10b981' },
-                    { name: 'Amber Glow', hex: '#f59e0b' },
-                    { name: 'Ice White', hex: '#ffffff' },
-                    { name: 'Blood Crimson', hex: '#ef4444' },
-                    { name: 'Neon Toxic', hex: '#eab308' }
-                  ].map((preset) => (
-                    <button
-                      key={preset.hex}
-                      type="button"
-                      onClick={() => {
+                  <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-black/50 border border-white/[0.08]">
+                    {[
+                      { id: 'left', label: 'Left', icon: AlignLeft },
+                      { id: 'center', label: 'Center', icon: AlignCenter },
+                      { id: 'right', label: 'Right', icon: AlignRight }
+                    ].map((alignOpt) => {
+                      const Icon = alignOpt.icon;
+                      const isSelected = (neonConfig.align || 'center') === alignOpt.id;
+                      return (
+                        <button
+                          key={alignOpt.id}
+                          type="button"
+                          onClick={() => {
+                            updateData({
+                              artistInfo: {
+                                ...artistInfo,
+                                neonSign: { ...neonConfig, align: alignOpt.id }
+                              }
+                            });
+                            showToast(`Hero title aligned ${alignOpt.label}`);
+                          }}
+                          className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-fuchsia-600 text-white shadow-md shadow-fuchsia-600/40'
+                              : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span>{alignOpt.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[9.5px] font-mono text-slate-400">
+                    Positions artist title, subtitle caption, bio paragraph, and on tour badge to the Left, Center, or Right.
+                  </p>
+                </div>
+
+                {/* Color Preset & Picker */}
+                <div className="space-y-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                  <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center gap-1.5">
+                    <Palette className="w-3.5 h-3.5 text-fuchsia-400" />
+                    <span>Neon Gas Color & Ionization Bloom</span>
+                  </label>
+
+                  {/* Swatches */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { name: 'Electric Violet', hex: '#a855f7' },
+                      { name: 'Hot Magenta', hex: '#ff3ea5' },
+                      { name: 'Cyan Laser', hex: '#06b6d4' },
+                      { name: 'Acid Emerald', hex: '#10b981' },
+                      { name: 'Amber Glow', hex: '#f59e0b' },
+                      { name: 'Ice White', hex: '#ffffff' },
+                      { name: 'Blood Crimson', hex: '#ef4444' },
+                      { name: 'Neon Toxic', hex: '#eab308' }
+                    ].map((preset) => (
+                      <button
+                        key={preset.hex}
+                        type="button"
+                        onClick={() => {
+                          updateData({
+                            artistInfo: {
+                              ...artistInfo,
+                              neonSign: { ...neonConfig, color: preset.hex }
+                            }
+                          });
+                          showToast(`Neon color set to ${preset.name}`);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono flex items-center gap-2 border transition-all cursor-pointer ${
+                          (neonConfig.color || '#a855f7').toLowerCase() === preset.hex.toLowerCase()
+                            ? 'border-white bg-white/10 text-white shadow-md'
+                            : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                        }`}
+                      >
+                        <span
+                          className="w-3 h-3 rounded-full shadow-sm"
+                          style={{ backgroundColor: preset.hex, boxShadow: `0 0 6px ${preset.hex}` }}
+                        />
+                        <span>{preset.name}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Custom Color Input */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="color"
+                      value={neonConfig.color || '#a855f7'}
+                      onChange={(e) => {
                         updateData({
                           artistInfo: {
                             ...artistInfo,
-                            neonSign: { ...neonConfig, color: preset.hex }
+                            neonSign: { ...neonConfig, color: e.target.value }
                           }
                         });
-                        showToast(`Neon color set to ${preset.name}`);
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-mono flex items-center gap-2 border transition-all ${
-                        (neonConfig.color || '#a855f7').toLowerCase() === preset.hex.toLowerCase()
-                          ? 'border-white bg-white/10 text-white shadow-md'
-                          : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]'
-                      }`}
-                    >
-                      <span
-                        className="w-3 h-3 rounded-full shadow-sm"
-                        style={{ backgroundColor: preset.hex, boxShadow: `0 0 6px ${preset.hex}` }}
-                      />
-                      <span>{preset.name}</span>
-                    </button>
-                  ))}
+                      className="w-10 h-9 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      placeholder="#a855f7"
+                      value={neonConfig.color || '#a855f7'}
+                      onChange={(e) => {
+                        updateData({
+                          artistInfo: {
+                            ...artistInfo,
+                            neonSign: { ...neonConfig, color: e.target.value }
+                          }
+                        });
+                      }}
+                      className="w-36 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white font-mono focus:outline-none"
+                    />
+                    <span className="text-[10px] text-slate-400 font-mono">Custom hex code</span>
+                  </div>
                 </div>
 
-                {/* Custom Color Input */}
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="color"
-                    value={neonConfig.color || '#a855f7'}
-                    onChange={(e) => {
-                      updateData({
-                        artistInfo: {
-                          ...artistInfo,
-                          neonSign: { ...neonConfig, color: e.target.value }
-                        }
-                      });
-                    }}
-                    className="w-10 h-9 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
-                  />
-                  <input
-                    type="text"
-                    placeholder="#a855f7"
-                    value={neonConfig.color || '#a855f7'}
-                    onChange={(e) => {
-                      updateData({
-                        artistInfo: {
-                          ...artistInfo,
-                          neonSign: { ...neonConfig, color: e.target.value }
-                        }
-                      });
-                    }}
-                    className="w-36 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white font-mono focus:outline-none"
-                  />
-                  <span className="text-[10px] text-slate-400 font-mono">Custom hex</span>
-                </div>
-              </div>
-
-              {/* Font Family, Weight & Size */}
-              <div className="space-y-3">
-                <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Type className="w-3.5 h-3.5 text-fuchsia-400" />
-                  <span>Typography, Tubing Weight & Scale</span>
-                </label>
-
-                {/* Font Family */}
-                <div>
-                  <span className="text-[10px] font-mono text-slate-400 block mb-1">Font Family Style</span>
-                  <select
-                    value={neonConfig.font || 'font-display'}
-                    onChange={(e) => {
-                      updateData({
-                        artistInfo: {
-                          ...artistInfo,
-                          neonSign: { ...neonConfig, font: e.target.value }
-                        }
-                      });
-                      showToast('Updated neon font');
-                    }}
-                    className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
-                  >
-                    <option value="font-display">Syne (Heavy Geometric Display)</option>
-                    <option value="font-tech">Space Grotesk (Tech Cyber Headline)</option>
-                    <option value="font-sans">Plus Jakarta Sans (Modern Ultra-Clean)</option>
-                    <option value="font-mono">JetBrains Mono (Industrial Monospace)</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Font Weight */}
+                {/* Tubing Weight & Flicker */}
+                <div className="space-y-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 block mb-1">Tubing Weight</span>
+                    <span className="text-[10px] font-mono text-slate-400 block mb-1">Tubing Glass Weight</span>
                     <select
                       value={neonConfig.fontWeight || 'font-black'}
                       onChange={(e) => {
@@ -1303,32 +1403,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                     </select>
                   </div>
 
-                  {/* Size Preset */}
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 block mb-1">Sign Scale Preset</span>
-                    <select
-                      value={neonConfig.size || 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]'}
-                      onChange={(e) => {
-                        updateData({
-                          artistInfo: {
-                            ...artistInfo,
-                            neonSign: { ...neonConfig, size: e.target.value }
-                          }
-                        });
-                        showToast('Updated neon size');
-                      }}
-                      className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
-                    >
-                      <option value="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]">Sleek Monumental (Default • 5.25rem)</option>
-                      <option value="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl">Refined Stage (4.5rem)</option>
-                      <option value="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl">Clean Modern (3.75rem)</option>
-                      <option value="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl">Compact Club (3rem)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Flicker Toggle */}
-                <div className="pt-2">
+                  {/* Flicker Toggle */}
                   <label className="flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] cursor-pointer hover:bg-white/[0.05] transition-colors">
                     <input
                       type="checkbox"
@@ -1349,10 +1424,174 @@ export default function AdminDashboard({ onReturnToSite }) {
                         Ambient Tube Brown-Out (Flicker)
                       </span>
                       <span className="text-[10px] text-slate-400 font-mono block">
-                        Subtle intermittent brown-out on random letter tubes every few seconds for hyper-realistic glass tube behavior.
+                        Intermittent random letter tube voltage drop for realistic physical neon behavior.
                       </span>
                     </div>
                   </label>
+                </div>
+
+              </div>
+
+              {/* Right Column: Expanded Font Library & Granular Sizing */}
+              <div className="space-y-4">
+                
+                {/* Granular Sizing Slider & Quick Scale Presets */}
+                <div className="space-y-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-fuchsia-400" />
+                      <span>Artist Title Sizing & Scale Control</span>
+                    </label>
+                    <span className="text-xs font-mono font-bold text-fuchsia-300 bg-fuchsia-950/60 px-2 py-0.5 rounded border border-fuchsia-500/40">
+                      {neonConfig.fontSizeRem || 5.25}rem (~{Math.round((neonConfig.fontSizeRem || 5.25) * 16)}px)
+                    </span>
+                  </div>
+
+                  {/* Granular Size Slider */}
+                  <div className="space-y-1">
+                    <input
+                      type="range"
+                      min="2.5"
+                      max="12"
+                      step="0.25"
+                      value={neonConfig.fontSizeRem || 5.25}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        updateData({
+                          artistInfo: {
+                            ...artistInfo,
+                            neonSign: {
+                              ...neonConfig,
+                              fontSizeRem: val,
+                              size: `text-[${val}rem]`
+                            }
+                          }
+                        });
+                      }}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-fuchsia-500"
+                    />
+                    <div className="flex justify-between text-[9px] font-mono text-slate-500">
+                      <span>2.5rem (Compact)</span>
+                      <span>5.25rem (Default)</span>
+                      <span>8.0rem (Stadium)</span>
+                      <span>12.0rem (Monumental)</span>
+                    </div>
+                  </div>
+
+                  {/* Quick Scale Presets */}
+                  <div>
+                    <span className="text-[10px] font-mono text-slate-400 block mb-1.5">Quick Scale Presets</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SIZE_PRESETS.map((preset) => {
+                        const isSelected = Math.abs((neonConfig.fontSizeRem || 5.25) - preset.rem) < 0.15;
+                        return (
+                          <button
+                            key={preset.rem}
+                            type="button"
+                            onClick={() => {
+                              updateData({
+                                artistInfo: {
+                                  ...artistInfo,
+                                  neonSign: {
+                                    ...neonConfig,
+                                    fontSizeRem: preset.rem,
+                                    size: preset.tailwind
+                                  }
+                                }
+                              });
+                              showToast(`Size set to ${preset.label}`);
+                            }}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10.5px] font-mono border transition-all cursor-pointer ${
+                              isSelected
+                                ? 'border-fuchsia-500 bg-fuchsia-600/30 text-white font-bold shadow-sm'
+                                : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                            }`}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Font Library with Live Visual Cards */}
+                <div className="space-y-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center gap-1.5">
+                      <Type className="w-3.5 h-3.5 text-fuchsia-400" />
+                      <span>Neon Font Library ({FONT_OPTIONS.length} Typefaces)</span>
+                    </label>
+                    <span className="text-[9.5px] font-mono text-fuchsia-400">Click card to select</span>
+                  </div>
+
+                  {/* Quick Dropdown */}
+                  <select
+                    value={neonConfig.font || 'font-display'}
+                    onChange={(e) => {
+                      updateData({
+                        artistInfo: {
+                          ...artistInfo,
+                          neonSign: { ...neonConfig, font: e.target.value }
+                        }
+                      });
+                      showToast('Updated neon font');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none font-mono mb-2"
+                  >
+                    {FONT_OPTIONS.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name} — {f.tag}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Visual Font Cards Grid */}
+                  <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto p-1.5 rounded-xl bg-black/50 border border-white/[0.08]">
+                    {FONT_OPTIONS.map((f) => {
+                      const isSelected = (neonConfig.font || 'font-display') === f.id;
+                      return (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => {
+                            updateData({
+                              artistInfo: {
+                                ...artistInfo,
+                                neonSign: { ...neonConfig, font: f.id }
+                              }
+                            });
+                            showToast(`Neon font set to ${f.name}`);
+                          }}
+                          className={`p-2.5 rounded-xl text-left border transition-all flex flex-col justify-between cursor-pointer ${
+                            isSelected
+                              ? 'border-fuchsia-500 bg-fuchsia-950/50 shadow-md shadow-fuchsia-500/20'
+                              : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-mono text-slate-300 font-bold truncate">
+                              {f.name}
+                            </span>
+                            {isSelected && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-sm" />
+                            )}
+                          </div>
+                          <div
+                            className={`${f.id} font-black text-sm text-white tracking-wider truncate py-0.5`}
+                            style={{
+                              textShadow: isSelected ? `0 0 8px ${neonConfig.color || '#a855f7'}` : 'none'
+                            }}
+                          >
+                            {f.sample}
+                          </div>
+                          <span className="text-[8.5px] font-mono text-slate-500 truncate mt-1">
+                            {f.tag}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
               </div>
@@ -1642,10 +1881,14 @@ export default function AdminDashboard({ onReturnToSite }) {
                   </div>
                 )}
 
-                {/* Overlaid Neon Title in Preview */}
-                <div className="relative z-10 text-center select-none pointer-events-none px-4">
+                {/* Overlaid Neon Title in Preview with Dynamic Alignment & Font */}
+                <div className={`relative z-10 flex flex-col ${
+                  neonConfig.align === 'left' ? 'items-start text-left' :
+                  neonConfig.align === 'right' ? 'items-end text-right' :
+                  'items-center text-center'
+                } select-none pointer-events-none px-4`}>
                   <h1
-                    className="font-display font-black text-4xl sm:text-6xl tracking-tight uppercase"
+                    className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} text-4xl sm:text-6xl tracking-tight uppercase`}
                     style={{
                       color: '#ffffff',
                       textShadow: previewIlluminated || (testIgnitionStep !== null && testIgnitionStep >= 9)

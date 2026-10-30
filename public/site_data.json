@@ -50,6 +50,8 @@
       "color": "#a855f7",
       "font": "font-display",
       "size": "text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]",
+      "fontSizeRem": 5.25,
+      "align": "center",
       "fontWeight": "font-black",
       "flicker": true,
       "glowCaption": true

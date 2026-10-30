@@ -87,6 +87,48 @@ export default function HeroSection({
     }).join(', ');
   }, [isIlluminated, ignitionState, neonConfig.color]);
 
+  const align = neonConfig.align || 'center';
+  const gasColor = neonConfig.color || '#a855f7';
+
+  // Dynamic alignment classes for hero stage
+  const alignmentContainerClass = 
+    align === 'left' ? 'items-start text-left' :
+    align === 'right' ? 'items-end text-right' :
+    'items-center text-center';
+
+  const titleJustifyClass = 
+    align === 'left' ? 'justify-start text-left' :
+    align === 'right' ? 'justify-end text-right' :
+    'justify-center text-center';
+
+  const subtitleJustifyClass =
+    align === 'left' ? 'justify-start' :
+    align === 'right' ? 'justify-end' :
+    'justify-center';
+
+  const bioAlignClass =
+    align === 'left' ? 'text-left mr-auto ml-0' :
+    align === 'right' ? 'text-right ml-auto mr-0' :
+    'text-center mx-auto';
+
+  const tourBadgeAlignClass =
+    align === 'left' ? 'self-start' :
+    align === 'right' ? 'self-end' :
+    'self-center';
+
+  // Dynamic caption illumination (lights up progressively as the neon sign ignites)
+  const isCaptionLit = ignitionState.isFullyLit;
+  const captionProgress = ignitionState.progress;
+  const captionShadow = isCaptionLit
+    ? `0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 20px ${gasColor}, 0 0 35px ${gasColor}aa`
+    : (captionProgress > 0
+        ? `0 0 2px #ffffff, 0 0 8px ${gasColor}88`
+        : `0 0 2px ${gasColor}20`);
+  const captionOpacity = isCaptionLit
+    ? 1
+    : (captionProgress > 0 ? 0.4 + (0.6 * captionProgress) : 0.35);
+  const captionTextColor = (isCaptionLit || captionProgress > 0.4) ? '#ffffff' : `${gasColor}90`;
+
   return (
     <section className="relative w-full flex flex-col items-center overflow-x-hidden">
       
@@ -94,10 +136,10 @@ export default function HeroSection({
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[650px] h-[340px] sm:h-[450px] bg-purple-600/12 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       {/* ======================================================== */}
-      {/* 1. MAIN HOME VIEWPORT: CINEMATIC TITLE & BIO (BALANCED SCALE) */}
-      {/* Refined, cohesive scale - no giant blown-up elements     */}
+      {/* 1. MAIN HOME VIEWPORT: CINEMATIC TITLE & BIO             */}
+      {/* Dynamic Alignment (Left, Center, Right) & Scalable Scale */}
       {/* ======================================================== */}
-      <div className="min-h-[82vh] sm:min-h-[88vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 pt-16 sm:pt-20 pb-8 sm:pb-10 relative z-10 w-full max-w-5xl mx-auto">
+      <div className={`min-h-[82vh] sm:min-h-[88vh] flex flex-col justify-center px-4 sm:px-6 pt-16 sm:pt-20 pb-8 sm:pb-10 relative z-10 w-full max-w-5xl mx-auto ${alignmentContainerClass}`}>
 
         {/* Top On Tour Look-At-Me Button */}
         {artistInfo.tourBadge?.enabled !== false && (
@@ -105,7 +147,7 @@ export default function HeroSection({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="mb-4 sm:mb-5"
+            className={`mb-4 sm:mb-5 ${tourBadgeAlignClass}`}
           >
             <motion.a
               href={artistInfo.tourBadge?.link || '#tour'}
@@ -180,10 +222,10 @@ export default function HeroSection({
         )}
 
         {/* Center Main Stage: Artist Title + Subtitle + Bio Teaser */}
-        <div className="w-full flex flex-col items-center justify-center">
+        <div className={`w-full flex flex-col ${alignmentContainerClass}`}>
 
           {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
-          <div className="relative mb-2 sm:mb-3 w-full flex flex-col items-center justify-center">
+          <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
 
             {/* BACKDROP IMAGE BEHIND ARTIST TITLE / HERO */}
             {backdrop.enabled && backdrop.image && (
@@ -232,7 +274,7 @@ export default function HeroSection({
                     className="absolute inset-0 pointer-events-none transition-opacity duration-700"
                     style={{
                       opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
-                      background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}40 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
+                      background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
                       mixBlendMode: 'color-dodge'
                     }}
                   />
@@ -241,58 +283,70 @@ export default function HeroSection({
             )}
 
             {/* Neon Title: Tubes are mounted immediately on page load, then randomly sputter & spark into light */}
-            <div className="w-full flex justify-center py-1 px-1 overflow-visible">
+            <div className={`w-full flex ${titleJustifyClass} py-1 px-1 overflow-visible`}>
               <NeonSign
                 as="h1"
-                color={neonConfig.color || '#a855f7'}
+                color={gasColor}
                 delay={0.2}
                 flicker={neonConfig.flicker ?? true}
                 onIgnitionProgress={setIgnitionState}
-                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] text-balance text-center justify-center whitespace-nowrap`}
+                style={neonConfig.fontSizeRem ? { fontSize: `clamp(2.5rem, 8.5vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
+                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
               >
                 {artistInfo.name || 'UNNOTICED'}
               </NeonSign>
             </div>
 
-            {/* Subtitle badge with Neon Illumination - Scaled and refined */}
+            {/* Subtitle badge with Dynamic Neon Illumination - Lights up with neon sign */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex items-center justify-center gap-2 sm:gap-2.5 mt-2.5 sm:mt-3 w-full max-w-lg px-2"
+              className={`flex items-center ${subtitleJustifyClass} gap-2 sm:gap-2.5 mt-2.5 sm:mt-3 w-full max-w-xl px-2`}
             >
-              <div
-                className="h-[1px] flex-1 max-w-[20px] xs:max-w-[32px] sm:max-w-[65px] md:max-w-[90px] transition-all"
-                style={{
-                  background: `linear-gradient(to right, transparent, ${neonConfig.color || '#a855f7'})`,
-                  boxShadow: `0 0 6px ${neonConfig.color || '#a855f7'}77`
-                }}
-              />
+              {(align === 'center' || align === 'right') && (
+                <div
+                  className="h-[1px] flex-1 max-w-[20px] xs:max-w-[32px] sm:max-w-[65px] md:max-w-[90px] transition-all duration-500"
+                  style={{
+                    background: isCaptionLit
+                      ? `linear-gradient(to right, transparent, ${gasColor})`
+                      : `linear-gradient(to right, transparent, ${gasColor}40)`,
+                    boxShadow: isCaptionLit ? `0 0 6px ${gasColor}` : 'none',
+                    opacity: isCaptionLit ? 1 : (captionProgress > 0 ? 0.6 : 0.3)
+                  }}
+                />
+              )}
               <p
-                className="font-tech text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold text-center px-1 select-none transition-all"
+                className="font-tech text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold px-1 select-none transition-all duration-300"
                 style={{
-                  color: '#ffffff',
-                  textShadow: `0 0 4px #ffffff, 0 0 8px ${neonConfig.color || '#a855f7'}, 0 0 16px ${neonConfig.color || '#a855f7'}88`
+                  color: captionTextColor,
+                  opacity: captionOpacity,
+                  textShadow: captionShadow
                 }}
               >
                 {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
               </p>
-              <div
-                className="h-[1px] flex-1 max-w-[20px] xs:max-w-[32px] sm:max-w-[65px] md:max-w-[90px] transition-all"
-                style={{
-                  background: `linear-gradient(to left, transparent, ${neonConfig.color || '#a855f7'})`,
-                  boxShadow: `0 0 6px ${neonConfig.color || '#a855f7'}77`
-                }}
-              />
+              {(align === 'center' || align === 'left') && (
+                <div
+                  className="h-[1px] flex-1 max-w-[20px] xs:max-w-[32px] sm:max-w-[65px] md:max-w-[90px] transition-all duration-500"
+                  style={{
+                    background: isCaptionLit
+                      ? `linear-gradient(to left, transparent, ${gasColor})`
+                      : `linear-gradient(to left, transparent, ${gasColor}40)`,
+                    boxShadow: isCaptionLit ? `0 0 6px ${gasColor}` : 'none',
+                    opacity: isCaptionLit ? 1 : (captionProgress > 0 ? 0.6 : 0.3)
+                  }}
+                />
+              )}
             </motion.div>
           </div>
 
-          {/* Bio Teaser - Balanced and clean */}
+          {/* Bio Teaser - Dynamic Alignment & Balanced Scale */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2"
+            className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2 ${bioAlignClass}`}
           >
             Forged in the blue-collar industrial grit of McKees Rocks. 
             Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.

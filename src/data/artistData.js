@@ -40,6 +40,9 @@ export const ARTIST_INFO = {
     catalogReleases: "18 Tracks",
     keyMarkets: ["Pittsburgh", "Philadelphia", "New York", "Chicago", "London"]
   },
+  bio: "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
+  quote: "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all.",
+  quoteAuthor: "Tyler Sciullo (UNNOTICED)",
   heroSubtitle: "Once Known As Ty Sciullo • Now A Man Unseen",
   theme: {
     id: "violet",

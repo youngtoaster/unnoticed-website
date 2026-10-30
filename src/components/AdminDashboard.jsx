@@ -1440,8 +1440,9 @@ export default function AdminDashboard({ onReturnToSite }) {
                 biography: [
                   ...(prev.biography || []),
                   {
-                    title: 'New Chapter Title',
+                    title: `Chapter 0${(prev.biography || []).length + 1}: Next Horizon`,
                     era: '2026—PRESENT',
+                    text: 'Write narrative chapter biography here.',
                     content: 'Write narrative chapter biography here.'
                   }
                 ]
@@ -1517,6 +1518,57 @@ export default function AdminDashboard({ onReturnToSite }) {
                   value={artistInfo.stats?.totalStreams || ''}
                   onChange={(e) => updateData({ artistInfo: { ...artistInfo, stats: { ...artistInfo.stats, totalStreams: e.target.value } } })}
                   className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400"
+                />
+              </div>
+            </div>
+
+            {/* Hero Stage Bio Statement (Featured on Main Home Viewport) */}
+            <div className="pt-2 border-t border-white/[0.06]">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-mono font-semibold text-purple-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  Hero Stage Bio Statement (Main Home Screen)
+                </label>
+                <span className="text-[10px] font-mono text-slate-400">
+                  {((artistInfo.bio || artistInfo.heroBio) || '').length} characters
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                value={artistInfo.bio ?? artistInfo.heroBio ?? "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
+                onChange={(e) => updateData({ artistInfo: { ...artistInfo, bio: e.target.value } })}
+                placeholder="Enter the short hero statement displayed directly below the illuminated artist name..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 leading-relaxed font-sans placeholder:text-slate-500"
+              />
+              <p className="text-[10px] font-mono text-slate-400 mt-1">
+                This narrative teaser appears prominently on the main homepage directly under UNNOTICED and the subtitle.
+              </p>
+            </div>
+
+            {/* Featured Philosophy Pull-Quote & Attribution */}
+            <div className="pt-2 grid grid-cols-1 lg:grid-cols-3 gap-3 border-t border-white/[0.06]">
+              <div className="lg:col-span-2">
+                <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                  Featured Philosophy Pull-Quote (Bio Section)
+                </label>
+                <textarea
+                  rows={2}
+                  value={artistInfo.quote ?? "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all."}
+                  onChange={(e) => updateData({ artistInfo: { ...artistInfo, quote: e.target.value } })}
+                  placeholder="Enter artist philosophical quote..."
+                  className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 leading-relaxed font-sans"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                  Quote Attribution
+                </label>
+                <input
+                  type="text"
+                  value={artistInfo.quoteAuthor ?? "Tyler Sciullo (UNNOTICED)"}
+                  onChange={(e) => updateData({ artistInfo: { ...artistInfo, quoteAuthor: e.target.value } })}
+                  placeholder="e.g. Tyler Sciullo (UNNOTICED)"
+                  className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 font-mono"
                 />
               </div>
             </div>
@@ -2632,19 +2684,26 @@ export default function AdminDashboard({ onReturnToSite }) {
           {/* Biography Paragraphs */}
           <SpotlightCard className="p-6 space-y-4" tilt={false}>
             <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
-              <h3 className="font-display text-lg font-bold text-white">
-                Multi-Paragraph Biography Chapters ({biography.length})
-              </h3>
+              <div>
+                <h3 className="font-display text-lg font-bold text-white">
+                  Multi-Paragraph Biography Chapters ({biography.length})
+                </h3>
+                <p className="text-[11px] font-mono text-slate-400 mt-0.5">
+                  Narrative chronicle chapters displayed in the interactive biography tab section.
+                </p>
+              </div>
               <button
                 onClick={() => {
                   const newChapter = {
                     title: `Chapter 0${biography.length + 1}: Next Horizon`,
-                    text: 'New chapter narrative...'
+                    era: '2026—PRESENT',
+                    text: 'Write narrative chapter biography here.',
+                    content: 'Write narrative chapter biography here.'
                   };
                   updateData({ biography: [...biography, newChapter] });
-                  showToast('Added chapter');
+                  showToast('Added new chapter');
                 }}
-                className="px-3 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs flex items-center gap-1 active:scale-95"
+                className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow-md shadow-purple-600/30"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Chapter</span>
@@ -2653,54 +2712,97 @@ export default function AdminDashboard({ onReturnToSite }) {
 
             <div className="space-y-4">
               {biography.map((para, bIdx) => (
-                <div key={bIdx} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
+                <div key={bIdx} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-purple-400">Chapter 0{bIdx + 1}</span>
+                    <span className="text-[10px] font-mono text-purple-400 font-semibold uppercase tracking-wider">
+                      Chapter 0{bIdx + 1}
+                    </span>
                     <div className="flex items-center gap-1">
                       <button
                         disabled={bIdx === 0}
                         onClick={() => handleMove('biography', bIdx, 'up')}
-                        className="p-1 rounded bg-white/[0.05] disabled:opacity-20 text-white"
+                        className="p-1.5 rounded-md bg-white/[0.05] hover:bg-white/[0.1] disabled:opacity-20 text-white cursor-pointer active:scale-90"
+                        title="Move Up"
                       >
                         <ArrowUp className="w-3 h-3" />
                       </button>
                       <button
                         disabled={bIdx === biography.length - 1}
                         onClick={() => handleMove('biography', bIdx, 'down')}
-                        className="p-1 rounded bg-white/[0.05] disabled:opacity-20 text-white"
+                        className="p-1.5 rounded-md bg-white/[0.05] hover:bg-white/[0.1] disabled:opacity-20 text-white cursor-pointer active:scale-90"
+                        title="Move Down"
                       >
                         <ArrowDown className="w-3 h-3" />
                       </button>
                       <button
                         onClick={() => handleDelete('biography', bIdx)}
-                        className="p-1 rounded bg-red-500/10 text-red-400 ml-1"
+                        className="p-1.5 rounded-md bg-red-500/10 hover:bg-red-500/20 text-red-400 ml-1 cursor-pointer active:scale-90"
+                        title="Delete Chapter"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
 
-                  <input
-                    type="text"
-                    value={para.title}
-                    onChange={(e) => {
-                      const updated = [...biography];
-                      updated[bIdx].title = e.target.value;
-                      updateData({ biography: updated });
-                    }}
-                    className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-bold text-white focus:outline-none"
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-mono text-slate-400 block mb-1">Chapter Title</label>
+                      <input
+                        type="text"
+                        value={para.title || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          updateData({
+                            biography: biography.map((item, idx) =>
+                              idx === bIdx ? { ...item, title: val } : item
+                            )
+                          });
+                        }}
+                        placeholder="e.g. The Industrial Roots of McKees Rocks"
+                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-bold text-white focus:outline-none focus:border-purple-400 font-sans"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-mono text-slate-400 block mb-1">Era / Timeline</label>
+                      <input
+                        type="text"
+                        value={para.era || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          updateData({
+                            biography: biography.map((item, idx) =>
+                              idx === bIdx ? { ...item, era: val } : item
+                            )
+                          });
+                        }}
+                        placeholder="e.g. 1997-2016"
+                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/[0.1] text-xs font-mono text-purple-300 focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                  </div>
 
-                  <textarea
-                    rows={4}
-                    value={para.text}
-                    onChange={(e) => {
-                      const updated = [...biography];
-                      updated[bIdx].text = e.target.value;
-                      updateData({ biography: updated });
-                    }}
-                    className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/[0.1] text-xs text-slate-300 focus:outline-none leading-relaxed"
-                  />
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[10px] font-mono text-slate-400">Chapter Narrative Text</label>
+                      <span className="text-[9px] font-mono text-slate-500">
+                        {((para.text || para.content) || '').length} characters
+                      </span>
+                    </div>
+                    <textarea
+                      rows={5}
+                      value={para.text ?? para.content ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        updateData({
+                          biography: biography.map((item, idx) =>
+                            idx === bIdx ? { ...item, text: val, content: val } : item
+                          )
+                        });
+                      }}
+                      placeholder="Write biographical chapter story narrative here..."
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/[0.1] text-xs text-slate-300 focus:outline-none focus:border-purple-400 leading-relaxed font-sans placeholder:text-slate-500"
+                    />
+                  </div>
                 </div>
               ))}
             </div>

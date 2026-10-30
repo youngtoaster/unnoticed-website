@@ -274,7 +274,7 @@ export default function HeroSection({
               {/* Fluid Text */}
               <ShinyText
                 text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
-                className="text-[10px] sm:text-[11px] font-mono font-bold tracking-wide text-purple-100 max-w-[210px] xs:max-w-none truncate sm:overflow-visible"
+                className="text-[10px] sm:text-[11px] font-mono font-bold tracking-wide text-purple-100 whitespace-nowrap"
                 speed={4}
               />
 
@@ -292,16 +292,16 @@ export default function HeroSection({
             {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
             {backdrop.enabled && backdrop.image && backdrop.scope !== 'hero' && (
               <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out w-full max-w-3xl h-[220px] sm:h-[280px] md:h-[340px] rounded-3xl"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out w-full max-w-4xl h-[260px] sm:h-[320px] md:h-[380px]"
                 style={{
                   opacity: currentBackdropOpacity,
                   filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
                   maskImage: backdrop.vignette
-                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)'
-                    : 'none',
+                    ? 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.55) 60%, transparent 95%)'
+                    : 'radial-gradient(ellipse 85% 80% at 50% 50%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.7) 75%, transparent 100%)',
                   WebkitMaskImage: backdrop.vignette
-                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)'
-                    : 'none',
+                    ? 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.55) 60%, transparent 95%)'
+                    : 'radial-gradient(ellipse 85% 80% at 50% 50%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.7) 75%, transparent 100%)',
                 }}
               >
                 <img
@@ -404,10 +404,9 @@ export default function HeroSection({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2 ${bioAlignClass}`}
+            className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2 whitespace-pre-line ${bioAlignClass}`}
           >
-            Forged in the blue-collar industrial grit of McKees Rocks. 
-            Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.
+            {artistInfo.bio || artistInfo.heroBio || "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
           </motion.p>
         </div>
 

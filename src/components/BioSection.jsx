@@ -101,7 +101,7 @@ export default function BioSection() {
           <SpotlightCard className="p-5 sm:p-8" spotlightColor="rgba(168, 85, 247, 0.15)">
             <div className="mb-3 sm:mb-4 flex items-center justify-between border-b border-white/[0.08] pb-3">
               <span className="text-[10px] sm:text-xs font-mono text-purple-400 uppercase tracking-wider">
-                Chapter 0{activeBioTab + 1}
+                Chapter 0{activeBioTab + 1} {biography[activeBioTab]?.era ? `• ${biography[activeBioTab].era}` : ''}
               </span>
               <span className="text-[10px] sm:text-xs font-mono text-slate-400">
                 Verified Historical Context
@@ -112,8 +112,8 @@ export default function BioSection() {
               {biography[activeBioTab]?.title}
             </h3>
 
-            <p className="text-slate-300 text-xs sm:text-base leading-relaxed font-sans font-normal">
-              {biography[activeBioTab]?.text}
+            <p className="text-slate-300 text-xs sm:text-base leading-relaxed font-sans font-normal whitespace-pre-line">
+              {biography[activeBioTab]?.text || biography[activeBioTab]?.content}
             </p>
 
             <div className="mt-5 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
@@ -132,10 +132,10 @@ export default function BioSection() {
             <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 shrink-0 opacity-60 mt-0.5" />
             <div>
               <p className="text-xs sm:text-sm text-slate-200 italic font-serif leading-relaxed">
-                "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all."
+                "{artistInfo.quote || "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all."}"
               </p>
               <span className="text-[11px] sm:text-xs font-mono text-purple-300 block mt-2">
-                — Tyler Sciullo (UNNOTICED)
+                — {artistInfo.quoteAuthor || "Tyler Sciullo (UNNOTICED)"}
               </span>
             </div>
           </div>

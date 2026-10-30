@@ -6,7 +6,7 @@ import {
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Pause, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
-  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio
+  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio, Layout
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -129,7 +129,7 @@ function SectionControlsHeader({
           {allowReset && (
             <button
               onClick={() => onResetDefault(collectionKey, title)}
-              className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold text-slate-300 border border-white/[0.08] flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
+              className="px-3 py-1.5 rounded-xl bg-[#12131e] hover:bg-[#1c1e2e] text-xs font-semibold text-slate-200 border border-white/[0.12] flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95 shadow-sm"
               title="Reset only this section to factory sample data"
             >
               <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
@@ -594,7 +594,7 @@ export default function AdminDashboard({ onReturnToSite }) {
     { id: 'tracks', label: 'Music & Audio', icon: Music, count: tracks.length },
     { id: 'lyrics', label: 'Genius Lyrics', icon: FileText, count: tracks.length },
     { id: 'showcase', label: 'Release Showcase', icon: Disc3, count: null },
-    { id: 'backdrop', label: 'Hero Stage Image', icon: ImageIcon, count: null },
+    { id: 'backdrop', label: 'Homepage & Hero Stage', icon: Layout, count: null },
     { id: 'theme', label: 'Site Color Theme', icon: Palette, count: null },
     { id: 'profile', label: 'Profile & Bio', icon: Sparkles, count: biography.length },
     { id: 'videos', label: 'Videos & Visuals', icon: Youtube, count: videos.length },
@@ -1617,12 +1617,12 @@ export default function AdminDashboard({ onReturnToSite }) {
         </div>
       )}
 
-      {/* ================= TAB: HERO STAGE & BACKDROP IMAGE STUDIO ================= */}
+      {/* ================= TAB: HOMEPAGE HERO STAGE, BIO & BACKDROP STUDIO ================= */}
       {activeTab === 'backdrop' && (
         <div className="space-y-6">
           <SectionControlsHeader
-            title="Hero Stage & Backdrop Image Studio"
-            subtitle="Configure the signature cinematic visual revealed behind UNNOTICED on site load. Upload custom photos, adjust zoom, focal alignment, blur, opacity, lighting, and stage layout."
+            title="Homepage Hero Stage, Bio & Backdrop Studio"
+            subtitle="Configure the full homepage stage: artist typography, hero bio statement, vertical centering, stage backdrop imagery, and lighting detonation."
             badgeText={backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'Backdrop Active' : 'Backdrop Hidden'}
             badgeColor={backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'cyan' : 'red'}
             sectionKey="heroBackdrop"
@@ -1646,9 +1646,153 @@ export default function AdminDashboard({ onReturnToSite }) {
                 illuminateOnGlow: true,
                 glowIntensity: 85
               });
-              showToast('Reset Hero Backdrop to default stage visual');
+              updateData({
+                artistInfo: {
+                  ...artistInfo,
+                  showHeroBio: true,
+                  heroBio: "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
+                  bio: "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."
+                }
+              });
+              showToast('Reset Homepage Stage & Bio to factory defaults');
             }}
           />
+
+          {/* ======================================================== */}
+          {/* HERO STAGE BIO STATEMENT & VERTICAL CENTERING CONTROLS   */}
+          {/* Edit bio below signs, toggle on/off, auto-recenter title */}
+          {/* ======================================================== */}
+          <SpotlightCard className="p-6 space-y-5" tilt={false} spotlightColor="rgba(168, 85, 247, 0.15)">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+              <div>
+                <h3 className="font-display text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-purple-400" />
+                  <span>Hero Stage Bio Statement & Vertical Centering</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Narrative statement displayed directly below the neon artist sign on the homepage. When turned OFF, the artist name automatically drops down and recenters to the exact middle of the screen.
+                </p>
+              </div>
+
+              {/* Master Bio On/Off Switch */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = artistInfo.showHeroBio ?? true;
+                    const nextVal = !current;
+                    updateData({ artistInfo: { ...artistInfo, showHeroBio: nextVal } });
+                    showToast(nextVal ? 'Hero Bio enabled on stage' : 'Hero Bio hidden - Artist title recentered to dead center');
+                  }}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border ${
+                    (artistInfo.showHeroBio ?? true)
+                      ? 'bg-purple-600 hover:bg-purple-500 text-white border-purple-400 shadow-md shadow-purple-600/30'
+                      : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 border-white/[0.1]'
+                  }`}
+                  title="Toggle whether the bio statement appears on the homepage below the signs"
+                >
+                  {(artistInfo.showHeroBio ?? true) ? (
+                    <>
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Bio: Visible on Stage</span>
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="w-3.5 h-3.5" />
+                      <span>Bio: Hidden (Title Centered)</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Bio Content Textarea */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono font-semibold text-slate-200 flex items-center gap-2">
+                  <Edit3 className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Bio Statement (Appears Directly Under Artist Neon Title)</span>
+                </label>
+                <span className="text-[10px] font-mono text-slate-400">
+                  {((artistInfo.heroBio || artistInfo.bio) || '').length} characters
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                value={artistInfo.heroBio ?? artistInfo.bio ?? "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
+                onChange={(e) => {
+                  updateData({
+                    artistInfo: {
+                      ...artistInfo,
+                      heroBio: e.target.value,
+                      bio: e.target.value
+                    }
+                  });
+                }}
+                placeholder="Enter the short hero statement displayed directly below the illuminated artist name..."
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 leading-relaxed font-sans placeholder:text-slate-500"
+              />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-mono text-slate-400 gap-1 pt-0.5">
+                <span className="text-purple-300">• Live synchronized to homepage hero stage</span>
+                <span className="text-cyan-300">• When toggled OFF: Artist Title automatically recenters dead-center</span>
+              </div>
+            </div>
+
+            {/* Subtitle & Alignment Quick Tools */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-white/[0.06]">
+              <div>
+                <label className="text-xs font-mono text-slate-300 block mb-1">
+                  Hero Stage Subtitle Tagline (Between Title and Bio)
+                </label>
+                <input
+                  type="text"
+                  value={artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
+                  onChange={(e) => updateData({ artistInfo: { ...artistInfo, heroSubtitle: e.target.value } })}
+                  placeholder="e.g. Once Known As Ty Sciullo • Now A Man Unseen"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-mono text-slate-300 block mb-1">
+                  Stage Typography Alignment
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'center', label: 'Center (Default)', icon: AlignCenter },
+                    { id: 'left', label: 'Left Aligned', icon: AlignLeft },
+                    { id: 'right', label: 'Right Aligned', icon: AlignRight }
+                  ].map((alignOpt) => {
+                    const isSelected = (neonConfig.align || 'center') === alignOpt.id;
+                    const AlignIcon = alignOpt.icon;
+                    return (
+                      <button
+                        key={alignOpt.id}
+                        type="button"
+                        onClick={() => {
+                          updateData({
+                            artistInfo: {
+                              ...artistInfo,
+                              neonSign: { ...neonConfig, align: alignOpt.id }
+                            }
+                          });
+                          showToast(`Hero title aligned ${alignOpt.label}`);
+                        }}
+                        className={`h-10 rounded-xl text-xs font-mono flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                          isSelected
+                            ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/30'
+                            : 'bg-white/[0.03] text-slate-400 border-white/[0.08] hover:text-white hover:bg-white/[0.06]'
+                        }`}
+                      >
+                        <AlignIcon className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">{alignOpt.id.toUpperCase()}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </SpotlightCard>
 
           {/* MASTER VISIBILITY & STAGE SCOPE TOOLBAR */}
           <SpotlightCard className="p-6 space-y-4" tilt={false}>
@@ -1960,6 +2104,11 @@ export default function AdminDashboard({ onReturnToSite }) {
                 >
                   {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
                 </p>
+                {(artistInfo.showHeroBio ?? true) && (
+                  <p className="text-[10px] sm:text-[11px] text-slate-300 font-light mt-2 max-w-md line-clamp-2 leading-relaxed opacity-90 transition-all duration-300 pointer-events-none">
+                    {artistInfo.heroBio || artistInfo.bio || "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
+                  </p>
+                )}
               </div>
 
               {/* Floating Status Pill in Preview */}
@@ -2654,26 +2803,64 @@ export default function AdminDashboard({ onReturnToSite }) {
             </div>
 
             {/* Hero Stage Bio Statement (Featured on Main Home Viewport) */}
-            <div className="pt-2 border-t border-white/[0.06]">
-              <div className="flex items-center justify-between mb-1.5">
+            <div className="pt-2 border-t border-white/[0.06] space-y-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
                 <label className="text-[11px] font-mono font-semibold text-purple-300 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                   Hero Stage Bio Statement (Main Home Screen)
                 </label>
-                <span className="text-[10px] font-mono text-slate-400">
-                  {((artistInfo.bio || artistInfo.heroBio) || '').length} characters
-                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = artistInfo.showHeroBio ?? true;
+                      const nextVal = !current;
+                      updateData({ artistInfo: { ...artistInfo, showHeroBio: nextVal } });
+                      showToast(nextVal ? 'Hero Bio enabled on stage' : 'Hero Bio hidden - Artist title recentered to dead center');
+                    }}
+                    className={`px-3 py-1 rounded-xl font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer border ${
+                      (artistInfo.showHeroBio ?? true)
+                        ? 'bg-purple-600 hover:bg-purple-500 text-white border-purple-400 shadow-sm shadow-purple-600/30'
+                        : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 border-white/[0.1]'
+                    }`}
+                  >
+                    {(artistInfo.showHeroBio ?? true) ? (
+                      <>
+                        <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Visible on Stage</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Hidden (Recentered)</span>
+                      </>
+                    )}
+                  </button>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {((artistInfo.bio || artistInfo.heroBio) || '').length} chars
+                  </span>
+                </div>
               </div>
               <textarea
                 rows={3}
-                value={artistInfo.bio ?? artistInfo.heroBio ?? "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
-                onChange={(e) => updateData({ artistInfo: { ...artistInfo, bio: e.target.value } })}
+                value={artistInfo.heroBio ?? artistInfo.bio ?? "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  updateData({
+                    artistInfo: {
+                      ...artistInfo,
+                      bio: val,
+                      heroBio: val
+                    }
+                  });
+                }}
                 placeholder="Enter the short hero statement displayed directly below the illuminated artist name..."
                 className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 leading-relaxed font-sans placeholder:text-slate-500"
               />
-              <p className="text-[10px] font-mono text-slate-400 mt-1">
-                This narrative teaser appears prominently on the main homepage directly under UNNOTICED and the subtitle.
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] font-mono text-slate-400 gap-1 mt-1">
+                <span>Appears directly below the neon artist sign on the homepage.</span>
+                <span className="text-cyan-300">When toggled OFF, artist title drops down & recenters.</span>
+              </div>
             </div>
 
             {/* Featured Philosophy Pull-Quote & Attribution */}

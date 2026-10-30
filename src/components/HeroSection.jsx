@@ -178,6 +178,10 @@ export default function HeroSection({
     align === 'right' ? 'self-end' :
     'self-center';
 
+  // Bio visibility toggle and synchronized narrative text
+  const isHeroBioVisible = (artistInfo.showHeroBio ?? true) && (sectionsVisibility?.heroBio !== false);
+  const heroBioText = artistInfo.heroBio || artistInfo.bio || "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.";
+
   // Dynamic caption illumination (lights up progressively as the neon sign ignites)
   const isCaptionLit = canIgnite && ignitionState.isFullyLit;
   const captionProgress = canIgnite ? ignitionState.progress : 0;
@@ -435,10 +439,10 @@ export default function HeroSection({
         )}
 
         {/* Top spacer to balance the bottom scroll prompt so the middle is dead-center */}
-        <div className="w-full shrink-0 h-4 sm:h-8 pointer-events-none" />
+        <div className={`w-full shrink-0 pointer-events-none transition-all duration-500 ${isHeroBioVisible ? 'h-4 sm:h-8' : 'h-8 sm:h-14'}`} />
 
         {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser */}
-        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto ${alignmentContainerClass}`}>
+        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 ${alignmentContainerClass}`}>
 
           {/* Top On Tour Look-At-Me Button */}
           {artistInfo.tourBadge?.enabled !== false && (
@@ -685,15 +689,21 @@ export default function HeroSection({
             </motion.div>
           </div>
 
-          {/* Bio Teaser - Dynamic Alignment & Balanced Scale */}
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={canIgnite ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed mt-3 sm:mt-4 text-balance px-2 whitespace-pre-line ${bioAlignClass}`}
-          >
-            {artistInfo.bio || artistInfo.heroBio || "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind."}
-          </motion.p>
+          {/* Bio Teaser - Dynamic Alignment & Balanced Scale with Smooth Collapse */}
+          <AnimatePresence>
+            {isHeroBioVisible && (
+              <motion.p
+                key="hero-bio-statement"
+                initial={{ opacity: 0, height: 0, y: 10, marginTop: 0 }}
+                animate={canIgnite ? { opacity: 1, height: 'auto', y: 0, marginTop: '1rem' } : { opacity: 0, height: 0, y: 10, marginTop: 0 }}
+                exit={{ opacity: 0, height: 0, y: -8, marginTop: 0 }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed text-balance px-2 whitespace-pre-line overflow-hidden ${bioAlignClass}`}
+              >
+                {heroBioText}
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt & Stage Art Toggle */}
@@ -799,7 +809,7 @@ export default function HeroSection({
                       togglePlay();
                     }
                   }}
-                  className="flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-bold text-xs sm:text-sm border active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-lg"
+                  className="theme-primary-btn flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm border active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-lg"
                   style={{
                     background: `linear-gradient(135deg, ${theme.primary || '#a855f7'} 0%, ${theme.secondary || '#6366f1'} 100%)`,
                     borderColor: `${theme.primary || '#a855f7'}60`,
@@ -807,15 +817,15 @@ export default function HeroSection({
                   }}
                 >
                   {isFeaturedPlaying ? (
-                    <Pause className="w-3.5 h-3.5 fill-white" />
+                    <Pause className="w-3.5 h-3.5 fill-current" />
                   ) : (
-                    <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                    <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                   )}
                   <span>{isFeaturedPlaying ? 'Pause Preview' : `Listen: ${featuredTrack.title}`}</span>
                   <span className="flex items-center gap-0.5 h-2.5 ml-1">
-                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-1' : 'h-1'}`} />
-                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-2' : 'h-1.5'}`} />
-                    <span className={`w-0.5 bg-white/80 rounded-full ${isFeaturedPlaying ? 'h-2 animate-equalizer-3' : 'h-1'}`} />
+                    <span className={`w-0.5 bg-current rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-1' : 'h-1'}`} />
+                    <span className={`w-0.5 bg-current rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-2' : 'h-1.5'}`} />
+                    <span className={`w-0.5 bg-current rounded-full ${isFeaturedPlaying ? 'h-2 animate-equalizer-3' : 'h-1'}`} />
                   </span>
                 </button>
               </Magnet>
@@ -876,7 +886,7 @@ export default function HeroSection({
                         Current Era • The Man Unseen
                       </p>
                       <p className="text-xs text-slate-300 leading-relaxed font-light">
-                        Stripped of industry posturing. Highlighting emotional truth, nocturnal storytelling, and raw existential weight.
+                        {artistInfo.metamorphosisBio || "Stripped of industry posturing. Highlighting emotional truth, nocturnal storytelling, and raw existential weight."}
                       </p>
                     </motion.div>
                   ) : (

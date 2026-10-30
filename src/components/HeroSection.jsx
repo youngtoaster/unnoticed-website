@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap } from 'lucide-react';
+import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap, Eye, EyeOff } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sliders, Music, FileText, Ticket, ShoppingBag, Image as ImageIcon,
-  ArrowLeft, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
+  ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Pause, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,

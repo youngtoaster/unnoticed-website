@@ -427,9 +427,9 @@ export default function MusicSection({
                   {/* ======================================================== */}
                   <div className="lg:w-[370px] xl:w-[410px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden">
                     <div>
-                      {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY */}
+                      {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY (Fixed Height Container: Zero Layout Jitter) */}
                       {/* Disc slides out prominently with dramatic exposure */}
-                      <div className="relative w-full max-w-[340px] xl:max-w-[380px] mx-auto pt-2 pb-3 flex items-center justify-center">
+                      <div className="relative w-full max-w-[340px] xl:max-w-[380px] h-48 sm:h-52 xl:h-56 mx-auto my-2 flex items-center justify-center shrink-0">
                         {/* Vinyl Disc Sliding Out Prominently Behind Sleeve When Playing, Put Away Inside Sleeve When Paused */}
                         <motion.div
                           animate={
@@ -527,18 +527,20 @@ export default function MusicSection({
                         </motion.div>
                       </div>
 
-                      {/* Track Identity Header */}
-                      <div className="text-center mt-3 mb-1">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-mono uppercase font-semibold mb-1.5">
+                      {/* Track Identity Header (Locked Heights: 100% Elimination of Any UI Jumping) */}
+                      <div className="text-center mt-2 mb-1 shrink-0">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-mono uppercase font-semibold mb-1">
                           <Sparkles className="w-3 h-3 text-cyan-400" />
                           <span>Studio Discography Master</span>
                         </div>
 
-                        <h3 className="font-display font-black text-xl xl:text-2xl text-white tracking-tight line-clamp-1">
-                          {focusedTrack.title}
-                        </h3>
+                        <div className="h-7 sm:h-8 flex items-center justify-center">
+                          <h3 className="font-display font-black text-xl xl:text-2xl text-white tracking-tight truncate">
+                            {focusedTrack.title}
+                          </h3>
+                        </div>
 
-                        <p className="text-xs text-slate-300 font-mono mt-0.5 min-h-[18px] flex items-center justify-center">
+                        <p className="text-xs text-slate-300 font-mono h-5 flex items-center justify-center">
                           <span className="text-white font-semibold">UNNOTICED</span>{' '}
                           {focusedTrack.featuring && !focusedTrack.featuring.toLowerCase().includes('unnoticed') && (
                             <span className="text-purple-300 font-normal">

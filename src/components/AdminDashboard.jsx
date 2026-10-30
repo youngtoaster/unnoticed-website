@@ -455,9 +455,9 @@ export default function AdminDashboard({ onReturnToSite }) {
     }
   };
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2500);
+  const showToast = (msg, type = 'success') => {
+    setToastMessage({ text: msg, type });
+    setTimeout(() => setToastMessage(null), 3200);
   };
 
   const handleResetSection = (collectionKey, title) => {
@@ -595,9 +595,20 @@ export default function AdminDashboard({ onReturnToSite }) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-purple-600 text-white font-semibold text-xs shadow-2xl flex items-center gap-2 border border-purple-400"
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full font-semibold text-xs shadow-2xl flex items-center gap-2 border ${
+              (typeof toastMessage === 'object' && toastMessage?.type === 'error') ||
+              (typeof toastMessage === 'string' && (toastMessage.toLowerCase().includes('error') || toastMessage.toLowerCase().includes('failed') || toastMessage.toLowerCase().includes('could not')))
+                ? 'bg-rose-950/95 text-rose-200 border-rose-500/60 shadow-rose-950/50'
+                : 'bg-purple-600 text-white border-purple-400 shadow-purple-900/50'
+            }`}
           >
-            <Check className="w-4 h-4" /> {toastMessage}
+            {(typeof toastMessage === 'object' && toastMessage?.type === 'error') ||
+            (typeof toastMessage === 'string' && (toastMessage.toLowerCase().includes('error') || toastMessage.toLowerCase().includes('failed') || toastMessage.toLowerCase().includes('could not'))) ? (
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            ) : (
+              <Check className="w-4 h-4 text-white shrink-0" />
+            )}
+            <span>{typeof toastMessage === 'object' ? toastMessage.text : toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -634,9 +645,9 @@ export default function AdminDashboard({ onReturnToSite }) {
             onClick={async () => {
               const res = await pushToGitHub();
               if (res.success) {
-                showToast(res.message || 'Pushed all CMS content to GitHub repository!');
+                showToast(res.message || 'Pushed all CMS content to GitHub repository!', 'success');
               } else {
-                showToast('GitHub Sync: ' + (res.error || 'Check local server status'));
+                showToast(res.error || 'GitHub Sync failed. Check local server status', 'error');
               }
             }}
             disabled={isPushingGit}
@@ -4274,10 +4285,10 @@ export default function AdminDashboard({ onReturnToSite }) {
                 onClick={async () => {
                   const res = await pushToGitHub(customCommitMsg || undefined);
                   if (res.success) {
-                    showToast(res.message || 'Pushed all CMS content to GitHub repository!');
+                    showToast(res.message || 'Pushed all CMS content to GitHub repository!', 'success');
                     setCustomCommitMsg('');
                   } else {
-                    showToast('Sync error: ' + (res.error || 'Check local server status'));
+                    showToast(res.error || 'GitHub sync failed. Check local server status', 'error');
                   }
                 }}
                 disabled={isPushingGit}

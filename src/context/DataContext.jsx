@@ -332,7 +332,18 @@ export function DataProvider({ children }) {
         setIsPushingGit(false);
         setSyncStatus('synced');
         refreshGitStatus();
-        return { success: true, method: 'local-git', ...result };
+        return {
+          success: true,
+          method: 'local-git',
+          pushed: result.pushed,
+          hash: result.hash,
+          message: result.pushed
+            ? (result.message || `Pushed commit ${result.hash} to GitHub!`)
+            : '✓ Up to date: GitHub already has your latest changes.'
+        };
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Git commit/push command failed on local server');
       }
     } catch (localErr) {
       console.warn('Local git endpoint unreachable, checking GitHub API fallback:', localErr);

@@ -13,6 +13,7 @@ function syncArtistDataFile(data, rootDir) {
     const header = `// Artist data for UNNOTICED (Formerly Ty Sciullo)\n// Auto-synchronized CMS state for production consistency\n\n`;
     const content = header + [
       `export const SECTIONS_VISIBILITY = ${JSON.stringify(data.sectionsVisibility || {}, null, 2)};\n`,
+      `export const FEATURED_RELEASE = ${JSON.stringify(data.featuredRelease || {}, null, 2)};\n`,
       `export const ARTIST_INFO = ${JSON.stringify(data.artistInfo || {}, null, 2)};\n`,
       `export const TRACKS = ${JSON.stringify(data.tracks || [], null, 2)};\n`,
       `export const BIOGRAPHY_PARAGRAPHS = ${JSON.stringify(data.biography || [], null, 2)};\n`,

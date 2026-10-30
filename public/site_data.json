@@ -1,5 +1,5 @@
 {
-  "_lastUpdated": 1793319723246,
+  "_lastUpdated": 1793332395623,
   "artistInfo": {
     "name": "UNNOTICED",
     "previousName": "Ty Sciullo",
@@ -721,5 +721,7 @@
     "gallery": true,
     "social": true,
     "newsletter": true
-  }
+  },
+  "autoGitPush": true,
+  "commitMessage": "content: test live auto-sync to GitHub"
 }

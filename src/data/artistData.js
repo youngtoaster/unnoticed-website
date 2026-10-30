@@ -1,339 +1,351 @@
 // Artist data for UNNOTICED (Formerly Ty Sciullo)
-// Authentic data sourced from Groover profile, discography, and biographical archive
+// Auto-synchronized CMS state for production consistency
 
 export const SECTIONS_VISIBILITY = {
-  music: true,
-  streaming: true,
-  bio: true,
-  media: true,
-  tour: true,
-  store: true,
-  gallery: true,
-  social: true,
-  newsletter: true,
+  "music": true,
+  "streaming": true,
+  "bio": true,
+  "media": true,
+  "tour": true,
+  "store": true,
+  "gallery": true,
+  "social": true,
+  "newsletter": true
 };
 
 export const ARTIST_INFO = {
-  name: "UNNOTICED",
-  previousName: "Ty Sciullo",
-  legalName: "Tyler R. Sciullo",
-  tagline: "Once known as Ty Sciullo, now a man unseen.",
-  showNavbarMoniker: true,
-  navbarMoniker: "Ty Sciullo",
-  showNavbarTagline: true,
-  navbarTagline: "Official Artist Experience",
-  location: "McKees Rocks, Pennsylvania / Pittsburgh, PA",
-  originYear: "2016",
-  genres: ["Alternative Hip-Hop", "Nocturnal Rap", "Dark Pop", "Emo Rap", "Melodic Trapsoul"],
-  avatar: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
-  banner: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/linkInBioBackground",
-  spotifyArtistId: "7bRcQsxF25DWP1fqCd2lyR",
-  spotifyEmbedAlbum: "https://open.spotify.com/embed/album/5R2zsn8QgVVOpFY8NUVCcp?utm_source=generator&theme=0",
-  spotifyArtistEmbed: "https://open.spotify.com/embed/artist/5ETABaJMvhYJpsxQku2IQe?utm_source=generator&theme=0",
-  socials: {
-    instagram: "https://www.instagram.com/unnoticedmusic",
-    twitter: "https://twitter.com/Unnoticedmusic",
-    youtube: "https://www.youtube.com/@Unnoticed",
-    spotify: "https://open.spotify.com/artist/5ETABaJMvhYJpsxQku2IQe",
-    appleMusic: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
-    soundcloud: "https://soundcloud.com/tysciullo",
-    groover: "https://groover.me/unnoticed"
+  "name": "UNNOTICED",
+  "previousName": "Ty Sciullo",
+  "legalName": "Tyler R. Sciullo",
+  "tagline": "Once known as Ty Sciullo, now a man unseen.",
+  "showNavbarMoniker": true,
+  "navbarMoniker": "Ty Sciullo",
+  "showNavbarTagline": true,
+  "navbarTagline": "Official Artist Experience",
+  "location": "McKees Rocks, Pennsylvania / Pittsburgh, PA",
+  "originYear": "2016",
+  "genres": [
+    "Alternative Hip-Hop",
+    "Nocturnal Rap",
+    "Dark Pop",
+    "Emo Rap",
+    "Melodic Trapsoul"
+  ],
+  "avatar": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
+  "banner": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/linkInBioBackground",
+  "spotifyArtistId": "7bRcQsxF25DWP1fqCd2lyR",
+  "spotifyEmbedAlbum": "https://open.spotify.com/embed/album/5R2zsn8QgVVOpFY8NUVCcp?utm_source=generator&theme=0",
+  "spotifyArtistEmbed": "https://open.spotify.com/embed/artist/5ETABaJMvhYJpsxQku2IQe?utm_source=generator&theme=0",
+  "socials": {
+    "instagram": "https://www.instagram.com/unnoticedmusic",
+    "twitter": "https://twitter.com/Unnoticedmusic",
+    "youtube": "https://www.youtube.com/@Unnoticed",
+    "spotify": "https://open.spotify.com/artist/5ETABaJMvhYJpsxQku2IQe",
+    "appleMusic": "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+    "soundcloud": "https://soundcloud.com/tysciullo",
+    "groover": "https://groover.me/unnoticed"
   },
-  stats: {
-    monthlyListeners: "148,200+",
-    totalStreams: "4.2M+",
-    catalogReleases: "18 Tracks",
-    keyMarkets: ["Pittsburgh", "Philadelphia", "New York", "Chicago", "London"]
+  "stats": {
+    "monthlyListeners": "148,200+",
+    "totalStreams": "4.2M+",
+    "catalogReleases": "18 Tracks",
+    "keyMarkets": [
+      "Pittsburgh",
+      "Philadelphia",
+      "New York",
+      "Chicago",
+      "London"
+    ]
   },
-  bio: "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
-  quote: "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all.",
-  quoteAuthor: "Tyler Sciullo (UNNOTICED)",
-  heroSubtitle: "Once Known As Ty Sciullo • Now A Man Unseen",
-  theme: {
-    id: "violet",
-    name: "Electric Violet",
-    primary: "#a855f7",
-    secondary: "#6366f1",
-    accent: "#06b6d4",
-    glow: "#a855f7",
-    syncNeon: true
+  "bio": "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.",
+  "quote": "I grew up watching family members give their best years to jobs that drained their souls. I realized that whatever pain comes with chasing your art is nothing compared to the regret of never trying at all.",
+  "quoteAuthor": "Tyler Sciullo (UNNOTICED)",
+  "heroSubtitle": "Once Known As Ty Sciullo • Now A Man Unseen",
+  "theme": {
+    "id": "violet",
+    "name": "Electric Violet",
+    "primary": "#a855f7",
+    "secondary": "#6366f1",
+    "accent": "#06b6d4",
+    "glow": "#a855f7",
+    "syncNeon": true
   },
-  tourBadge: {
-    enabled: true,
-    text: "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS",
-    link: "#tour"
+  "tourBadge": {
+    "enabled": true,
+    "text": "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS",
+    "link": "#tour"
   },
-  neonSign: {
-    color: "#a855f7",
-    font: "font-display",
-    size: "text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]",
-    fontSizeRem: 4.25,
-    align: "center",
-    fontWeight: "font-black",
-    flicker: true,
-    glowCaption: true
+  "neonSign": {
+    "color": "#a855f7",
+    "font": "font-display",
+    "size": "text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]",
+    "fontSizeRem": 4.25,
+    "align": "center",
+    "fontWeight": "font-black",
+    "flicker": true,
+    "glowCaption": true
   },
-  heroBackdrop: {
-    enabled: true,
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
-    blur: 6,
-    blurEnabled: true,
-    opacity: 45,
-    zoom: 105,
-    positionX: 50,
-    positionY: 45,
-    scope: "title",
-    blendMode: "screen",
-    vignette: true,
-    illuminateOnGlow: true,
-    glowIntensity: 85
+  "heroBackdrop": {
+    "enabled": true,
+    "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+    "blur": 6,
+    "blurEnabled": true,
+    "opacity": 45,
+    "zoom": 105,
+    "positionX": 50,
+    "positionY": 45,
+    "scope": "title",
+    "blendMode": "screen",
+    "vignette": true,
+    "illuminateOnGlow": true,
+    "glowIntensity": 85
   }
 };
 
 export const TRACKS = [
   {
-    id: "andale",
-    title: "Andale",
-    featuring: "feat. Unnoticed",
-    type: "Single",
-    duration: "2:44",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
-    spotifyUrl: "https://open.spotify.com/track/2MkakG4Vzc5K7AjQpGNW85",
-    appleMusicUrl: "https://music.apple.com/us/album/andale-feat-unnoticed/1734799432?i=1734799732",
-    deezerUrl: "https://deezer.com/album/557178682",
-    description: "High-octane tempo paired with introspective undertones, exploring relentless momentum and the hunger to outrun inner ghosts.",
-    lyrics: [
+    "id": "andale",
+    "title": "Andale",
+    "featuring": "feat. Unnoticed",
+    "type": "Single",
+    "duration": "2:44",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
+    "spotifyUrl": "https://open.spotify.com/track/2MkakG4Vzc5K7AjQpGNW85",
+    "appleMusicUrl": "https://music.apple.com/us/album/andale-feat-unnoticed/1734799432?i=1734799732",
+    "deezerUrl": "https://deezer.com/album/557178682",
+    "description": "High-octane tempo paired with introspective undertones, exploring relentless momentum and the hunger to outrun inner ghosts.",
+    "lyrics": [
       {
-        text: "Late night in the steel city, wheels turning fast",
-        annotated: false
+        "text": "Late night in the steel city, wheels turning fast",
+        "annotated": false
       },
       {
-        text: "Tell 'em Ándale, I cannot leave my future in the past",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Verified Artist",
-          verified: true,
-          content: "McKees Rocks is an old industrial steel hub. Growing up there, everyone told me to stay in line and take a mill or factory shift. 'Ándale' was my refusal to stand still. If you don't sprint toward what you want, this city will freeze you in place."
+        "text": "Tell 'em Ándale, I cannot leave my future in the past",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Verified Artist",
+          "verified": true,
+          "content": "McKees Rocks is an old industrial steel hub. Growing up there, everyone told me to stay in line and take a mill or factory shift. 'Ándale' was my refusal to stand still. If you don't sprint toward what you want, this city will freeze you in place."
         }
       },
       {
-        text: "They only love you when you're gone, but check the aftermath",
-        annotated: false
+        "text": "They only love you when you're gone, but check the aftermath",
+        "annotated": false
       },
       {
-        text: "Gave my brother my last dollar, put my city on my back",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Behind The Bars",
-          verified: true,
-          content: "Family loyalty is non-negotiable for me. When money was tightest during early recording sessions, whatever cash we had went into studio equipment and keeping my circle fed."
+        "text": "Gave my brother my last dollar, put my city on my back",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Behind The Bars",
+          "verified": true,
+          "content": "Family loyalty is non-negotiable for me. When money was tightest during early recording sessions, whatever cash we had went into studio equipment and keeping my circle fed."
         }
       },
       {
-        text: "Run it up, no brake lines, living on the edge",
-        annotated: false
+        "text": "Run it up, no brake lines, living on the edge",
+        "annotated": false
       },
       {
-        text: "Used to scream into the microphone with blood upon the ledge",
-        annotated: false
+        "text": "Used to scream into the microphone with blood upon the ledge",
+        "annotated": false
       }
     ]
   },
   {
-    id: "overthink",
-    title: "Overthink",
-    featuring: "",
-    type: "Single",
-    duration: "2:58",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/08d59cff3f1512bc8bc081cc1e7d2f9de291a1fa?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
-    spotifyUrl: "https://open.spotify.com/album/3h11akoOLkmhlVyJ5CzZmG",
-    appleMusicUrl: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
-    deezerUrl: "https://deezer.com/album/556373202",
-    description: "A vulnerable confession on paralysis by analysis, insomniac spirals, and fighting the self-destructive loops in your own head.",
-    lyrics: [
+    "id": "overthink",
+    "title": "Overthink",
+    "featuring": "",
+    "type": "Single",
+    "duration": "2:58",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/08d59cff3f1512bc8bc081cc1e7d2f9de291a1fa?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
+    "spotifyUrl": "https://open.spotify.com/album/3h11akoOLkmhlVyJ5CzZmG",
+    "appleMusicUrl": "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+    "deezerUrl": "https://deezer.com/album/556373202",
+    "description": "A vulnerable confession on paralysis by analysis, insomniac spirals, and fighting the self-destructive loops in your own head.",
+    "lyrics": [
       {
-        text: "3 AM ceiling staring, clock is ticking loud",
-        annotated: false
+        "text": "3 AM ceiling staring, clock is ticking loud",
+        "annotated": false
       },
       {
-        text: "I build a fortress in my head and let it burn back down",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Mental Architecture",
-          verified: true,
-          content: "I produce and write in isolation late at night. Sometimes the obsession with making every syllable perfect turns into self-sabotage. You build up all these plans, then tear them down before dawn out of insecurity."
+        "text": "I build a fortress in my head and let it burn back down",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Mental Architecture",
+          "verified": true,
+          "content": "I produce and write in isolation late at night. Sometimes the obsession with making every syllable perfect turns into self-sabotage. You build up all these plans, then tear them down before dawn out of insecurity."
         }
       },
       {
-        text: "Is it paranoia or just seeing through the crowd?",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Perspective",
-          verified: true,
-          content: "Transitioning from Ty Sciullo into Unnoticed came from realizing how many people around you are just spectators waiting to see you stumble. Becoming 'unseen' allowed me to observe who was real."
+        "text": "Is it paranoia or just seeing through the crowd?",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Perspective",
+          "verified": true,
+          "content": "Transitioning from Ty Sciullo into Unnoticed came from realizing how many people around you are just spectators waiting to see you stumble. Becoming 'unseen' allowed me to observe who was real."
         }
       },
       {
-        text: "Every conversation replayed twenty times or more",
-        annotated: false
+        "text": "Every conversation replayed twenty times or more",
+        "annotated": false
       },
       {
-        text: "Leave the key beneath the mat but keep a lock upon the door",
-        annotated: false
+        "text": "Leave the key beneath the mat but keep a lock upon the door",
+        "annotated": false
       }
     ]
   },
   {
-    id: "this-aint-love",
-    title: "This Ain't Love",
-    featuring: "",
-    type: "Single",
-    duration: "3:12",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
-    spotifyUrl: "https://open.spotify.com/track/6zkXBh5zGgQzPVrla2Todg",
-    appleMusicUrl: "https://music.apple.com/us/album/this-aint-love-feat-unnoticed/1734614309?i=1734614321",
-    deezerUrl: "https://deezer.com",
-    description: "Atmospheric bass and haunting reverb dissecting toxic attachments, emotional debt, and clarity in the aftermath of heartbreak.",
-    lyrics: [
+    "id": "this-aint-love",
+    "title": "This Ain't Love",
+    "featuring": "",
+    "type": "Single",
+    "duration": "3:12",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/b6cdb3115927e7db423d2238223b5a6b4a57008b?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+    "spotifyUrl": "https://open.spotify.com/track/6zkXBh5zGgQzPVrla2Todg",
+    "appleMusicUrl": "https://music.apple.com/us/album/this-aint-love-feat-unnoticed/1734614309?i=1734614321",
+    "deezerUrl": "https://deezer.com",
+    "description": "Atmospheric bass and haunting reverb dissecting toxic attachments, emotional debt, and clarity in the aftermath of heartbreak.",
+    "lyrics": [
       {
-        text: "You only call me when the liquor starts to speak for you",
-        annotated: false
+        "text": "You only call me when the liquor starts to speak for you",
+        "annotated": false
       },
       {
-        text: "We call it passion but it's poison wrapped in deja vu",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Relationship Breakdown",
-          verified: true,
-          content: "We often mistake chaos for intensity. When you grow up in turbulence, peace feels foreign, so you keep running back into emotional fires because at least they feel warm."
+        "text": "We call it passion but it's poison wrapped in deja vu",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Relationship Breakdown",
+          "verified": true,
+          "content": "We often mistake chaos for intensity. When you grow up in turbulence, peace feels foreign, so you keep running back into emotional fires because at least they feel warm."
         }
       },
       {
-        text: "Look in the mirror and I wonder who I'm turning to",
-        annotated: false
+        "text": "Look in the mirror and I wonder who I'm turning to",
+        "annotated": false
       },
       {
-        text: "This ain't love, this is surviving what we couldn't lose",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Title Genesis",
-          verified: true,
-          content: "This line anchors the whole song. It wasn't about love anymore; it was an ego game of who refused to be the first one to walk away."
+        "text": "This ain't love, this is surviving what we couldn't lose",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Title Genesis",
+          "verified": true,
+          "content": "This line anchors the whole song. It wasn't about love anymore; it was an ego game of who refused to be the first one to walk away."
         }
       }
     ]
   },
   {
-    id: "baddie",
-    title: "Baddie",
-    featuring: "feat. Unnoticed",
-    type: "Single",
-    duration: "2:36",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/c2c99f73bff20aedf3b73f5db9bca8aecc9ddcda?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/37a221d0-bc02-4cfa-93b8-6c7493808b27/card_2x",
-    spotifyUrl: "https://open.spotify.com/track/0iI0YVMB7HrMqjkHoG22U1",
-    appleMusicUrl: "https://music.apple.com/us/album/baddie-feat-unnoticed/1734503647?i=1734503880",
-    deezerUrl: "https://deezer.com",
-    description: "Seductive 808s and crisp snare rolls exploring nocturnal city nightlife, allure, and unsaid tensions.",
-    lyrics: [
+    "id": "baddie",
+    "title": "Baddie",
+    "featuring": "feat. Unnoticed",
+    "type": "Single",
+    "duration": "2:36",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/c2c99f73bff20aedf3b73f5db9bca8aecc9ddcda?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/37a221d0-bc02-4cfa-93b8-6c7493808b27/card_2x",
+    "spotifyUrl": "https://open.spotify.com/track/0iI0YVMB7HrMqjkHoG22U1",
+    "appleMusicUrl": "https://music.apple.com/us/album/baddie-feat-unnoticed/1734503647?i=1734503880",
+    "deezerUrl": "https://deezer.com",
+    "description": "Seductive 808s and crisp snare rolls exploring nocturnal city nightlife, allure, and unsaid tensions.",
+    "lyrics": [
       {
-        text: "Black tint on the windows when we pull up to the venue",
-        annotated: false
+        "text": "Black tint on the windows when we pull up to the venue",
+        "annotated": false
       },
       {
-        text: "She got expensive taste, ain't looking at no menu",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Club Atmosphere",
-          verified: true,
-          content: "A lighter, infectious bounce that came together during our weekend sessions in Philly. We wanted an energetic vibe that would hit in the club while keeping that moody undertone."
+        "text": "She got expensive taste, ain't looking at no menu",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Club Atmosphere",
+          "verified": true,
+          "content": "A lighter, infectious bounce that came together during our weekend sessions in Philly. We wanted an energetic vibe that would hit in the club while keeping that moody undertone."
         }
       },
       {
-        text: "Eyes locked from across the room, she knowing what we came to do",
-        annotated: false
+        "text": "Eyes locked from across the room, she knowing what we came to do",
+        "annotated": false
       }
     ]
   },
   {
-    id: "smile",
-    title: "SMILE",
-    featuring: "",
-    type: "Single",
-    duration: "3:05",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/f6d67675c5892801ea4fbf532ba942debb6241de?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
-    spotifyUrl: "https://open.spotify.com/album/4DTbK549jUUVwEi5ZGxQmX",
-    appleMusicUrl: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
-    deezerUrl: "https://deezer.com",
-    description: "An ironic, emotionally charged anthem about wearing a counterfeit grin to protect the people around you from your reality.",
-    lyrics: [
+    "id": "smile",
+    "title": "SMILE",
+    "featuring": "",
+    "type": "Single",
+    "duration": "3:05",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/f6d67675c5892801ea4fbf532ba942debb6241de?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
+    "spotifyUrl": "https://open.spotify.com/album/4DTbK549jUUVwEi5ZGxQmX",
+    "appleMusicUrl": "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+    "deezerUrl": "https://deezer.com",
+    "description": "An ironic, emotionally charged anthem about wearing a counterfeit grin to protect the people around you from your reality.",
+    "lyrics": [
       {
-        text: "Put on the costume, step under neon lights",
-        annotated: false
+        "text": "Put on the costume, step under neon lights",
+        "annotated": false
       },
       {
-        text: "Tell everybody you're okay to get through one more night",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Raw Honesty",
-          verified: true,
-          content: "The mask of entertaining. As an artist, everyone expects you to be 'on' all the time. 'SMILE' is the reality of smiling through anxiety and depression so you don't bring down the room."
+        "text": "Tell everybody you're okay to get through one more night",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Raw Honesty",
+          "verified": true,
+          "content": "The mask of entertaining. As an artist, everyone expects you to be 'on' all the time. 'SMILE' is the reality of smiling through anxiety and depression so you don't bring down the room."
         }
       },
       {
-        text: "Flash from the cameras blind the tears inside your eyes",
-        annotated: false
+        "text": "Flash from the cameras blind the tears inside your eyes",
+        "annotated": false
       }
     ]
   },
   {
-    id: "calling-for-help",
-    title: "Calling for Help",
-    featuring: "",
-    type: "Single",
-    duration: "3:18",
-    releaseYear: "2024",
-    previewAudio: "https://p.scdn.co/mp3-preview/c2ac2210b33c31cfe9247918cf6d67daf1021cd5?cid=3bb56cf560444175950d63e79d4febc8",
-    cover: "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
-    spotifyUrl: "https://open.spotify.com/album/7JzULNKwVLgJ2EiQhHwyi7",
-    appleMusicUrl: "https://music.apple.com/us/artist/ty-sciullo/1218320490",
-    deezerUrl: "https://deezer.com",
-    description: "A chilling acoustic guitar riff swallowed by thunderous sub-bass, chronicling an SOS to the universe when you've hit rock bottom.",
-    lyrics: [
+    "id": "calling-for-help",
+    "title": "Calling for Help",
+    "featuring": "",
+    "type": "Single",
+    "duration": "3:18",
+    "releaseYear": "2024",
+    "previewAudio": "https://p.scdn.co/mp3-preview/c2ac2210b33c31cfe9247918cf6d67daf1021cd5?cid=3bb56cf560444175950d63e79d4febc8",
+    "cover": "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
+    "spotifyUrl": "https://open.spotify.com/album/7JzULNKwVLgJ2EiQhHwyi7",
+    "appleMusicUrl": "https://music.apple.com/us/artist/ty-sciullo/1218320490",
+    "deezerUrl": "https://deezer.com",
+    "description": "A chilling acoustic guitar riff swallowed by thunderous sub-bass, chronicling an SOS to the universe when you've hit rock bottom.",
+    "lyrics": [
       {
-        text: "Dialing numbers in the dark, nobody on the line",
-        annotated: false
+        "text": "Dialing numbers in the dark, nobody on the line",
+        "annotated": false
       },
       {
-        text: "Praying for a signal just to know that I'm alive",
-        annotated: true,
-        annotation: {
-          author: "UNNOTICED",
-          badge: "Life-Saving Track",
-          verified: true,
-          content: "I wrote this at the lowest point of 2023. When you're suffering in silence, reaching out feels like admitting defeat. I put it on wax because I know thousands of people listening are feeling that exact same silence."
+        "text": "Praying for a signal just to know that I'm alive",
+        "annotated": true,
+        "annotation": {
+          "author": "UNNOTICED",
+          "badge": "Life-Saving Track",
+          "verified": true,
+          "content": "I wrote this at the lowest point of 2023. When you're suffering in silence, reaching out feels like admitting defeat. I put it on wax because I know thousands of people listening are feeling that exact same silence."
         }
       },
       {
-        text: "If you hear me through the static, hold the line",
-        annotated: false
+        "text": "If you hear me through the static, hold the line",
+        "annotated": false
       }
     ]
   }
@@ -341,316 +353,383 @@ export const TRACKS = [
 
 export const BIOGRAPHY_PARAGRAPHS = [
   {
-    title: "The Industrial Roots of McKees Rocks",
-    text: "Born on August 29, 1997 in McKees Rocks, Pennsylvania—a gritty, storied borough nestled along the Ohio River adjacent to Pittsburgh—Tyler R. Sciullo grew up surrounded by the unvarnished realities of the American Rust Belt. In an environment defined by relentless work shifts, shuttered factories, and generational grind, music was not merely a hobby; it was an existential lifeline. Witnessing family members trapped in unfulfilling jobs catalyzed Tyler's fierce determination to craft his own destiny on his own terms."
+    "title": "The Industrial Roots of McKees Rocks",
+    "text": "Born on August 29, 1997 in McKees Rocks, Pennsylvania—a gritty, storied borough nestled along the Ohio River adjacent to Pittsburgh—Tyler R. Sciullo grew up surrounded by the unvarnished realities of the American Rust Belt. In an environment defined by relentless work shifts, shuttered factories, and generational grind, music was not merely a hobby; it was an existential lifeline. Witnessing family members trapped in unfulfilling jobs catalyzed Tyler's fierce determination to craft his own destiny on his own terms."
   },
   {
-    title: "The Ty Sciullo Era & The Rise (2016–2022)",
-    text: "At 19, Tyler began carving out his presence under the moniker Ty Sciullo. With early breakthrough records like 'Cold Night' and the Tunnabeatz-produced underground anthem 'Insanity,' his music struck a chord with listeners who felt isolated. Over the subsequent six years, Tyler released a steady cadence of emotive singles, coordinated regional tour dates across the East Coast, and amassed hundreds of thousands of organic streams. His signature style fused introspective vulnerability with sharp lyrical wit, speaking frankly about depression, grief, and survival."
+    "title": "The Ty Sciullo Era & The Rise (2016–2022)",
+    "text": "At 19, Tyler began carving out his presence under the moniker Ty Sciullo. With early breakthrough records like 'Cold Night' and the Tunnabeatz-produced underground anthem 'Insanity,' his music struck a chord with listeners who felt isolated. Over the subsequent six years, Tyler released a steady cadence of emotive singles, coordinated regional tour dates across the East Coast, and amassed hundreds of thousands of organic streams. His signature style fused introspective vulnerability with sharp lyrical wit, speaking frankly about depression, grief, and survival."
   },
   {
-    title: "Metamorphosis: Now A Man Unseen (UNNOTICED)",
-    text: "Artistic evolution demands shedding old skin. In 2024, Tyler stepped away from the spotlight to undergo a fundamental creative transformation, adopting the artist identity UNNOTICED. 'Once known as Ty Sciullo, now a man unseen' became the mantra of this new era. Stripping away superficial industry vanity, UNNOTICED focuses purely on visceral sonic storytelling—layering nocturnal synths, haunting vocal textures, and unapologetic confessions across breakout tracks like 'Andale', 'Overthink', and 'This Ain't Love'. He remains the voice of those who feel overlooked, giving power to the invisible."
+    "title": "Metamorphosis: Now A Man Unseen (UNNOTICED)",
+    "text": "Artistic evolution demands shedding old skin. In 2024, Tyler stepped away from the spotlight to undergo a fundamental creative transformation, adopting the artist identity UNNOTICED. 'Once known as Ty Sciullo, now a man unseen' became the mantra of this new era. Stripping away superficial industry vanity, UNNOTICED focuses purely on visceral sonic storytelling—layering nocturnal synths, haunting vocal textures, and unapologetic confessions across breakout tracks like 'Andale', 'Overthink', and 'This Ain't Love'. He remains the voice of those who feel overlooked, giving power to the invisible."
   }
 ];
 
 export const VIDEOS = [
   {
-    id: "vid-1",
-    title: "UNNOTICED — Andale (Official Music Video)",
-    thumbnail: "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
-    youtubeEmbedId: "dQw4w9WgXcQ", // Embed ID or custom video modal
-    views: "214K views",
-    duration: "2:54",
-    category: "Music Video",
-    description: "Cinematic night-drive visualizer captured across the bridges and industrial tunnels of Pittsburgh."
+    "id": "vid-1",
+    "title": "UNNOTICED — Andale (Official Music Video)",
+    "thumbnail": "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
+    "youtubeEmbedId": "dQw4w9WgXcQ",
+    "views": "214K views",
+    "duration": "2:54",
+    "category": "Music Video",
+    "description": "Cinematic night-drive visualizer captured across the bridges and industrial tunnels of Pittsburgh."
   },
   {
-    id: "vid-2",
-    title: "UNNOTICED — Overthink (Live Studio Acoustic)",
-    thumbnail: "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
-    youtubeEmbedId: "dQw4w9WgXcQ",
-    views: "148K views",
-    duration: "3:10",
-    category: "Acoustic Session",
-    description: "Intimate one-take live acoustic arrangement recorded at Midnight Room Studios."
+    "id": "vid-2",
+    "title": "UNNOTICED — Overthink (Live Studio Acoustic)",
+    "thumbnail": "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
+    "youtubeEmbedId": "dQw4w9WgXcQ",
+    "views": "148K views",
+    "duration": "3:10",
+    "category": "Acoustic Session",
+    "description": "Intimate one-take live acoustic arrangement recorded at Midnight Room Studios."
   },
   {
-    id: "vid-3",
-    title: "UNNOTICED — This Ain't Love (Visualizer)",
-    thumbnail: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
-    youtubeEmbedId: "dQw4w9WgXcQ",
-    views: "98K views",
-    duration: "3:15",
-    category: "Official Visualizer",
-    description: "Dark aesthetic visual project exploring fragmented memory and urban neon gloom."
+    "id": "vid-3",
+    "title": "UNNOTICED — This Ain't Love (Visualizer)",
+    "thumbnail": "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+    "youtubeEmbedId": "dQw4w9WgXcQ",
+    "views": "98K views",
+    "duration": "3:15",
+    "category": "Official Visualizer",
+    "description": "Dark aesthetic visual project exploring fragmented memory and urban neon gloom."
   },
   {
-    id: "vid-4",
-    title: "Becoming UNNOTICED: The McKees Rocks Documentary",
-    thumbnail: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
-    youtubeEmbedId: "dQw4w9WgXcQ",
-    views: "340K views",
-    duration: "12:40",
-    category: "Short Documentary",
-    description: "Tyler chronicles his journey from Ty Sciullo into Unnoticed and his hometown roots."
+    "id": "vid-4",
+    "title": "Becoming UNNOTICED: The McKees Rocks Documentary",
+    "thumbnail": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
+    "youtubeEmbedId": "dQw4w9WgXcQ",
+    "views": "340K views",
+    "duration": "12:40",
+    "category": "Short Documentary",
+    "description": "Tyler chronicles his journey from Ty Sciullo into Unnoticed and his hometown roots."
   }
 ];
 
 export const TOUR_DATES = [
   {
-    id: "tour-1",
-    date: "NOV 14, 2026",
-    city: "Pittsburgh, PA",
-    venue: "Roxian Theatre (Hometown Show)",
-    status: "Selling Fast",
-    ticketLink: "https://seatgeek.com",
-    vipAvailable: true
+    "id": "tour-1",
+    "date": "NOV 14, 2026",
+    "city": "Pittsburgh, PA",
+    "venue": "Roxian Theatre (Hometown Show)",
+    "status": "Selling Fast",
+    "ticketLink": "https://seatgeek.com",
+    "vipAvailable": true
   },
   {
-    id: "tour-2",
-    date: "NOV 20, 2026",
-    city: "Philadelphia, PA",
-    venue: "The Foundry at The Fillmore",
-    status: "Tickets Available",
-    ticketLink: "https://ticketmaster.com",
-    vipAvailable: true
+    "id": "tour-2",
+    "date": "NOV 20, 2026",
+    "city": "Philadelphia, PA",
+    "venue": "The Foundry at The Fillmore",
+    "status": "Tickets Available",
+    "ticketLink": "https://ticketmaster.com",
+    "vipAvailable": true
   },
   {
-    id: "tour-3",
-    date: "DEC 04, 2026",
-    city: "New York, NY",
-    venue: "Mercury Lounge (Manhattan)",
-    status: "Low Tickets",
-    ticketLink: "https://ticketmaster.com",
-    vipAvailable: false
+    "id": "tour-3",
+    "date": "DEC 04, 2026",
+    "city": "New York, NY",
+    "venue": "Mercury Lounge (Manhattan)",
+    "status": "Low Tickets",
+    "ticketLink": "https://ticketmaster.com",
+    "vipAvailable": false
   },
   {
-    id: "tour-4",
-    date: "DEC 12, 2026",
-    city: "Columbus, OH",
-    venue: "A&R Music Bar",
-    status: "Tickets Available",
-    ticketLink: "https://ticketmaster.com",
-    vipAvailable: true
+    "id": "tour-4",
+    "date": "DEC 12, 2026",
+    "city": "Columbus, OH",
+    "venue": "A&R Music Bar",
+    "status": "Tickets Available",
+    "ticketLink": "https://ticketmaster.com",
+    "vipAvailable": true
   },
   {
-    id: "tour-5",
-    date: "JAN 16, 2027",
-    city: "Chicago, IL",
-    venue: "Subterranean",
-    status: "On Sale Soon",
-    ticketLink: "https://ticketmaster.com",
-    vipAvailable: true
+    "id": "tour-5",
+    "date": "JAN 16, 2027",
+    "city": "Chicago, IL",
+    "venue": "Subterranean",
+    "status": "On Sale Soon",
+    "ticketLink": "https://ticketmaster.com",
+    "vipAvailable": true
   },
   {
-    id: "tour-6",
-    date: "JAN 23, 2027",
-    city: "Detroit, MI",
-    venue: "The Magic Stick",
-    status: "Tickets Available",
-    ticketLink: "https://ticketmaster.com",
-    vipAvailable: false
+    "id": "tour-6",
+    "date": "JAN 23, 2027",
+    "city": "Detroit, MI",
+    "venue": "The Magic Stick",
+    "status": "Tickets Available",
+    "ticketLink": "https://ticketmaster.com",
+    "vipAvailable": false
   }
 ];
 
 export const PAST_TOUR_HIGHLIGHTS = [
-  { year: "2025", event: "The Unseen Regional Run", cities: "Pittsburgh, Cleveland, DC, Buffalo", attendance: "Sold Out 4/5 Venues" },
-  { year: "2024", event: "Midwest Underground Showcase", cities: "Chicago, Indianapolis, Cincinnati", attendance: "Special Guest Performer" },
-  { year: "2022", event: "Ty Sciullo Farewell Tour", cities: "McKees Rocks, Altoona, Erie", attendance: "Hometown Capstone" }
+  {
+    "year": "2025",
+    "event": "The Unseen Regional Run",
+    "cities": "Pittsburgh, Cleveland, DC, Buffalo",
+    "attendance": "Sold Out 4/5 Venues"
+  },
+  {
+    "year": "2024",
+    "event": "Midwest Underground Showcase",
+    "cities": "Chicago, Indianapolis, Cincinnati",
+    "attendance": "Special Guest Performer"
+  },
+  {
+    "year": "2022",
+    "event": "Ty Sciullo Farewell Tour",
+    "cities": "McKees Rocks, Altoona, Erie",
+    "attendance": "Hometown Capstone"
+  }
 ];
 
 export const MERCH_PRODUCTS = [
   {
-    id: "merch-1",
-    name: "“MAN UNSEEN” Heavyweight Hoodie",
-    price: 78.00,
-    category: "Hoodies",
-    badge: "Limited Edition",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
-    sizes: ["S", "M", "L", "XL", "2XL"],
-    colors: ["Obsidian Black", "Stone Washed Grey"],
-    description: "480 GSM French Terry cotton with tonal puff print on chest and reflective 'UNNOTICED' coordinates on sleeve.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-1",
+    "name": "“MAN UNSEEN” Heavyweight Hoodie",
+    "price": 78,
+    "category": "Hoodies",
+    "badge": "Limited Edition",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "2XL"
+    ],
+    "colors": [
+      "Obsidian Black",
+      "Stone Washed Grey"
+    ],
+    "description": "480 GSM French Terry cotton with tonal puff print on chest and reflective 'UNNOTICED' coordinates on sleeve.",
+    "externalLink": "https://unnoticed.shop"
   },
   {
-    id: "merch-2",
-    name: "“OVERTHINK” Vintage Washed Tee",
-    price: 42.00,
-    category: "T-Shirts",
-    badge: "Bestseller",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Mineral Washed Black"],
-    description: "Vintage distressed wash, custom inner neck tag, single-stitch hem with album lyric art print.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-2",
+    "name": "“OVERTHINK” Vintage Washed Tee",
+    "price": 42,
+    "category": "T-Shirts",
+    "badge": "Bestseller",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Mineral Washed Black"
+    ],
+    "description": "Vintage distressed wash, custom inner neck tag, single-stitch hem with album lyric art print.",
+    "externalLink": "https://unnoticed.shop"
   },
   {
-    id: "merch-3",
-    name: "“ANDALE” 180g Bone White Vinyl LP",
-    price: 36.00,
-    category: "Vinyl & Music",
-    badge: "Collector's Item",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
-    sizes: ["12\" Gatefold Vinyl"],
-    colors: ["Bone White Swirl"],
-    description: "Limited pressing of 500 hand-numbered copies worldwide. Includes 16-page lyric zine and high-res art print.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-3",
+    "name": "“ANDALE” 180g Bone White Vinyl LP",
+    "price": 36,
+    "category": "Vinyl & Music",
+    "badge": "Collector's Item",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
+    "sizes": [
+      "12\" Gatefold Vinyl"
+    ],
+    "colors": [
+      "Bone White Swirl"
+    ],
+    "description": "Limited pressing of 500 hand-numbered copies worldwide. Includes 16-page lyric zine and high-res art print.",
+    "externalLink": "https://unnoticed.shop"
   },
   {
-    id: "merch-4",
-    name: "“THIS AIN'T LOVE” Embroidered Cap",
-    price: 34.00,
-    category: "Headwear",
-    badge: "Low Stock",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
-    sizes: ["One Size Fits All (Adjustable)"],
-    colors: ["Jet Black", "Dusty Violet"],
-    description: "Unstructured 6-panel dad hat with high-density tonal 3D embroidery and antique brass buckle closure.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-4",
+    "name": "“THIS AIN'T LOVE” Embroidered Cap",
+    "price": 34,
+    "category": "Headwear",
+    "badge": "Low Stock",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+    "sizes": [
+      "One Size Fits All (Adjustable)"
+    ],
+    "colors": [
+      "Jet Black",
+      "Dusty Violet"
+    ],
+    "description": "Unstructured 6-panel dad hat with high-density tonal 3D embroidery and antique brass buckle closure.",
+    "externalLink": "https://unnoticed.shop"
   },
   {
-    id: "merch-5",
-    name: "“SMILE” Dual-Sided Acid Wash Longsleeve",
-    price: 52.00,
-    category: "Apparel",
-    badge: "New Release",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
-    sizes: ["M", "L", "XL", "2XL"],
-    colors: ["Acid Charcoal"],
-    description: "Heavyweight ring-spun cotton featuring inverted smile artwork on reverse and sleeve text graphics.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-5",
+    "name": "“SMILE” Dual-Sided Acid Wash Longsleeve",
+    "price": 52,
+    "category": "Apparel",
+    "badge": "New Release",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
+    "sizes": [
+      "M",
+      "L",
+      "XL",
+      "2XL"
+    ],
+    "colors": [
+      "Acid Charcoal"
+    ],
+    "description": "Heavyweight ring-spun cotton featuring inverted smile artwork on reverse and sleeve text graphics.",
+    "externalLink": "https://unnoticed.shop"
   },
   {
-    id: "merch-6",
-    name: "“CALLING FOR HELP” Silk Screen Tour Poster",
-    price: 28.00,
-    category: "Art Prints",
-    badge: "Autographed Option",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
-    sizes: ["18x24 Inches"],
-    colors: ["Metallic Silver & Black"],
-    description: "Hand-pulled 4-color screen print on 100lb Cougar opaque archival paper. Option for hand-signed artist copy.",
-    externalLink: "https://unnoticed.shop"
+    "id": "merch-6",
+    "name": "“CALLING FOR HELP” Silk Screen Tour Poster",
+    "price": 28,
+    "category": "Art Prints",
+    "badge": "Autographed Option",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
+    "sizes": [
+      "18x24 Inches"
+    ],
+    "colors": [
+      "Metallic Silver & Black"
+    ],
+    "description": "Hand-pulled 4-color screen print on 100lb Cougar opaque archival paper. Option for hand-signed artist copy.",
+    "externalLink": "https://unnoticed.shop"
   }
 ];
 
 export const GALLERY_IMAGES = [
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
-    title: "Portrait of the Unseen",
-    subtitle: "Studio Session, Pittsburgh PA — 2025",
-    caption: "Tyler R. Sciullo stepping into the nocturnal aesthetic of UNNOTICED."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
+    "title": "Portrait of the Unseen",
+    "subtitle": "Studio Session, Pittsburgh PA — 2025",
+    "caption": "Tyler R. Sciullo stepping into the nocturnal aesthetic of UNNOTICED."
   },
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
-    title: "Andale Visual Concept",
-    subtitle: "Album Art Direction",
-    caption: "Raw industrial framing mirroring the momentum of the steel valley."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
+    "title": "Andale Visual Concept",
+    "subtitle": "Album Art Direction",
+    "caption": "Raw industrial framing mirroring the momentum of the steel valley."
   },
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
-    title: "The Overthink Sessions",
-    subtitle: "Late Night Mixing at Midnight Room",
-    caption: "Isolating analog synthesizers and vocal harmonies at 4 AM."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
+    "title": "The Overthink Sessions",
+    "subtitle": "Late Night Mixing at Midnight Room",
+    "caption": "Isolating analog synthesizers and vocal harmonies at 4 AM."
   },
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
-    title: "This Ain't Love Cover Shoot",
-    subtitle: "Location Shoot, Downtown",
-    caption: "Monochrome shadows representing emotional detachment."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/dfc1ac7c-e3a6-4c61-bc39-58e8b3eaa554/card_2x",
+    "title": "This Ain't Love Cover Shoot",
+    "subtitle": "Location Shoot, Downtown",
+    "caption": "Monochrome shadows representing emotional detachment."
   },
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
-    title: "SMILE Art Direction",
-    subtitle: "Single Release Artifacts",
-    caption: "Contrast between public presentation and private vulnerability."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/66aed8ca-17aa-426e-b856-822b8efdd84a/card_2x",
+    "title": "SMILE Art Direction",
+    "subtitle": "Single Release Artifacts",
+    "caption": "Contrast between public presentation and private vulnerability."
   },
   {
-    url: "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
-    title: "Calling for Help Artifact",
-    subtitle: "Archival Photography",
-    caption: "Analog tape saturation and tactile noise texture study."
+    "url": "https://d2hxjpynh54gwb.cloudfront.net/6935ba19-18cc-4a9d-97dc-680c6c88a31e/card_2x",
+    "title": "Calling for Help Artifact",
+    "subtitle": "Archival Photography",
+    "caption": "Analog tape saturation and tactile noise texture study."
   }
 ];
 
 export const SOCIAL_POSTS = [
   {
-    id: "post-1",
-    platform: "Instagram",
-    handle: "@unnoticedmusic",
-    date: "2 days ago",
-    content: "If you ever felt like you were screaming in an empty room, I made this next track for you. ‘Andale’ is out now on all streaming platforms. Link in bio.",
-    likes: "4,821",
-    comments: "318",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
-    soundTrack: "UNNOTICED • Andale",
-    link: "https://www.instagram.com/unnoticedmusic"
+    "id": "post-1",
+    "platform": "Instagram",
+    "handle": "@unnoticedmusic",
+    "date": "2 days ago",
+    "content": "If you ever felt like you were screaming in an empty room, I made this next track for you. ‘Andale’ is out now on all streaming platforms. Link in bio.",
+    "likes": "4,821",
+    "comments": "318",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/b0c689f8-815e-4b85-8e41-ec22e14fb844/card_2x",
+    "soundTrack": "UNNOTICED • Andale",
+    "link": "https://www.instagram.com/unnoticedmusic"
   },
   {
-    id: "post-2",
-    platform: "TikTok",
-    handle: "@unnoticedmusic",
-    date: "4 days ago",
-    content: "When they ask why you switched from Ty Sciullo to UNNOTICED... Sometimes you gotta kill the old version of you so the real one can breathe 🥀",
-    likes: "28.4K",
-    comments: "1,492",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
-    soundTrack: "Original Sound — UNNOTICED",
-    link: "https://www.tiktok.com/@unnoticedmusic"
+    "id": "post-2",
+    "platform": "TikTok",
+    "handle": "@unnoticedmusic",
+    "date": "4 days ago",
+    "content": "When they ask why you switched from Ty Sciullo to UNNOTICED... Sometimes you gotta kill the old version of you so the real one can breathe 🥀",
+    "likes": "28.4K",
+    "comments": "1,492",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/1774e774-9262-49f3-9a5f-fba49da0754d/card",
+    "soundTrack": "Original Sound — UNNOTICED",
+    "link": "https://www.tiktok.com/@unnoticedmusic"
   },
   {
-    id: "post-3",
-    platform: "Instagram",
-    handle: "@unnoticedmusic",
-    date: "1 week ago",
-    content: "Pittsburgh, hometown show at Roxian Theatre is officially locked. VIP packages include soundcheck listening session + limited zine.",
-    likes: "6,190",
-    comments: "420",
-    image: "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
-    soundTrack: "UNNOTICED • Overthink",
-    link: "https://www.instagram.com/unnoticedmusic"
+    "id": "post-3",
+    "platform": "Instagram",
+    "handle": "@unnoticedmusic",
+    "date": "1 week ago",
+    "content": "Pittsburgh, hometown show at Roxian Theatre is officially locked. VIP packages include soundcheck listening session + limited zine.",
+    "likes": "6,190",
+    "comments": "420",
+    "image": "https://d2hxjpynh54gwb.cloudfront.net/8f2aac47-6df7-45ab-ad71-afa30fffd1d1/card_2x",
+    "soundTrack": "UNNOTICED • Overthink",
+    "link": "https://www.instagram.com/unnoticedmusic"
   }
 ];
 
 export const EPK_DATA = {
-  headline: "UNNOTICED — Official Electronic Press Kit (EPK)",
-  artist: "UNNOTICED (Formerly Ty Sciullo)",
-  shortBio: "UNNOTICED (Tyler R. Sciullo) is a Pittsburgh-born recording artist crafting nocturnal alternative hip-hop and emotionally resonant dark pop. Emerging from McKees Rocks, PA, he fuses raw introspection with anthemic production, surpassing millions of global streams while giving a voice to the overlooked.",
-  pressQuotes: [
+  "headline": "UNNOTICED — Official Electronic Press Kit (EPK)",
+  "artist": "UNNOTICED (Formerly Ty Sciullo)",
+  "shortBio": "UNNOTICED (Tyler R. Sciullo) is a Pittsburgh-born recording artist crafting nocturnal alternative hip-hop and emotionally resonant dark pop. Emerging from McKees Rocks, PA, he fuses raw introspection with anthemic production, surpassing millions of global streams while giving a voice to the overlooked.",
+  "pressQuotes": [
     {
-      outlet: "Underground Sonic Review",
-      quote: "UNNOTICED strips away the polished veneer of modern pop-rap to deliver visceral, skin-tingling vulnerability that sticks in your ribs.",
-      year: "2025"
+      "outlet": "Underground Sonic Review",
+      "quote": "UNNOTICED strips away the polished veneer of modern pop-rap to deliver visceral, skin-tingling vulnerability that sticks in your ribs.",
+      "year": "2025"
     },
     {
-      outlet: "Rust Belt Soundwaves",
-      quote: "Ty Sciullo's evolution into UNNOTICED represents one of the most compelling artistic rebirths to emerge from the Pittsburgh metropolitan scene.",
-      year: "2025"
+      "outlet": "Rust Belt Soundwaves",
+      "quote": "Ty Sciullo's evolution into UNNOTICED represents one of the most compelling artistic rebirths to emerge from the Pittsburgh metropolitan scene.",
+      "year": "2025"
     },
     {
-      outlet: "Indie Curator Monthly",
-      quote: "Melodies that haunt your midnight hours and lyricism sharp enough to cut through industry noise.",
-      year: "2024"
+      "outlet": "Indie Curator Monthly",
+      "quote": "Melodies that haunt your midnight hours and lyricism sharp enough to cut through industry noise.",
+      "year": "2024"
     }
   ],
-  industryContacts: {
-    management: "mgmt@unnoticedmusic.com",
-    booking: "booking@unnoticedmusic.com",
-    pressInquiries: "press@unnoticedmusic.com",
-    syncLicensing: "sync@unnoticedmusic.com",
-    location: "Pittsburgh, PA / Worldwide Representation"
+  "industryContacts": {
+    "management": "mgmt@unnoticedmusic.com",
+    "booking": "booking@unnoticedmusic.com",
+    "pressInquiries": "press@unnoticedmusic.com",
+    "syncLicensing": "sync@unnoticedmusic.com",
+    "location": "Pittsburgh, PA / Worldwide Representation"
   },
-  techRider: {
-    inputCount: "2 Stereo In-Ear Channels, 1 Lead Wireless Vocal Mic (Shure KSM9 / Sennheiser D9000), 1 Acoustic DI",
-    monitoring: "Stereo IEMs (Wireless Sennheiser G4 preferred), 2 Stage Wedges for backup sub-lows",
-    lighting: "Low-key moody atmospheric palette: deep ultraviolet, cool obsidian shadows, strobe cue triggers on beat drops",
-    stagePlot: "Center lead vocal mic, DJ / playback rig stage left, live synthesizer & guitar stand stage right"
+  "techRider": {
+    "inputCount": "2 Stereo In-Ear Channels, 1 Lead Wireless Vocal Mic (Shure KSM9 / Sennheiser D9000), 1 Acoustic DI",
+    "monitoring": "Stereo IEMs (Wireless Sennheiser G4 preferred), 2 Stage Wedges for backup sub-lows",
+    "lighting": "Low-key moody atmospheric palette: deep ultraviolet, cool obsidian shadows, strobe cue triggers on beat drops",
+    "stagePlot": "Center lead vocal mic, DJ / playback rig stage left, live synthesizer & guitar stand stage right"
   },
-  downloadableAssets: [
-    { name: "Full EPK Press Asset Bundle (.ZIP)", size: "48.2 MB", desc: "Includes 300DPI promo photos, stage plot vector, vector logos & official bio" },
-    { name: "Official High-Res Press Photos", size: "28.4 MB", desc: "Studio portraiture, live concert captures, monochrome print files" },
-    { name: "Official Typography & Vector Logo Kit", size: "4.1 MB", desc: "Vector SVG, AI, EPS and PNG transparent marks in white, black & violet" },
-    { name: "Technical Stage Plot & Channel Rider (PDF)", size: "1.2 MB", desc: "Complete FOH routing, input patch list, power specifications" }
+  "downloadableAssets": [
+    {
+      "name": "Full EPK Press Asset Bundle (.ZIP)",
+      "size": "48.2 MB",
+      "desc": "Includes 300DPI promo photos, stage plot vector, vector logos & official bio"
+    },
+    {
+      "name": "Official High-Res Press Photos",
+      "size": "28.4 MB",
+      "desc": "Studio portraiture, live concert captures, monochrome print files"
+    },
+    {
+      "name": "Official Typography & Vector Logo Kit",
+      "size": "4.1 MB",
+      "desc": "Vector SVG, AI, EPS and PNG transparent marks in white, black & violet"
+    },
+    {
+      "name": "Technical Stage Plot & Channel Rider (PDF)",
+      "size": "1.2 MB",
+      "desc": "Complete FOH routing, input patch list, power specifications"
+    }
   ]
 };

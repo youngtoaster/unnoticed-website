@@ -14,7 +14,8 @@ export default function Navbar({
   setActiveView,
   onOpenAdmin
 }) {
-  const { artistInfo, sectionsVisibility } = useSiteData();
+  const { artistInfo, sectionsVisibility, siteTheme } = useSiteData();
+  const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
   const info = artistInfo || { socials: {} };
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,9 +100,15 @@ export default function Navbar({
             onClick={handleLogoClick}
             className="flex items-center gap-2 text-left group cursor-pointer focus:outline-none shrink-0"
           >
-            <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1.5px] shadow-md shadow-purple-500/20">
+            <div
+              className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full p-[1.5px] shadow-md"
+              style={{
+                background: `linear-gradient(to top right, ${theme.primary}, ${theme.secondary}, ${theme.accent})`,
+                boxShadow: `0 0 10px ${theme.primary}40`
+              }}
+            >
               <div className="w-full h-full rounded-full bg-[#08090f] flex items-center justify-center overflow-hidden">
-                <span className="font-display font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-cyan-200">
+                <span className="font-display font-black text-xs text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, #ffffff, ${theme.accent})` }}>
                   U
                 </span>
               </div>
@@ -141,21 +148,27 @@ export default function Navbar({
             <motion.button
               whileTap={{ scale: 0.94 }}
               onClick={togglePlay}
-              className={`hidden sm:inline-flex items-center gap-1.5 h-8 px-3 rounded-full border text-xs font-mono transition-all cursor-pointer ${
-                isPlaying
-                  ? 'bg-purple-600/30 border-purple-500/60 text-purple-200 shadow-md shadow-purple-600/30'
-                  : 'bg-[#12131e] border-white/[0.12] text-slate-200 hover:border-purple-400/50 hover:text-white shadow-sm'
-              }`}
+              className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3 rounded-full border text-xs font-mono transition-all cursor-pointer shadow-sm"
+              style={isPlaying ? {
+                backgroundColor: `${theme.primary}25`,
+                borderColor: `${theme.primary}70`,
+                color: '#ffffff',
+                boxShadow: `0 0 10px ${theme.primary}30`
+              } : {
+                backgroundColor: '#12131e',
+                borderColor: 'rgba(255,255,255,0.12)',
+                color: '#e2e8f0'
+              }}
               title={isPlaying ? `Pause: ${currentTrack?.title || 'Preview'}` : `Play: ${currentTrack?.title || 'Studio Preview'}`}
             >
               {isPlaying ? (
                 <span className="flex items-center gap-[2px] h-3">
-                  <span className="w-0.5 h-2 bg-purple-400 animate-pulse rounded-full" />
-                  <span className="w-0.5 h-3 bg-cyan-400 animate-bounce rounded-full" />
-                  <span className="w-0.5 h-1.5 bg-purple-300 animate-pulse rounded-full" />
+                  <span className="w-0.5 h-2 rounded-full animate-pulse" style={{ backgroundColor: theme.primary }} />
+                  <span className="w-0.5 h-3 rounded-full animate-bounce" style={{ backgroundColor: theme.accent }} />
+                  <span className="w-0.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.secondary }} />
                 </span>
               ) : (
-                <Disc3 className="w-3.5 h-3.5 text-purple-400" />
+                <Disc3 className="w-3.5 h-3.5" style={{ color: theme.primary }} />
               )}
               <span className="max-w-[80px] truncate text-[11px] font-semibold">
                 {isPlaying ? (currentTrack?.title || 'Playing') : 'Play'}
@@ -165,13 +178,19 @@ export default function Navbar({
             {/* Merch Cart Button */}
             <button
               onClick={openCart}
-              className="relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#12131e] border border-white/[0.12] text-slate-200 hover:text-white hover:border-purple-400/50 transition-all active:scale-90 cursor-pointer shadow-sm"
+              className="relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#12131e] border border-white/[0.12] text-slate-200 hover:text-white transition-all active:scale-90 cursor-pointer shadow-sm"
               aria-label="Shopping Cart"
               title="View Cart"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-[9px] font-bold text-white shadow-md shadow-purple-600/50 border border-purple-300/30">
+                <span
+                  className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold text-white shadow-md border border-white/20"
+                  style={{
+                    background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary})`,
+                    boxShadow: `0 0 8px ${theme.primary}60`
+                  }}
+                >
                   {cartCount}
                 </span>
               )}
@@ -180,7 +199,12 @@ export default function Navbar({
             {/* Mobile Hamburger Button with Fluid Tap Feedback */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full bg-purple-600/20 border border-purple-500/30 text-purple-200 hover:text-white active:scale-90 transition-all cursor-pointer"
+              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full border text-white active:scale-90 transition-all cursor-pointer"
+              style={{
+                backgroundColor: `${theme.primary}20`,
+                borderColor: `${theme.primary}40`,
+                color: '#ffffff'
+              }}
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

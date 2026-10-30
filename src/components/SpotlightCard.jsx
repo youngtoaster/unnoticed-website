@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 export default function SpotlightCard({
   children,
   className = '',
-  spotlightColor = 'rgba(139, 92, 246, 0.18)',
+  spotlightColor = 'rgba(var(--theme-primary-rgb, 168, 85, 247), 0.22)',
   tilt = true,
   onClick
 }) {

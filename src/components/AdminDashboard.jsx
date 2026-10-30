@@ -166,6 +166,100 @@ const SIZE_PRESETS = [
   { label: 'Monumental (10rem+)', rem: 10, tailwind: 'text-5xl sm:text-8xl md:text-9xl lg:text-[10rem]' },
 ];
 
+// Curated Aesthetic Color Themes for the Entire Website
+const THEME_PRESETS = [
+  {
+    id: 'violet',
+    name: 'Electric Violet',
+    tag: 'Signature Nocturnal Aesthetic',
+    primary: '#a855f7',
+    secondary: '#6366f1',
+    accent: '#06b6d4',
+    glow: '#a855f7',
+    swatches: ['#a855f7', '#6366f1', '#06b6d4']
+  },
+  {
+    id: 'magenta',
+    name: 'Neon Magenta',
+    tag: 'Cyberpunk Hot Pink',
+    primary: '#ff2a85',
+    secondary: '#d946ef',
+    accent: '#f43f5e',
+    glow: '#ff2a85',
+    swatches: ['#ff2a85', '#d946ef', '#f43f5e']
+  },
+  {
+    id: 'cyan',
+    name: 'Cyan Laser',
+    tag: 'Synthwave Electric Aqua',
+    primary: '#06b6d4',
+    secondary: '#0284c7',
+    accent: '#38bdf8',
+    glow: '#06b6d4',
+    swatches: ['#06b6d4', '#0284c7', '#38bdf8']
+  },
+  {
+    id: 'emerald',
+    name: 'Acid Emerald',
+    tag: 'Toxic Matrix Nightlife',
+    primary: '#10b981',
+    secondary: '#059669',
+    accent: '#84cc16',
+    glow: '#10b981',
+    swatches: ['#10b981', '#059669', '#84cc16']
+  },
+  {
+    id: 'amber',
+    name: 'Solar Amber',
+    tag: 'Molten Gold Sunset',
+    primary: '#f59e0b',
+    secondary: '#d97706',
+    accent: '#fbbf24',
+    glow: '#f59e0b',
+    swatches: ['#f59e0b', '#d97706', '#fbbf24']
+  },
+  {
+    id: 'crimson',
+    name: 'Blood Crimson',
+    tag: 'Nocturnal Vampire Red',
+    primary: '#ef4444',
+    secondary: '#dc2626',
+    accent: '#f87171',
+    glow: '#ef4444',
+    swatches: ['#ef4444', '#dc2626', '#f87171']
+  },
+  {
+    id: 'sapphire',
+    name: 'Midnight Sapphire',
+    tag: 'Deep Ocean Blue',
+    primary: '#3b82f6',
+    secondary: '#1d4ed8',
+    accent: '#60a5fa',
+    glow: '#3b82f6',
+    swatches: ['#3b82f6', '#1d4ed8', '#60a5fa']
+  },
+  {
+    id: 'lime',
+    name: 'Toxic Lime',
+    tag: 'Underground Acid Club',
+    primary: '#a3e635',
+    secondary: '#65a30d',
+    accent: '#4ade80',
+    glow: '#a3e635',
+    swatches: ['#a3e635', '#65a30d', '#4ade80']
+  },
+  {
+    id: 'mono',
+    name: 'Monochrome Silver',
+    tag: 'High-Fashion Ice Chrome',
+    primary: '#ffffff',
+    secondary: '#94a3b8',
+    accent: '#cbd5e1',
+    glow: '#ffffff',
+    swatches: ['#ffffff', '#94a3b8', '#cbd5e1']
+  }
+];
+
 export default function AdminDashboard({ onReturnToSite }) {
   const {
     artistInfo, tracks, biography, videos, tourDates, pastTours,
@@ -200,8 +294,38 @@ export default function AdminDashboard({ onReturnToSite }) {
     glowCaption: true
   };
 
+  const currentTheme = artistInfo?.theme || {
+    id: 'violet',
+    name: 'Electric Violet',
+    primary: '#a855f7',
+    secondary: '#6366f1',
+    accent: '#06b6d4',
+    glow: '#a855f7',
+    syncNeon: true
+  };
+
+  const updateSiteTheme = (themeUpdates, alsoSyncNeon = null) => {
+    const updatedTheme = {
+      ...(artistInfo?.theme || currentTheme),
+      ...themeUpdates
+    };
+    const shouldSyncNeon = alsoSyncNeon !== null ? alsoSyncNeon : (updatedTheme.syncNeon !== false);
+    
+    const updatedNeon = shouldSyncNeon
+      ? { ...neonConfig, color: updatedTheme.primary }
+      : neonConfig;
+
+    updateData({
+      artistInfo: {
+        ...artistInfo,
+        theme: updatedTheme,
+        neonSign: updatedNeon
+      }
+    });
+    showToast(`Site theme updated to ${updatedTheme.name || 'Custom'}`);
+  };
+
   const backdrop = artistInfo?.heroBackdrop || {
-    enabled: true,
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
     blur: 6,
     blurEnabled: true,
@@ -433,6 +557,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const tabs = [
     { id: 'tracks', label: 'Music & Audio', icon: Music, count: tracks.length },
     { id: 'lyrics', label: 'Genius Lyrics', icon: FileText, count: tracks.length },
+    { id: 'theme', label: 'Site Color Theme', icon: Palette, count: null },
     { id: 'profile', label: 'Profile & Bio', icon: Sparkles, count: biography.length },
     { id: 'videos', label: 'Videos & Visuals', icon: Youtube, count: videos.length },
     { id: 'tour', label: 'Tour Schedule', icon: Ticket, count: tourDates.length },
@@ -1031,6 +1156,268 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB: SITE COLOR THEME STUDIO ================= */}
+      {activeTab === 'theme' && (
+        <div className="space-y-6">
+          <SectionControlsHeader
+            title="Global Site Color Theme Studio"
+            subtitle="Change the entire website's aesthetic, accent colors, neon gas ionization, ambient glows, and button gradients."
+            badgeText={currentTheme.name || 'Electric Violet'}
+            badgeColor="purple"
+            sectionKey="theme"
+            allowDeleteAll={false}
+            allowReset={true}
+            onResetDefault={() => {
+              updateSiteTheme(THEME_PRESETS[0], true);
+              showToast('Reset theme to Electric Violet (Default)');
+            }}
+          />
+
+          {/* THEME PRESETS GRID */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.06]">
+              <div>
+                <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-fuchsia-400" />
+                  Curated Aesthetic Palettes (1-Click Transform)
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Click any theme to transform every button, neon tube, glowing aura, and accent across the website.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-fuchsia-300 bg-fuchsia-950/60 px-3 py-1 rounded-full border border-fuchsia-500/30">
+                Active: {currentTheme.name || 'Electric Violet'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-2">
+              {THEME_PRESETS.map((t) => {
+                const isActive = (currentTheme.id === t.id) || (currentTheme.primary?.toLowerCase() === t.primary.toLowerCase());
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => updateSiteTheme(t)}
+                    className={`p-4 rounded-2xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
+                      isActive
+                        ? 'border-white bg-white/[0.06] shadow-xl shadow-black ring-1 ring-white/30'
+                        : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20'
+                    }`}
+                  >
+                    {/* Glowing Accent Bar */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-1 transition-all"
+                      style={{
+                        background: `linear-gradient(to right, ${t.primary}, ${t.secondary}, ${t.accent})`
+                      }}
+                    />
+
+                    <div className="flex items-center justify-between mb-2 mt-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-4 h-4 rounded-full shadow-md shrink-0"
+                          style={{
+                            backgroundColor: t.primary,
+                            boxShadow: `0 0 10px ${t.primary}`
+                          }}
+                        />
+                        <span className="font-display font-bold text-sm text-white">
+                          {t.name}
+                        </span>
+                      </div>
+                      {isActive && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase bg-white/10 text-white border border-white/20">
+                          Active
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-slate-400 font-mono mb-3">
+                      {t.tag}
+                    </p>
+
+                    {/* Visual 3-Swatch Gradient Preview */}
+                    <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-black/50 border border-white/[0.06]">
+                      <div
+                        className="h-3 flex-1 rounded-md"
+                        style={{ backgroundColor: t.primary }}
+                        title={`Primary: ${t.primary}`}
+                      />
+                      <div
+                        className="h-3 flex-1 rounded-md"
+                        style={{ backgroundColor: t.secondary }}
+                        title={`Secondary: ${t.secondary}`}
+                      />
+                      <div
+                        className="h-3 flex-1 rounded-md"
+                        style={{ backgroundColor: t.accent }}
+                        title={`Accent: ${t.accent}`}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* CUSTOM COLOR PALETTE BUILDER & SYNC SETTINGS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Custom Color Inputs */}
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-4">
+              <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-cyan-400" />
+                Custom Color Builder
+              </h3>
+              <p className="text-xs text-slate-400">
+                Fine-tune each individual accent color or enter custom hex codes for bespoke branding.
+              </p>
+
+              {/* Primary Accent Color */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center justify-between">
+                  <span>Primary Brand Color (Buttons & Glows)</span>
+                  <span className="font-mono text-slate-400">{currentTheme.primary}</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentTheme.primary || '#a855f7'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', primary: e.target.value, glow: e.target.value })}
+                    className="w-10 h-10 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={currentTheme.primary || '#a855f7'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', primary: e.target.value, glow: e.target.value })}
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+                    placeholder="#a855f7"
+                  />
+                </div>
+              </div>
+
+              {/* Secondary Gradient Color */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center justify-between">
+                  <span>Secondary Gradient Color (Flows & Blends)</span>
+                  <span className="font-mono text-slate-400">{currentTheme.secondary}</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentTheme.secondary || '#6366f1'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', secondary: e.target.value })}
+                    className="w-10 h-10 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={currentTheme.secondary || '#6366f1'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', secondary: e.target.value })}
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+                    placeholder="#6366f1"
+                  />
+                </div>
+              </div>
+
+              {/* Tertiary / Highlight Accent */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-300 font-semibold flex items-center justify-between">
+                  <span>Tertiary Accent Color (Equalizer & Highlights)</span>
+                  <span className="font-mono text-slate-400">{currentTheme.accent}</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentTheme.accent || '#06b6d4'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', accent: e.target.value })}
+                    className="w-10 h-10 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={currentTheme.accent || '#06b6d4'}
+                    onChange={(e) => updateSiteTheme({ id: 'custom', name: 'Custom Palette', accent: e.target.value })}
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+                    placeholder="#06b6d4"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Sync Toggles & Live Component Mock Preview */}
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08] flex flex-col justify-between space-y-4">
+              <div>
+                <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  Theme Synchronization
+                </h3>
+                
+                <label className="flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] cursor-pointer hover:bg-white/[0.05] transition-colors mb-3">
+                  <input
+                    type="checkbox"
+                    checked={currentTheme.syncNeon !== false}
+                    onChange={(e) => {
+                      updateSiteTheme({ syncNeon: e.target.checked }, e.target.checked);
+                      showToast(e.target.checked ? 'Neon Sign gas color synchronized with theme' : 'Neon Sign color unlinked');
+                    }}
+                    className="rounded accent-fuchsia-500 w-4 h-4"
+                  />
+                  <div>
+                    <span className="text-xs font-semibold text-white block">
+                      Sync Neon Sign & Hero Illumination
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono block">
+                      Automatically updates the physical neon sign gas bloom to match this color palette.
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              {/* Live Preview Elements in Admin */}
+              <div className="p-4 rounded-xl bg-black/60 border border-white/[0.08] space-y-3">
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                  Live Component Appearance
+                </span>
+
+                {/* Mock Play Button */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-bold text-xs shadow-lg pointer-events-none"
+                    style={{
+                      background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`,
+                      boxShadow: `0 8px 20px -4px ${currentTheme.primary}60`
+                    }}
+                  >
+                    <Play className="w-3.5 h-3.5 fill-white" />
+                    <span>Listen: Studio Track</span>
+                    <span className="flex items-center gap-0.5 h-2.5 ml-1">
+                      <span className="w-0.5 h-2.5 bg-white rounded-full animate-pulse" />
+                      <span className="w-0.5 h-3 bg-white rounded-full animate-bounce" />
+                      <span className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
+                    </span>
+                  </button>
+
+                  {/* Mock On-Tour Beacon */}
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-white border pointer-events-none"
+                    style={{
+                      borderColor: `${currentTheme.primary}60`,
+                      background: `linear-gradient(to right, ${currentTheme.primary}30, transparent)`,
+                      boxShadow: `0 0 10px ${currentTheme.primary}30`
+                    }}
+                  >
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentTheme.accent, boxShadow: `0 0 6px ${currentTheme.accent}` }} />
+                    LIVE TOUR
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
           </div>
         </div>
       )}
@@ -1819,6 +2206,11 @@ export default function AdminDashboard({ onReturnToSite }) {
 
               {/* Scaled Preview Frame */}
               <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/[0.14] bg-[#07080d] flex items-center justify-center shadow-2xl">
+                {/* Scope Badge in Preview Frame */}
+                <div className="absolute top-2.5 right-3.5 z-20 text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-black/80 border border-white/20 text-slate-200">
+                  Scope: <strong className="text-fuchsia-300">{backdrop.scope === 'hero' ? 'Full Hero Section Viewport' : 'Framed Behind Title Only'}</strong>
+                </div>
+
                 {/* Ambient Room Darkness */}
                 <div className="absolute inset-0 bg-radial from-purple-950/25 via-transparent to-black pointer-events-none" />
 
@@ -1839,13 +2231,21 @@ export default function AdminDashboard({ onReturnToSite }) {
                           }
                     }
                     transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
+                    className={
+                      backdrop.scope === 'hero'
+                        ? "absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
+                        : "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-44 rounded-2xl pointer-events-none overflow-hidden border border-white/20 shadow-2xl"
+                    }
                     style={{
                       maskImage: backdrop.vignette
-                        ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.5) 65%, transparent 95%)'
+                        ? (backdrop.scope === 'hero'
+                            ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+                            : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
                         : 'none',
                       WebkitMaskImage: backdrop.vignette
-                        ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.5) 65%, transparent 95%)'
+                        ? (backdrop.scope === 'hero'
+                            ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+                            : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
                         : 'none',
                     }}
                   >
@@ -1982,31 +2382,45 @@ export default function AdminDashboard({ onReturnToSite }) {
 
                 {/* Framing Scope */}
                 <div>
-                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Framing Scope</label>
+                  <label className="text-[11px] font-mono text-slate-300 font-semibold block mb-1.5 flex items-center justify-between">
+                    <span>Backdrop Placement & Framing Scope</span>
+                    <span className="text-[10px] font-mono text-fuchsia-400 uppercase font-bold">
+                      {backdrop.scope === 'hero' ? 'Full Hero Viewport' : 'Title Only'}
+                    </span>
+                  </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => updateBackdrop({ scope: 'title' })}
-                      className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+                      onClick={() => {
+                        updateBackdrop({ scope: 'title' });
+                        showToast('Backdrop scope: Framed Behind Artist Title');
+                      }}
+                      className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
                         (backdrop.scope ?? 'title') === 'title'
-                          ? 'bg-purple-600 text-white border-purple-500 shadow-md'
+                          ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
                           : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
                       }`}
                     >
-                      Framed Behind Artist Title
+                      Framed Behind Title
                     </button>
                     <button
                       type="button"
-                      onClick={() => updateBackdrop({ scope: 'hero' })}
-                      className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+                      onClick={() => {
+                        updateBackdrop({ scope: 'hero' });
+                        showToast('Backdrop scope: Full Hero Viewport (Full Screen)');
+                      }}
+                      className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
                         backdrop.scope === 'hero'
-                          ? 'bg-purple-600 text-white border-purple-500 shadow-md'
+                          ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
                           : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
                       }`}
                     >
-                      Full Hero Section
+                      Full Hero Viewport
                     </button>
                   </div>
+                  <p className="text-[9.5px] font-mono text-slate-400 mt-1.5">
+                    "Full Hero Viewport" spans the entire screen behind title, bio, and badge with ambient edge feathering. "Framed Behind Title" keeps it localized to the lettering.
+                  </p>
                 </div>
 
                 {/* Blend Mode & Vignette */}

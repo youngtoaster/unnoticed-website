@@ -138,6 +138,37 @@ export function DataProvider({ children }) {
     };
   }, []);
 
+  // Dynamic CSS variables injection for Global Site Color Theme
+  useEffect(() => {
+    const theme = data.artistInfo?.theme || {
+      primary: '#a855f7',
+      secondary: '#6366f1',
+      accent: '#06b6d4',
+      glow: '#a855f7'
+    };
+
+    const hexToRgb = (hex) => {
+      if (!hex) return '168, 85, 247';
+      const clean = hex.replace('#', '');
+      if (clean.length === 3) {
+        return `${parseInt(clean[0]+clean[0], 16)}, ${parseInt(clean[1]+clean[1], 16)}, ${parseInt(clean[2]+clean[2], 16)}`;
+      }
+      if (clean.length === 6) {
+        return `${parseInt(clean.substring(0, 2), 16)}, ${parseInt(clean.substring(2, 4), 16)}, ${parseInt(clean.substring(4, 6), 16)}`;
+      }
+      return '168, 85, 247';
+    };
+
+    const root = document.documentElement;
+    root.style.setProperty('--theme-primary', theme.primary || '#a855f7');
+    root.style.setProperty('--theme-primary-rgb', hexToRgb(theme.primary));
+    root.style.setProperty('--theme-secondary', theme.secondary || '#6366f1');
+    root.style.setProperty('--theme-secondary-rgb', hexToRgb(theme.secondary));
+    root.style.setProperty('--theme-accent', theme.accent || '#06b6d4');
+    root.style.setProperty('--theme-accent-rgb', hexToRgb(theme.accent));
+    root.style.setProperty('--theme-glow', theme.glow || theme.primary || '#a855f7');
+  }, [data.artistInfo?.theme]);
+
   // Universal Data Updater:
   // Saves to localStorage immediately AND synchronizes to server disk (/api/sync-data)
   const updateData = useCallback((updater) => {
@@ -359,6 +390,14 @@ export function DataProvider({ children }) {
     <DataContext.Provider
       value={{
         ...data,
+        siteTheme: data.artistInfo?.theme || {
+          id: 'violet',
+          name: 'Electric Violet',
+          primary: '#a855f7',
+          secondary: '#6366f1',
+          accent: '#06b6d4',
+          glow: '#a855f7'
+        },
         sectionsVisibility: data.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
         updateData,
         reorderCollection,

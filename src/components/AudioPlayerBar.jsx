@@ -18,7 +18,8 @@ export default function AudioPlayerBar({
   onSelectTrack,
   onClosePlayer
 }) {
-  const { artistInfo } = useSiteData();
+  const { artistInfo, siteTheme } = useSiteData();
+  const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
   const audioRef = useRef(null);
   const lyricsContainerRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -657,8 +658,13 @@ export default function AudioPlayerBar({
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
             className="fixed bottom-3 left-3 right-3 sm:bottom-5 sm:left-6 sm:right-6 max-w-4xl mx-auto z-40"
           >
-            {/* Ambient neon backdrop backlight */}
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600/30 via-indigo-600/25 to-cyan-500/30 blur-xl -z-10 pointer-events-none" />
+            {/* Ambient neon backdrop backlight with theme gradient */}
+            <div
+              className="absolute -inset-1 rounded-full blur-xl -z-10 pointer-events-none transition-all duration-500"
+              style={{
+                background: `linear-gradient(to right, ${theme.primary}50, ${theme.secondary}40, ${theme.accent}50)`
+              }}
+            />
 
             <div
               onClick={(e) => {
@@ -672,10 +678,16 @@ export default function AudioPlayerBar({
               {/* High-Tech Glowing Progress Track */}
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/[0.08] cursor-pointer group">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-cyan-400 relative transition-all"
-                  style={{ width: `${progressPercent}%` }}
+                  className="h-full relative transition-all"
+                  style={{
+                    width: `${progressPercent}%`,
+                    background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary}, ${theme.accent})`
+                  }}
                 >
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-md shadow-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ boxShadow: `0 0 8px ${theme.primary}` }}
+                  />
                 </div>
                 <input
                   type="range"
@@ -747,7 +759,11 @@ export default function AudioPlayerBar({
                   <motion.button
                     whileTap={{ scale: 0.92 }}
                     onClick={togglePlay}
-                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-purple-600/40 border border-white/20 active:scale-90"
+                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center shadow-lg border border-white/20 active:scale-90"
+                    style={{
+                      background: `linear-gradient(to top right, ${theme.primary}, ${theme.secondary})`,
+                      boxShadow: `0 0 15px ${theme.primary}60`
+                    }}
                     title={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (

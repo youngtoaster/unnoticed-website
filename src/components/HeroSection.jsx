@@ -14,7 +14,8 @@ export default function HeroSection({
   togglePlay,
   onSelectTrack
 }) {
-  const { artistInfo, tracks } = useSiteData();
+  const { artistInfo, tracks, siteTheme } = useSiteData();
+  const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
   const featuredTrack = tracks[0] || currentTrack;
   const isFeaturedPlaying = isPlaying && currentTrack?.id === featuredTrack?.id;
@@ -132,8 +133,69 @@ export default function HeroSection({
   return (
     <section className="relative w-full flex flex-col items-center overflow-x-hidden">
       
-      {/* Background ambient light gradients */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[650px] h-[340px] sm:h-[450px] bg-purple-600/12 rounded-full blur-[120px] pointer-events-none -z-10" />
+      {/* Background ambient light gradients with dynamic theme color */}
+      <div
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[650px] h-[340px] sm:h-[450px] rounded-full blur-[120px] pointer-events-none -z-10 transition-colors duration-500"
+        style={{ backgroundColor: `${theme.primary || '#a855f7'}20` }}
+      />
+
+      {/* ======================================================== */}
+      {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
+      {/* Spans the entire hero section viewport behind all elements*/}
+      {/* ======================================================== */}
+      {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
+        <div
+          className="absolute inset-x-0 top-0 h-[88vh] min-h-[620px] pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out"
+          style={{
+            opacity: currentBackdropOpacity,
+            filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
+            maskImage: backdrop.vignette
+              ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+              : 'none',
+            WebkitMaskImage: backdrop.vignette
+              ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+              : 'none',
+          }}
+        >
+          <img
+            src={backdrop.image}
+            alt="Full Hero Backdrop"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out"
+            style={{
+              objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
+              transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+              mixBlendMode: backdrop.blendMode || 'screen',
+            }}
+          />
+
+          {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
+          {letterBloomOverlay && (
+            <div
+              className="absolute inset-0 pointer-events-none transition-all duration-200"
+              style={{
+                backgroundImage: letterBloomOverlay,
+                mixBlendMode: 'screen',
+              }}
+            />
+          )}
+
+          {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop when fully lit */}
+          {isIlluminated && (
+            <div
+              className="absolute inset-0 pointer-events-none transition-opacity duration-700"
+              style={{
+                opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
+                background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
+                mixBlendMode: 'color-dodge'
+              }}
+            />
+          )}
+
+          {/* Smooth bottom & top ambient fades into deep black background */}
+          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#060608] via-[#060608]/85 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#060608]/75 to-transparent pointer-events-none" />
+        </div>
+      )}
 
       {/* ======================================================== */}
       {/* 1. MAIN HOME VIEWPORT: CINEMATIC TITLE & BIO             */}
@@ -227,22 +289,18 @@ export default function HeroSection({
           {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
           <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
 
-            {/* BACKDROP IMAGE BEHIND ARTIST TITLE / HERO */}
-            {backdrop.enabled && backdrop.image && (
+            {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
+            {backdrop.enabled && backdrop.image && backdrop.scope !== 'hero' && (
               <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out ${
-                  backdrop.scope === 'hero'
-                    ? 'absolute inset-0 w-full h-full'
-                    : 'w-full max-w-3xl h-[200px] sm:h-[260px] md:h-[320px] rounded-2xl'
-                }`}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out w-full max-w-3xl h-[220px] sm:h-[280px] md:h-[340px] rounded-3xl"
                 style={{
                   opacity: currentBackdropOpacity,
                   filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
                   maskImage: backdrop.vignette
-                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)'
                     : 'none',
                   WebkitMaskImage: backdrop.vignette
-                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0.6) 65%, transparent 92%)'
+                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)'
                     : 'none',
                 }}
               >
@@ -416,7 +474,12 @@ export default function HeroSection({
                       togglePlay();
                     }
                   }}
-                  className="flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/25 border border-purple-400/30 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                  className="flex items-center justify-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-bold text-xs sm:text-sm border active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.primary || '#a855f7'} 0%, ${theme.secondary || '#6366f1'} 100%)`,
+                    borderColor: `${theme.primary || '#a855f7'}60`,
+                    boxShadow: `0 10px 25px -5px ${theme.primary || '#a855f7'}40`
+                  }}
                 >
                   {isFeaturedPlaying ? (
                     <Pause className="w-3.5 h-3.5 fill-white" />

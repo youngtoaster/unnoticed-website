@@ -41,6 +41,15 @@ export const ARTIST_INFO = {
     keyMarkets: ["Pittsburgh", "Philadelphia", "New York", "Chicago", "London"]
   },
   heroSubtitle: "Once Known As Ty Sciullo • Now A Man Unseen",
+  theme: {
+    id: "violet",
+    name: "Electric Violet",
+    primary: "#a855f7",
+    secondary: "#6366f1",
+    accent: "#06b6d4",
+    glow: "#a855f7",
+    syncNeon: true
+  },
   tourBadge: {
     enabled: true,
     text: "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS",

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   ARTIST_INFO as DEFAULT_ARTIST,
   TRACKS as DEFAULT_TRACKS,
@@ -9,13 +9,15 @@ import {
   MERCH_PRODUCTS as DEFAULT_MERCH,
   GALLERY_IMAGES as DEFAULT_GALLERY,
   SOCIAL_POSTS as DEFAULT_SOCIAL,
-  EPK_DATA as DEFAULT_EPK
+  EPK_DATA as DEFAULT_EPK,
+  SECTIONS_VISIBILITY as DEFAULT_SECTIONS_VISIBILITY
 } from '../data/artistData';
 
 const DataContext = createContext(null);
 
 const STORAGE_KEY = 'unnoticed_cms_v1_data';
-const AUTH_KEY = 'unnoticed_admin_session_token';
+// Persistent admin authorization token stored in localStorage so credentials survive tab/browser restarts
+const AUTH_KEY = 'unnoticed_admin_persistent_auth_v2';
 
 // Salted SHA-256 administrative authentication credential hash
 const TARGET_SALT = 'unnoticed_salt_tyler_2026_';
@@ -29,6 +31,7 @@ export function DataProvider({ children }) {
       if (stored) {
         const parsed = JSON.parse(stored);
         return {
+          _lastUpdated: parsed._lastUpdated || Date.now(),
           artistInfo: parsed.artistInfo || DEFAULT_ARTIST,
           tracks: parsed.tracks || DEFAULT_TRACKS,
           biography: parsed.biography || DEFAULT_BIO,
@@ -39,6 +42,7 @@ export function DataProvider({ children }) {
           galleryImages: parsed.galleryImages || DEFAULT_GALLERY,
           socialPosts: parsed.socialPosts || DEFAULT_SOCIAL,
           epkData: parsed.epkData || DEFAULT_EPK,
+          sectionsVisibility: parsed.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
         };
       }
     } catch (err) {
@@ -46,6 +50,7 @@ export function DataProvider({ children }) {
     }
 
     return {
+      _lastUpdated: Date.now(),
       artistInfo: DEFAULT_ARTIST,
       tracks: DEFAULT_TRACKS,
       biography: DEFAULT_BIO,
@@ -56,34 +61,219 @@ export function DataProvider({ children }) {
       galleryImages: DEFAULT_GALLERY,
       socialPosts: DEFAULT_SOCIAL,
       epkData: DEFAULT_EPK,
+      sectionsVisibility: DEFAULT_SECTIONS_VISIBILITY,
     };
   });
 
+  // Persistent administrative authentication state on this device
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
     try {
-      return sessionStorage.getItem(AUTH_KEY) === 'granted';
+      return localStorage.getItem(AUTH_KEY) === 'granted';
     } catch {
       return false;
     }
   });
 
-  // Sync to localStorage whenever data changes
-  const updateData = (updater) => {
+  // Multi-device synchronization state indicator
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+
+  // CROSS-DEVICE CLOUD/NETWORK HYDRATION ON MOUNT:
+  // Checks server endpoint /site_data.json to ensure content persists across every device
+  useEffect(() => {
+    let isMounted = true;
+    const syncFromNetwork = async () => {
+      try {
+        setSyncStatus('syncing');
+        const res = await fetch(`/site_data.json?t=${Date.now()}`);
+        if (res.ok) {
+          const remoteData = await res.json();
+          if (remoteData && typeof remoteData === 'object' && isMounted) {
+            const localStored = localStorage.getItem(STORAGE_KEY);
+            const localParsed = localStored ? JSON.parse(localStored) : null;
+
+            const remoteTime = remoteData._lastUpdated || 0;
+            const localTime = localParsed?._lastUpdated || 0;
+
+            // If remote has newer data or if device has no local modifications, hydrate
+            if (!localParsed || remoteTime >= localTime) {
+              setData((prev) => {
+                const merged = {
+                  ...prev,
+                  ...remoteData,
+                  artistInfo: remoteData.artistInfo || prev.artistInfo,
+                  tracks: remoteData.tracks || prev.tracks,
+                  biography: remoteData.biography || prev.biography,
+                  videos: remoteData.videos || prev.videos,
+                  tourDates: remoteData.tourDates || prev.tourDates,
+                  pastTours: remoteData.pastTours || prev.pastTours,
+                  merchProducts: remoteData.merchProducts || prev.merchProducts,
+                  galleryImages: remoteData.galleryImages || prev.galleryImages,
+                  socialPosts: remoteData.socialPosts || prev.socialPosts,
+                  epkData: remoteData.epkData || prev.epkData,
+                  sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
+                  _lastUpdated: remoteData._lastUpdated || Date.now(),
+                };
+                try {
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+                } catch (e) {
+                  console.warn('LocalStorage save failed:', e);
+                }
+                return merged;
+              });
+            }
+            setSyncStatus('synced');
+          }
+        } else {
+          setSyncStatus('synced');
+        }
+      } catch (err) {
+        console.warn('Network sync notice (running standalone/offline):', err);
+        setSyncStatus('idle');
+      }
+    };
+
+    syncFromNetwork();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Universal Data Updater:
+  // Saves to localStorage immediately AND synchronizes to server disk (/api/sync-data)
+  const updateData = useCallback((updater) => {
     setData((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      const payload = {
+        ...next,
+        _lastUpdated: Date.now()
+      };
+
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       } catch (err) {
         console.error('LocalStorage write failed:', err);
       }
-      return next;
+
+      // Multi-device persistence bridge:
+      // Writes to server disk so all other devices loading the site receive the updates
+      try {
+        setSyncStatus('syncing');
+        fetch('/api/sync-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then((r) => {
+            if (r.ok) {
+              setSyncStatus('synced');
+            } else {
+              setSyncStatus('error');
+            }
+          })
+          .catch(() => {
+            // Silently fall back to localStorage in environments without local dev server
+            setSyncStatus('synced');
+          });
+      } catch (err) {
+        console.warn('Server sync skipped:', err);
+      }
+
+      return payload;
     });
-  };
+  }, []);
+
+  // Force Push to Server Disk manually
+  const syncToServerDisk = useCallback(async () => {
+    setSyncStatus('syncing');
+    try {
+      const payload = {
+        ...data,
+        _lastUpdated: Date.now()
+      };
+      const res = await fetch('/api/sync-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        setSyncStatus('synced');
+        return true;
+      }
+      setSyncStatus('error');
+      return false;
+    } catch (err) {
+      setSyncStatus('error');
+      return false;
+    }
+  }, [data]);
+
+  // Section Visibility Controls (Turn ON/OFF from Public Site)
+  const toggleSectionVisibility = useCallback((sectionKey) => {
+    updateData((prev) => {
+      const current = prev.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY;
+      const updated = {
+        ...current,
+        [sectionKey]: !(current[sectionKey] ?? true)
+      };
+      return {
+        ...prev,
+        sectionsVisibility: updated
+      };
+    });
+  }, [updateData]);
+
+  const setSectionVisibility = useCallback((sectionKey, isVisible) => {
+    updateData((prev) => {
+      const current = prev.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY;
+      return {
+        ...prev,
+        sectionsVisibility: {
+          ...current,
+          [sectionKey]: !!isVisible
+        }
+      };
+    });
+  }, [updateData]);
+
+  // Section "Delete All" Cleaner (Empty a section collection)
+  const clearSection = useCallback((collectionKey) => {
+    updateData((prev) => {
+      if (collectionKey === 'biography') {
+        return { ...prev, biography: [] };
+      }
+      return {
+        ...prev,
+        [collectionKey]: []
+      };
+    });
+  }, [updateData]);
+
+  // Section "Reset to Defaults" (Restore specific section defaults)
+  const resetSectionToDefault = useCallback((collectionKey) => {
+    const defaultMap = {
+      tracks: DEFAULT_TRACKS,
+      videos: DEFAULT_VIDEOS,
+      tourDates: DEFAULT_TOUR,
+      pastTours: DEFAULT_PAST_TOUR,
+      merchProducts: DEFAULT_MERCH,
+      biography: DEFAULT_BIO,
+      galleryImages: DEFAULT_GALLERY,
+      socialPosts: DEFAULT_SOCIAL,
+      epkData: DEFAULT_EPK,
+    };
+
+    if (defaultMap[collectionKey]) {
+      updateData((prev) => ({
+        ...prev,
+        [collectionKey]: defaultMap[collectionKey]
+      }));
+    }
+  }, [updateData]);
 
   // Reorder helper: moves item at fromIndex to toIndex in array under key
   const reorderCollection = (key, fromIndex, toIndex) => {
     updateData((prev) => {
-      const list = [...prev[key]];
+      const list = [...(prev[key] || [])];
       if (fromIndex < 0 || fromIndex >= list.length || toIndex < 0 || toIndex >= list.length) {
         return prev;
       }
@@ -104,10 +294,11 @@ export function DataProvider({ children }) {
       const hashBuffer = await crypto.subtle.digest('SHA-256', payload);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-      
+
       if (hashHex === TARGET_HASH) {
         setIsAdminLoggedIn(true);
-        sessionStorage.setItem(AUTH_KEY, 'granted');
+        // Persist to localStorage so the device remembers this admin login indefinitely
+        localStorage.setItem(AUTH_KEY, 'granted');
         return true;
       }
       return false;
@@ -119,12 +310,13 @@ export function DataProvider({ children }) {
 
   const logoutAdmin = () => {
     setIsAdminLoggedIn(false);
-    sessionStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(AUTH_KEY);
   };
 
-  // Reset to initial default content
+  // Reset entire site to initial default content
   const resetToDefaults = () => {
     const defaults = {
+      _lastUpdated: Date.now(),
       artistInfo: DEFAULT_ARTIST,
       tracks: DEFAULT_TRACKS,
       biography: DEFAULT_BIO,
@@ -135,6 +327,7 @@ export function DataProvider({ children }) {
       galleryImages: DEFAULT_GALLERY,
       socialPosts: DEFAULT_SOCIAL,
       epkData: DEFAULT_EPK,
+      sectionsVisibility: DEFAULT_SECTIONS_VISIBILITY,
     };
     updateData(defaults);
   };
@@ -166,14 +359,22 @@ export function DataProvider({ children }) {
     <DataContext.Provider
       value={{
         ...data,
+        sectionsVisibility: data.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
         updateData,
         reorderCollection,
         isAdminLoggedIn,
+        isAdminAuthenticated: isAdminLoggedIn, // Aliased for seamless compatibility across components
         verifyPassword,
         logoutAdmin,
         resetToDefaults,
         exportBackup,
         importBackup,
+        syncStatus,
+        syncToServerDisk,
+        toggleSectionVisibility,
+        setSectionVisibility,
+        clearSection,
+        resetSectionToDefault,
       }}
     >
       {children}

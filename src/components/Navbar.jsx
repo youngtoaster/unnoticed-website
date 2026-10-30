@@ -14,7 +14,7 @@ export default function Navbar({
   setActiveView,
   onOpenAdmin
 }) {
-  const { artistInfo } = useSiteData();
+  const { artistInfo, sectionsVisibility } = useSiteData();
   const info = artistInfo || { socials: {} };
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,14 +56,17 @@ export default function Navbar({
     };
   }, [mobileMenuOpen]);
 
-  const navLinks = [
-    { num: '01', label: 'Music & Lyrics', href: '#music' },
-    { num: '02', label: 'Biography', href: '#bio' },
-    { num: '03', label: 'Visual Media', href: '#media' },
-    { num: '04', label: 'Tour Dates', href: '#tour' },
-    { num: '05', label: 'Merch Store', href: '#store' },
-    { num: '06', label: 'Community', href: '#community' },
+  const rawNavLinks = [
+    { id: 'music', num: '01', label: 'Music & Lyrics', href: '#music' },
+    { id: 'bio', num: '02', label: 'Biography', href: '#bio' },
+    { id: 'media', num: '03', label: 'Visual Media', href: '#media' },
+    { id: 'tour', num: '04', label: 'Tour Dates', href: '#tour' },
+    { id: 'store', num: '05', label: 'Merch Store', href: '#store' },
+    { id: 'social', num: '06', label: 'Community', href: '#community' },
   ];
+
+  // Dynamically hide navigation links when their corresponding section is disabled
+  const navLinks = rawNavLinks.filter((link) => sectionsVisibility?.[link.id] !== false);
 
   const handleNavClick = (href) => {
     setMobileMenuOpen(false);
@@ -159,20 +162,6 @@ export default function Navbar({
               </span>
             </motion.button>
 
-            {/* EPK Switcher */}
-            <button
-              onClick={() => setActiveView(activeView === 'epk' ? 'main' : 'epk')}
-              className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[11px] font-semibold tracking-wide transition-all border cursor-pointer active:scale-95 ${
-                activeView === 'epk'
-                  ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/30'
-                  : 'bg-white/[0.04] text-slate-300 border-white/[0.1] hover:border-cyan-400/40 hover:text-white'
-              }`}
-              title="Electronic Press Kit"
-            >
-              <FileText className="w-3.5 h-3.5 text-cyan-400" />
-              <span>EPK</span>
-            </button>
-
             {/* Merch Cart Button */}
             <button
               onClick={openCart}
@@ -256,28 +245,6 @@ export default function Navbar({
                   <ArrowRight className="w-4 h-4 text-slate-500" />
                 </motion.button>
               ))}
-
-              {/* Dedicated EPK Mobile Button */}
-              <motion.button
-                initial={{ opacity: 0, x: -25 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.3 }}
-                onClick={() => {
-                  setActiveView(activeView === 'epk' ? 'main' : 'epk');
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center justify-between w-full py-3.5 px-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-left mt-2 active:scale-[0.98]"
-              >
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-xs text-cyan-400 font-semibold">08</span>
-                  <span className="font-display text-xl font-bold text-cyan-300">
-                    Electronic Press Kit (EPK)
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200">
-                  Press / Booking
-                </span>
-              </motion.button>
             </div>
 
             {/* Now Playing Mini-Card inside Menu */}

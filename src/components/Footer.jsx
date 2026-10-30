@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUp, Disc, Radio, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowUp, Disc, Radio, ExternalLink, Sparkles, FileText, Download, ShieldCheck, ArrowRight } from 'lucide-react';
 import { InstagramIcon, TwitterIcon, YoutubeIcon, SpotifyIcon } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
 
@@ -31,9 +31,62 @@ export default function Footer({ onOpenEPK, onOpenAdmin }) {
   };
 
   return (
-    <footer className="relative border-t border-white/[0.08] bg-[#07080c] pt-20 pb-28 px-4 sm:px-6">
+    <footer className="relative border-t border-white/[0.08] bg-[#07080c] pt-16 sm:pt-20 pb-28 px-4 sm:px-6">
       
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
+      {/* ======================================================== */}
+      {/* PROMINENT OFFICIAL ELECTRONIC PRESS KIT (EPK) ACTION BAR */}
+      {/* Located prominently at the bottom of the site             */}
+      {/* ======================================================== */}
+      <div className="max-w-6xl mx-auto mb-14">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-[#0d1224]/90 via-[#0a0c16]/90 to-[#120e24]/90 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl shadow-cyan-950/30"
+        >
+          {/* Ambient rim glow */}
+          <div className="absolute top-0 right-0 w-72 h-72 bg-cyan-500/10 rounded-full blur-[90px] pointer-events-none -z-10" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-[90px] pointer-events-none -z-10" />
+
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 font-mono text-[10px] uppercase tracking-wider font-semibold">
+                  <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                  Media, Curators & Promoters
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Updated 2026/2027
+                </span>
+              </div>
+
+              <h3 className="font-display text-xl sm:text-2xl font-black text-white tracking-tight">
+                Official Electronic Press Kit (EPK)
+              </h3>
+
+              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                Access high-resolution print portraiture, venue tech rider & stage plots, streaming telemetry, verified biographical dossier, and industry booking representation.
+              </p>
+            </div>
+
+            {/* Prominent Press Kit Action Trigger Button */}
+            <div className="flex items-center gap-3 shrink-0">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={onOpenEPK}
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-xl shadow-cyan-500/25 border border-cyan-300/40 cursor-pointer active:scale-95 transition-all"
+              >
+                <FileText className="w-4 h-4 text-cyan-200" />
+                <span>Open Electronic Press Kit</span>
+                <ArrowRight className="w-4 h-4 text-white/80" />
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
         
         {/* Brand Left */}
         <div className="space-y-3 max-w-sm">
@@ -65,8 +118,9 @@ export default function Footer({ onOpenEPK, onOpenAdmin }) {
           <a href="#tour" className="hover:text-purple-300 transition-colors">Tour Dates</a>
           <a href="#store" className="hover:text-purple-300 transition-colors">Official Merch</a>
           <a href="#community" className="hover:text-purple-300 transition-colors">Community</a>
-          <button onClick={onOpenEPK} className="text-purple-300 hover:text-white transition-colors font-semibold cursor-pointer">
-            EPK & Booking
+          <button onClick={onOpenEPK} className="text-cyan-400 hover:text-cyan-300 transition-colors font-semibold cursor-pointer flex items-center gap-1">
+            <span>Press Kit</span>
+            <ArrowRight className="w-3 h-3" />
           </button>
         </div>
 
@@ -125,7 +179,7 @@ export default function Footer({ onOpenEPK, onOpenAdmin }) {
       </div>
 
       {/* Bottom Copyright Row with Secret Admin Triggers */}
-      <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 gap-4">
+      <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 gap-4">
         <div>
           {/* Secret Trigger 1: Triple-clicking the copyright symbol opens the login modal */}
           <span

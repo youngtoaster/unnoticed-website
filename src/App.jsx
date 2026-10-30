@@ -18,7 +18,7 @@ import AdminLoginModal from './components/AdminLoginModal';
 import ClickSpark from './components/reactbits/ClickSpark';
 
 function AppContent() {
-  const { tracks, merchProducts, isAdminAuthenticated } = useSiteData();
+  const { tracks, merchProducts, isAdminAuthenticated, sectionsVisibility } = useSiteData();
   const [currentTrack, setCurrentTrack] = useState(tracks && tracks[0] ? tracks[0] : null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
@@ -230,36 +230,52 @@ function AppContent() {
               />
 
               {/* 2. Music: Self-Hosted Preview Clips, Genius Lyric Annotations, Spotify Embeds */}
-              <MusicSection
-                currentTrack={currentTrack || tracks[0]}
-                isPlaying={isPlaying}
-                togglePlay={togglePlay}
-                onSelectTrack={onSelectTrack}
-              />
+              {sectionsVisibility?.music !== false && (
+                <MusicSection
+                  currentTrack={currentTrack || tracks[0]}
+                  isPlaying={isPlaying}
+                  togglePlay={togglePlay}
+                  onSelectTrack={onSelectTrack}
+                />
+              )}
 
               {/* 3. Bio: McKees Rocks Roots, Ty Sciullo Era, Rebirth into Unnoticed */}
-              <BioSection />
+              {sectionsVisibility?.bio !== false && (
+                <BioSection />
+              )}
 
               {/* 4. Visual & Media Archive: Combined Videos & Photography Gallery */}
-              <MediaSection />
+              {sectionsVisibility?.media !== false && (
+                <MediaSection />
+              )}
 
               {/* 5. Tour Dates: Schedule, VIP Tickets, Past Tour Archive & RSVP */}
-              <TourSection />
+              {sectionsVisibility?.tour !== false && (
+                <TourSection />
+              )}
 
               {/* 6. Store / Merch: Catalog Grid, Sizing, Quick View, Slide-Out Cart */}
-              <MerchSection
-                cart={cart}
-                addToCart={addToCart}
-                removeFromCart={removeFromCart}
-                updateCartQuantity={updateCartQuantity}
-                cartOpen={cartOpen}
-                setCartOpen={setCartOpen}
-                cartTotal={cartTotal}
-              />
+              {sectionsVisibility?.store !== false && (
+                <MerchSection
+                  cart={cart}
+                  addToCart={addToCart}
+                  removeFromCart={removeFromCart}
+                  updateCartQuantity={updateCartQuantity}
+                  cartOpen={cartOpen}
+                  setCartOpen={setCartOpen}
+                  cartTotal={cartTotal}
+                />
+              )}
 
               {/* 7. Community: Social Feed & Newsletter Syndicate */}
-              <SocialFeedSection />
-              <MailingListSection />
+              {sectionsVisibility?.social !== false && (
+                <SocialFeedSection />
+              )}
+
+              {/* 8. VIP Newsletter Syndicate */}
+              {sectionsVisibility?.newsletter !== false && (
+                <MailingListSection />
+              )}
             </main>
           ) : (
             <main className="relative z-10">

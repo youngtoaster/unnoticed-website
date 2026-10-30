@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sliders, Music, FileText, Ticket, ShoppingBag, Image as ImageIcon,
   ArrowLeft, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
-  RotateCcw, Download, Upload, Check, AlertTriangle, Eye, Shield, Sparkles, ExternalLink,
+  RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
-  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info
+  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -15,10 +15,136 @@ import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/v
 import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
 import NeonSign from './ui/NeonSign';
 
+// Reusable Section Header Control Bar with Visibility Toggle, Delete All & Reset Defaults
+function SectionControlsHeader({
+  title,
+  subtitle,
+  badgeText,
+  badgeColor = 'purple',
+  sectionKey,
+  collectionKey,
+  itemCount,
+  onAddNew,
+  addLabel = 'Add New',
+  allowDeleteAll = true,
+  allowReset = true,
+  sectionsVisibility,
+  toggleSectionVisibility,
+  onOpenDeleteConfirm,
+  onResetDefault
+}) {
+  const isEnabled = sectionsVisibility?.[sectionKey] !== false;
+
+  return (
+    <div className="flex flex-col gap-4 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] shadow-inner mb-6">
+      {/* Row 1: Title, Count Badge, Description, and Add Button */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-white">
+              {title}
+            </h2>
+            {badgeText && (
+              <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono border ${
+                badgeColor === 'red' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                badgeColor === 'cyan' ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' :
+                badgeColor === 'pink' ? 'bg-pink-500/10 text-pink-300 border-pink-500/20' :
+                'bg-purple-500/10 text-purple-300 border-purple-500/20'
+              }`}>
+                {badgeText}
+              </span>
+            )}
+          </div>
+          {subtitle && (
+            <p className="text-xs text-slate-400 mt-1">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {onAddNew && (
+          <button
+            onClick={onAddNew}
+            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/25 w-fit cursor-pointer shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{addLabel}</span>
+          </button>
+        )}
+      </div>
+
+      {/* Row 2: Section Controls Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/[0.06]">
+        {/* Disable/Enable Section Toggle */}
+        {sectionKey && (
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => toggleSectionVisibility(sectionKey)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer active:scale-95 ${
+                isEnabled
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25'
+                  : 'bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500/25'
+              }`}
+              title="Toggle whether this section appears on the public live site and top menu"
+            >
+              {isEnabled ? (
+                <>
+                  <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Section Status: <strong className="text-white">ENABLED</strong> on Site</span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Section Status: <strong className="text-amber-200">DISABLED</strong> (Hidden)</span>
+                </>
+              )}
+            </button>
+            <span className="text-[10px] text-slate-400 hidden sm:inline">
+              {isEnabled ? '• Active on homepage & top menu' : '• Hidden from visitors & navbar'}
+            </span>
+          </div>
+        )}
+
+        {/* Delete All & Reset Defaults */}
+        <div className="flex items-center gap-2 ml-auto">
+          {allowDeleteAll && (
+            <button
+              onClick={() => onOpenDeleteConfirm({ title, collectionKey, count: itemCount })}
+              disabled={!itemCount || itemCount === 0}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 ${
+                itemCount > 0
+                  ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  : 'bg-white/[0.02] text-slate-600 border border-white/[0.05] cursor-not-allowed'
+              }`}
+              title="Delete all items in this section to restart it"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete All {itemCount > 0 ? `(${itemCount})` : ''}</span>
+            </button>
+          )}
+
+          {allowReset && collectionKey && (
+            <button
+              onClick={() => onResetDefault(collectionKey, title)}
+              className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold text-slate-300 border border-white/[0.08] flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
+              title="Reset only this section to factory sample data"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+              <span>Reset Defaults</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard({ onReturnToSite }) {
   const {
     artistInfo, tracks, biography, videos, tourDates, pastTours,
     merchProducts, galleryImages, socialPosts, epkData,
+    sectionsVisibility, toggleSectionVisibility, clearSection, resetSectionToDefault,
+    syncStatus, syncToServerDisk,
     updateData, reorderCollection, logoutAdmin, resetToDefaults, exportBackup, importBackup
   } = useSiteData();
 
@@ -26,6 +152,8 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [toastMessage, setToastMessage] = useState(null);
   const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState(null); // { title, collectionKey, count }
+  const [isSavingDisk, setIsSavingDisk] = useState(false);
   const [previewIlluminated, setPreviewIlluminated] = useState(false);
   const [testIgnitionStep, setTestIgnitionStep] = useState(null); // null = idle, 0..9 = letter strike simulation
   const [isFetchingMeta, setIsFetchingMeta] = useState(false);
@@ -160,6 +288,11 @@ export default function AdminDashboard({ onReturnToSite }) {
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleResetSection = (collectionKey, title) => {
+    resetSectionToDefault(collectionKey);
+    showToast(`Restored default sample data for ${title}`);
   };
 
   // Reorganize helper
@@ -299,25 +432,48 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* Top Admin Header Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-6 mb-8 border-b border-white/[0.1] gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">
-              LIVE SYSTEM COMMAND CENTRE
-            </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Multi-Device Sync: Active</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-[10px] font-mono text-purple-300">
+              <CheckCircle2 className="w-3 h-3 text-purple-400" />
+              <span>Admin Logged In (Device Remembered)</span>
+            </div>
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-black text-white tracking-tight mt-1">
+          <h1 className="font-display text-3xl sm:text-4xl font-black text-white tracking-tight mt-1.5">
             UNNOTICED CMS // ADMIN
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Real-time content management, upload local files or paste web links, and reorganize live site modules.
+            Real-time multi-device content management. Changes persist permanently across every phone, laptop, and browser.
           </p>
         </div>
 
         {/* Global Toolbar Actions */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Multi-Device Disk Sync Button */}
+          <button
+            onClick={async () => {
+              setIsSavingDisk(true);
+              const ok = await syncToServerDisk();
+              setIsSavingDisk(false);
+              if (ok) {
+                showToast('Synced all changes to server disk for multi-device persistence!');
+              } else {
+                showToast('Changes saved locally.');
+              }
+            }}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-xs font-semibold text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
+            title="Force push changes to server disk so all other devices load the latest content"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSavingDisk ? 'animate-spin' : ''}`} />
+            <span>{isSavingDisk ? 'Syncing...' : 'Sync Disk'}</span>
+          </button>
+
           <button
             onClick={onReturnToSite}
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95"
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95 cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>View Live Site</span>
@@ -325,7 +481,7 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           <button
             onClick={exportBackup}
-            className="px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 border border-white/[0.1] flex items-center gap-1.5 transition-colors active:scale-95"
+            className="px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 border border-white/[0.1] flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
             title="Download JSON backup"
           >
             <Download className="w-3.5 h-3.5" />
@@ -340,7 +496,7 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-red-950/40 text-xs font-semibold text-red-300 border border-red-500/20 flex items-center gap-1.5 transition-colors active:scale-95"
+            className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-red-950/40 text-xs font-semibold text-red-300 border border-red-500/20 flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
             title="Reset site to factory defaults"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -349,12 +505,60 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           <button
             onClick={logoutAdmin}
-            className="px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-400 hover:text-white border border-white/[0.08] transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-400 hover:text-white border border-white/[0.08] transition-colors cursor-pointer"
           >
             Log Out
           </button>
         </div>
       </div>
+
+      {/* Reusable Delete All Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="max-w-md w-full bg-[#0c0d16] border border-rose-500/40 rounded-3xl p-6 shadow-2xl shadow-rose-950/40 space-y-4 text-left"
+            >
+              <div className="flex items-center gap-3 text-rose-400">
+                <div className="w-10 h-10 rounded-2xl bg-rose-500/20 flex items-center justify-center shrink-0 border border-rose-500/30">
+                  <AlertTriangle className="w-5 h-5 text-rose-400" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg text-white">Delete All Items?</h3>
+                  <p className="text-xs text-slate-400">{deleteConfirmModal.title}</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Are you sure you want to delete all <strong className="text-white">{deleteConfirmModal.count} items</strong> in this section? This will clear this collection from the public site. You can restore sample defaults at any time using "Reset Defaults".
+              </p>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  onClick={() => setDeleteConfirmModal(null)}
+                  className="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 border border-white/[0.1] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    clearSection(deleteConfirmModal.collectionKey);
+                    showToast(`Deleted all items in ${deleteConfirmModal.title}`);
+                    setDeleteConfirmModal(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-rose-600/30 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Yes, Delete All</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* CMS Navigation Tabs Bar */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-8 border-b border-white/[0.06]">
@@ -386,51 +590,45 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 1: TRACKS & DISCOGRAPHY ================= */}
       {activeTab === 'tracks' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>Audio Tracks & Playlist Sequencer</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 font-mono border border-purple-500/20">
-                  {tracks.length} tracks
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Manage track order, upload audio clips, attach custom cover art, and update streaming URLs.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'track',
-                  isNew: true,
-                  data: {
-                    id: `track-${Date.now()}`,
-                    title: 'New Single',
-                    featuring: '',
-                    type: 'Single',
-                    duration: '3:00',
-                    releaseYear: '2026',
-                    previewAudio: 'https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8',
-                    cover: artistInfo.avatar,
-                    spotifyUrl: artistInfo.socials?.spotify || 'https://open.spotify.com',
-                    appleMusicUrl: artistInfo.socials?.appleMusic || 'https://music.apple.com',
-                    deezerUrl: 'https://deezer.com',
-                    description: 'Brand new track release by UNNOTICED.',
-                    lyrics: [
-                      { text: 'New lyric verse bar one...', annotated: false },
-                      { text: 'Annotated punchline with meaning...', annotated: true, annotation: { author: 'UNNOTICED', badge: 'Verified Artist', content: 'Story behind the verse.' } }
-                    ]
-                  }
-                });
-                setMetaFeedback(null);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Track</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="Audio Tracks & Playlist Sequencer"
+            subtitle="Manage track order, upload audio clips, attach custom cover art, and update streaming URLs."
+            badgeText={`${tracks.length} tracks`}
+            badgeColor="purple"
+            sectionKey="music"
+            collectionKey="tracks"
+            itemCount={tracks.length}
+            addLabel="Add New Track"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'track',
+                isNew: true,
+                data: {
+                  id: `track-${Date.now()}`,
+                  title: 'New Single',
+                  featuring: '',
+                  type: 'Single',
+                  duration: '3:00',
+                  releaseYear: '2026',
+                  previewAudio: 'https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8',
+                  cover: artistInfo.avatar,
+                  spotifyUrl: artistInfo.socials?.spotify || 'https://open.spotify.com',
+                  appleMusicUrl: artistInfo.socials?.appleMusic || 'https://music.apple.com',
+                  deezerUrl: 'https://deezer.com',
+                  description: 'Brand new track release by UNNOTICED.',
+                  lyrics: [
+                    { text: 'New lyric verse bar one...', annotated: false },
+                    { text: 'Annotated punchline with meaning...', annotated: true, annotation: { author: 'UNNOTICED', badge: 'Verified Artist', content: 'Story behind the verse.' } }
+                  ]
+                }
+              });
+              setMetaFeedback(null);
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           {/* Quick Track Auto-Pull from Link */}
           <SpotlightCard className="p-4 sm:p-5 border-purple-500/30 bg-purple-950/20" tilt={false}>
@@ -641,14 +839,21 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 2: GENIUS LYRICS & ANNOTATIONS ================= */}
       {activeTab === 'lyrics' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white">
-              Genius-Style Lyrics & Verified Annotations
-            </h2>
-            <p className="text-xs text-slate-400">
-              Select any song to edit verses, annotate clickable lines, author verified commentary, and set timestamps.
-            </p>
-          </div>
+          <SectionControlsHeader
+            title="Genius-Style Lyrics & Verified Annotations"
+            subtitle="Select any song to edit verses, annotate clickable lines, author verified commentary, and set timestamps."
+            badgeText={`${tracks.length} songs`}
+            badgeColor="purple"
+            sectionKey="music"
+            collectionKey="tracks"
+            itemCount={tracks.length}
+            allowDeleteAll={false}
+            allowReset={true}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Track Selector */}
@@ -803,14 +1008,34 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 3: PROFILE & BIOGRAPHY ================= */}
       {activeTab === 'profile' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white">
-              Artist Profile & Multi-Chapter Biography
-            </h2>
-            <p className="text-xs text-slate-400">
-              Update artist name, metrics, tags, location, avatar imagery, and narrative chapters.
-            </p>
-          </div>
+          <SectionControlsHeader
+            title="Artist Profile & Multi-Chapter Biography"
+            subtitle="Update artist name, metrics, tags, location, avatar imagery, and narrative chapters."
+            badgeText={`${biography.length} chapters`}
+            badgeColor="purple"
+            sectionKey="bio"
+            collectionKey="biography"
+            itemCount={biography.length}
+            addLabel="Add Bio Chapter"
+            onAddNew={() => {
+              updateData((prev) => ({
+                ...prev,
+                biography: [
+                  ...(prev.biography || []),
+                  {
+                    title: 'New Chapter Title',
+                    era: '2026—PRESENT',
+                    content: 'Write narrative chapter biography here.'
+                  }
+                ]
+              }));
+              showToast('Added new biography chapter');
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <SpotlightCard className="p-6 space-y-5" tilt={false}>
             <h3 className="font-display text-lg font-bold text-white pb-2 border-b border-white/[0.08]">
@@ -1829,45 +2054,39 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 4: VIDEOS ================= */}
       {activeTab === 'videos' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>YouTube Videos & Visualizer Grid</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 font-mono border border-red-500/20">
-                  {videos.length} visuals
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Add YouTube links or upload video files directly, edit metadata, and reorganize the showcase.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'video',
-                  isNew: true,
-                  data: {
-                    id: `vid-${Date.now()}`,
-                    title: '',
-                    category: 'Music Video',
-                    duration: '3:30',
-                    views: 'New Release',
-                    description: '',
-                    type: 'youtube',
-                    youtubeEmbedId: '',
-                    videoUrl: '',
-                    thumbnail: artistInfo?.avatar || ''
-                  }
-                });
-                setMetaFeedback(null);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-600/20 w-fit cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Video to Showcase</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="YouTube Videos & Visualizer Grid"
+            subtitle="Add YouTube links or upload video files directly, edit metadata, and reorganize the showcase."
+            badgeText={`${videos.length} visuals`}
+            badgeColor="red"
+            sectionKey="media"
+            collectionKey="videos"
+            itemCount={videos.length}
+            addLabel="Add Video to Showcase"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'video',
+                isNew: true,
+                data: {
+                  id: `vid-${Date.now()}`,
+                  title: '',
+                  category: 'Music Video',
+                  duration: '3:30',
+                  views: 'New Release',
+                  description: '',
+                  type: 'youtube',
+                  youtubeEmbedId: '',
+                  videoUrl: '',
+                  thumbnail: artistInfo?.avatar || ''
+                }
+              });
+              setMetaFeedback(null);
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           {/* Quick Link Metadata Auto-Fetcher Banner */}
           <SpotlightCard className="p-4 sm:p-5 border-purple-500/30 bg-purple-950/20" tilt={false}>
@@ -2091,41 +2310,35 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 5: TOUR DATES ================= */}
       {activeTab === 'tour' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>Tour Schedule & Stage Dates</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-mono border border-cyan-500/20">
-                  {tourDates.length} shows
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Add tour stops, modify venue names, adjust ticket availability statuses, and reorganize.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'tour',
-                  isNew: true,
-                  data: {
-                    id: `tour-${Date.now()}`,
-                    date: 'MAR 20, 2027',
-                    city: 'Pittsburgh, PA',
-                    venue: 'Stage AE',
-                    status: 'On Sale',
-                    ticketLink: 'https://ticketmaster.com',
-                    vipAvailable: true
-                  }
-                });
-              }}
-              className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow-md shadow-cyan-500/20"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Tour Date</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="Tour Schedule & Stage Dates"
+            subtitle="Add tour stops, modify venue names, adjust ticket availability statuses, and reorganize."
+            badgeText={`${tourDates.length} shows`}
+            badgeColor="cyan"
+            sectionKey="tour"
+            collectionKey="tourDates"
+            itemCount={tourDates.length}
+            addLabel="Add Tour Date"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'tour',
+                isNew: true,
+                data: {
+                  id: `tour-${Date.now()}`,
+                  date: 'MAR 20, 2027',
+                  city: 'Pittsburgh, PA',
+                  venue: 'Stage AE',
+                  status: 'On Sale',
+                  ticketLink: 'https://ticketmaster.com',
+                  vipAvailable: true
+                }
+              });
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <div className="space-y-3">
             {tourDates.map((tour, idx) => (
@@ -2170,44 +2383,38 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 6: MERCH CATALOG ================= */}
       {activeTab === 'merch' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>Merch Atelier & Store Catalog</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 font-mono border border-purple-500/20">
-                  {merchProducts.length} items
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Update merchandise pricing, product photography (upload or link), sizing arrays, and reorder.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'merch',
-                  isNew: true,
-                  data: {
-                    id: `merch-${Date.now()}`,
-                    name: 'New Tour Merchandise',
-                    price: 45.0,
-                    category: 'Apparel',
-                    badge: 'New Arrival',
-                    image: artistInfo.avatar,
-                    sizes: ['S', 'M', 'L', 'XL'],
-                    colors: ['Black'],
-                    description: 'Premium heavyweight custom artist garment.',
-                    externalLink: 'https://unnoticed.shop'
-                  }
-                });
-              }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow-md shadow-purple-600/20"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Product</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="Merch Atelier & Store Catalog"
+            subtitle="Update merchandise pricing, product photography (upload or link), sizing arrays, and reorder."
+            badgeText={`${merchProducts.length} items`}
+            badgeColor="purple"
+            sectionKey="store"
+            collectionKey="merchProducts"
+            itemCount={merchProducts.length}
+            addLabel="Add Product"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'merch',
+                isNew: true,
+                data: {
+                  id: `merch-${Date.now()}`,
+                  name: 'New Tour Merchandise',
+                  price: 45.0,
+                  category: 'Apparel',
+                  badge: 'New Arrival',
+                  image: artistInfo.avatar,
+                  sizes: ['S', 'M', 'L', 'XL'],
+                  colors: ['Black'],
+                  description: 'Premium heavyweight custom artist garment.',
+                  externalLink: 'https://unnoticed.shop'
+                }
+              });
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {merchProducts.map((prod, idx) => (
@@ -2252,38 +2459,32 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 7: GALLERY SLIDES ================= */}
       {activeTab === 'gallery' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>Gallery Slideshow Manager</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 font-mono border border-purple-500/20">
-                  {galleryImages.length} slides
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Reorder slide progression, edit captions, and upload or link high-resolution photos.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'gallery',
-                  isNew: true,
-                  data: {
-                    url: artistInfo.avatar,
-                    title: 'New Exhibition Still',
-                    subtitle: 'Studio Archive',
-                    caption: 'Behind the scenes visual artifact.'
-                  }
-                });
-              }}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow-md shadow-purple-600/20"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Slide</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="Gallery Slideshow Manager"
+            subtitle="Reorder slide progression, edit captions, and upload or link high-resolution photos."
+            badgeText={`${galleryImages.length} slides`}
+            badgeColor="purple"
+            sectionKey="gallery"
+            collectionKey="galleryImages"
+            itemCount={galleryImages.length}
+            addLabel="Add Slide"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'gallery',
+                isNew: true,
+                data: {
+                  url: artistInfo.avatar,
+                  title: 'New Exhibition Still',
+                  subtitle: 'Studio Archive',
+                  caption: 'Behind the scenes visual artifact.'
+                }
+              });
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {galleryImages.map((img, idx) => (
@@ -2330,44 +2531,38 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 8: SOCIAL FEED ================= */}
       {activeTab === 'social' && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-                <span>Social Feed Stream</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/10 text-pink-300 font-mono border border-pink-500/20">
-                  {socialPosts.length} posts
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Update social post cards, upload media imagery, set likes/comments counts, and reorder.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditingItem({
-                  type: 'social',
-                  isNew: true,
-                  data: {
-                    id: `post-${Date.now()}`,
-                    platform: 'Instagram',
-                    handle: '@unnoticedmusic',
-                    date: 'Just now',
-                    content: 'New studio updates dropping soon. Link in bio.',
-                    likes: '5,000',
-                    comments: '250',
-                    image: artistInfo.avatar,
-                    soundTrack: 'UNNOTICED • New Release',
-                    link: artistInfo.socials?.instagram || 'https://instagram.com'
-                  }
-                });
-              }}
-              className="px-4 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow-md shadow-pink-600/20"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Social Post</span>
-            </button>
-          </div>
+          <SectionControlsHeader
+            title="Social Feed Stream"
+            subtitle="Update social post cards, upload media imagery, set likes/comments counts, and reorder."
+            badgeText={`${socialPosts.length} posts`}
+            badgeColor="pink"
+            sectionKey="social"
+            collectionKey="socialPosts"
+            itemCount={socialPosts.length}
+            addLabel="Add Social Post"
+            onAddNew={() => {
+              setEditingItem({
+                type: 'social',
+                isNew: true,
+                data: {
+                  id: `post-${Date.now()}`,
+                  platform: 'Instagram',
+                  handle: '@unnoticedmusic',
+                  date: 'Just now',
+                  content: 'New studio updates dropping soon. Link in bio.',
+                  likes: '5,000',
+                  comments: '250',
+                  image: artistInfo.avatar,
+                  soundTrack: 'UNNOTICED • New Release',
+                  link: artistInfo.socials?.instagram || 'https://instagram.com'
+                }
+              });
+            }}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {socialPosts.map((post, idx) => (
@@ -2412,14 +2607,21 @@ export default function AdminDashboard({ onReturnToSite }) {
       {/* ================= TAB 9: EPK & PRESS KIT ================= */}
       {activeTab === 'epk' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white">
-              Electronic Press Kit (EPK) Settings
-            </h2>
-            <p className="text-xs text-slate-400">
-              Update industry booking emails, critical press quotes, and downloadable high-res media asset files.
-            </p>
-          </div>
+          <SectionControlsHeader
+            title="Electronic Press Kit (EPK) Settings & VIP Syndicate"
+            subtitle="Update industry booking emails, critical press quotes, downloadable press assets, and toggle newsletter visibility."
+            badgeText="Industry Assets"
+            badgeColor="cyan"
+            sectionKey="newsletter"
+            collectionKey="epkData"
+            itemCount={epkData.downloadableAssets?.length || 4}
+            allowDeleteAll={false}
+            allowReset={true}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onOpenDeleteConfirm={setDeleteConfirmModal}
+            onResetDefault={handleResetSection}
+          />
 
           <SpotlightCard className="p-6 space-y-4" tilt={false}>
             <h3 className="font-display text-lg font-bold text-white pb-2 border-b border-white/[0.08]">

@@ -1,6 +1,17 @@
 // Artist data for UNNOTICED (Formerly Ty Sciullo)
 // Authentic data sourced from Groover profile, discography, and biographical archive
 
+export const SECTIONS_VISIBILITY = {
+  music: true,
+  bio: true,
+  media: true,
+  tour: true,
+  store: true,
+  gallery: true,
+  social: true,
+  newsletter: true,
+};
+
 export const ARTIST_INFO = {
   name: "UNNOTICED",
   previousName: "Ty Sciullo",

@@ -451,24 +451,29 @@ export default function MusicSection({
                             scale: { duration: 0.25 },
                             opacity: { duration: 0.2 }
                           }}
-                          className={`absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 ${
-                            isPlaying && currentTrack?.id === focusedTrack.id ? 'animate-[spin_4.5s_linear_infinite]' : ''
-                          }`}
-                          style={{
-                            boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
-                            backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
-                          }}
+                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 flex items-center justify-center pointer-events-none z-0"
                         >
-                          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
-                          {/* Vinyl Center Label & Grooves */}
-                          <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
-                            <img
-                              src={focusedTrack.cover}
-                              alt="Vinyl Center"
-                              className="w-full h-full object-cover"
-                            />
-                            {/* Center Spindle Hole */}
-                            <div className="absolute w-3.5 h-3.5 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
+                          {/* Dedicated rotating vinyl body: separated DOM layer prevents CSS spin transform from overriding Framer Motion translateX */}
+                          <div
+                            className={`w-full h-full rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center ${
+                              isPlaying && currentTrack?.id === focusedTrack.id ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                            }`}
+                            style={{
+                              boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
+                              backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
+                            }}
+                          >
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+                            {/* Vinyl Center Label & Grooves */}
+                            <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+                              <img
+                                src={focusedTrack.cover}
+                                alt="Vinyl Center"
+                                className="w-full h-full object-cover"
+                              />
+                              {/* Center Spindle Hole */}
+                              <div className="absolute w-3.5 h-3.5 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
+                            </div>
                           </div>
                         </motion.div>
 

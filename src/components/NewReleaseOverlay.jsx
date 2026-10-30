@@ -323,7 +323,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                   initial={false}
                   animate={
                     isPlaying
-                      ? { x: 75, opacity: 1, scale: 1 }
+                      ? { x: 80, opacity: 1, scale: 1 }
                       : { x: 0, opacity: 0, scale: 0.9 }
                   }
                   transition={{
@@ -331,18 +331,23 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                     scale: { duration: 0.25 },
                     opacity: { duration: 0.2 }
                   }}
-                  className={`absolute w-52 h-52 sm:w-64 sm:h-64 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 ${
-                    isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
-                  }`}
-                  style={{
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95)',
-                    backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
-                  }}
+                  className="absolute w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center pointer-events-none z-0"
                 >
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
-                    <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
-                    <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
+                  {/* Dedicated rotating vinyl body: separated DOM layer prevents CSS spin transform from overriding Framer Motion translateX */}
+                  <div
+                    className={`w-full h-full rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center ${
+                      isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                    }`}
+                    style={{
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95)',
+                      backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
+                    }}
+                  >
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
+                      <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
+                      <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
+                    </div>
                   </div>
                 </motion.div>
 

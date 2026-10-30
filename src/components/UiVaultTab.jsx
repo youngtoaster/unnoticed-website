@@ -60,7 +60,7 @@ export const UI_INSPIRATION_SITES = [
     name: 'Footer Design',
     url: 'https://footer.design',
     category: 'Components & CTAs',
-    superpower: 'Footers that don\'t embarrass you',
+    superpower: 'Footer styles & footers that don\'t embarrass you',
     description: 'Curated archive of elegant footer layouts, multi-column sitemaps, copyright treatments, newsletter capture forms, and closing stages.',
     tags: ['Footers', 'Sitemaps', 'Bottom Stages'],
     color: '#94a3b8',
@@ -78,6 +78,18 @@ export const UI_INSPIRATION_SITES = [
     color: '#f43f5e',
     accentBg: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
     badge: 'CTAs & Buttons'
+  },
+  {
+    id: 'collectui',
+    name: 'Collect UI',
+    url: 'https://collectui.com',
+    category: 'Components & CTAs',
+    superpower: 'All design resources & daily UI components',
+    description: 'Comprehensive daily archive of vetted user interface patterns, checkout flows, modals, navigation elements, inputs, and layout components inspired by real products and top Dribbble concepts.',
+    tags: ['Daily UI', 'Component Library', 'All Design Resources'],
+    color: '#ec4899',
+    accentBg: 'bg-pink-500/10 text-pink-300 border-pink-500/30',
+    badge: 'All UI Resources'
   },
   {
     id: 'styles-refero',
@@ -120,7 +132,7 @@ export const UI_INSPIRATION_SITES = [
     name: 'Land-book',
     url: 'https://land-book.com',
     category: 'Landing & Heroes',
-    superpower: 'Landing page inspiration done right',
+    superpower: 'Landing page inspo done right',
     description: 'Hand-curated gallery of high-converting, aesthetically crafted landing pages, portfolios, blogs, and marketing sites with design breakdowns.',
     tags: ['Landing Pages', 'Conversion UX', 'Portfolios'],
     color: '#8b5cf6',
@@ -140,11 +152,23 @@ export const UI_INSPIRATION_SITES = [
     badge: 'Agency Inspo'
   },
   {
+    id: 'inspora',
+    name: 'Inspora Design',
+    url: 'https://inspora.design',
+    category: 'Product & Design Systems',
+    superpower: 'New designs & fresh creative direction',
+    description: 'Curated gallery of freshly dropped digital experiences, boundary-pushing art direction, next-generation landing layouts, and trendsetting web aesthetics updated continuously.',
+    tags: ['New Designs', 'Fresh Inspo', 'Creative Direction'],
+    color: '#06b6d4',
+    accentBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+    badge: 'New Designs'
+  },
+  {
     id: 'landdding',
     name: 'Landdding',
     url: 'https://landdding.com',
     category: 'Landing & Heroes',
-    superpower: 'Top notch landings',
+    superpower: 'Landing page design & top notch landings',
     description: 'Carefully selected showcase highlighting grid layouts, conversion anatomy, section transitions, and responsive SaaS landing engineering.',
     tags: ['Top Landings', 'SaaS Anatomy', 'Responsive UI'],
     color: '#6366f1',
@@ -233,11 +257,11 @@ export default function UiVaultTab({ onToast }) {
   };
 
   const copyAllPrompt = () => {
-    const promptText = `Reference these 15 premier UI & Web Design platforms when building high-end components, landing pages, and interactive experiences:\n\n` +
+    const promptText = `Reference these ${UI_INSPIRATION_SITES.length} premier UI & Web Design platforms when building high-end components, landing pages, and interactive experiences:\n\n` +
       UI_INSPIRATION_SITES.map((s, idx) => `${idx + 1}. ${s.name} (${s.url})\n   • Superpower: ${s.superpower}\n   • Details: ${s.description}\n`).join('\n');
     try {
       navigator.clipboard.writeText(promptText);
-      if (onToast) onToast('Copied full 15-site design prompt to clipboard!');
+      if (onToast) onToast(`Copied full ${UI_INSPIRATION_SITES.length}-site design prompt to clipboard!`);
     } catch {
       if (onToast) onToast('Could not copy prompt', 'error');
     }
@@ -255,7 +279,7 @@ export default function UiVaultTab({ onToast }) {
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest uppercase bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
                 <Compass className="w-3.5 h-3.5 text-cyan-400" />
-                UI & Inspo Vault • 15 Curated Platforms
+                <span>UI & Inspo Vault • {UI_INSPIRATION_SITES.length} Curated Platforms</span>
               </span>
               <span className="text-xs font-mono text-slate-400">
                 Live Design Engineering Directory

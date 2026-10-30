@@ -14,7 +14,7 @@ import SpotlightCard from './SpotlightCard';
 import MediaUploadOrLink from './MediaUploadOrLink';
 import NewReleaseOverlay from './NewReleaseOverlay';
 import VisualSampleEditor from './VisualSampleEditor';
-import UiVaultTab from './UiVaultTab';
+import UiVaultTab, { UI_INSPIRATION_SITES } from './UiVaultTab';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
 import NeonSign from './ui/NeonSign';
@@ -609,7 +609,7 @@ export default function AdminDashboard({ onReturnToSite }) {
     { id: 'gallery', label: 'Gallery Slides', icon: Layers, count: galleryImages.length },
     { id: 'social', label: 'Social Feed', icon: Instagram, count: socialPosts.length },
     { id: 'epk', label: 'EPK & Press', icon: Shield, count: null },
-    { id: 'ui-vault', label: 'UI & Inspo Vault', icon: Compass, count: 15 },
+    { id: 'ui-vault', label: 'UI & Inspo Vault', icon: Compass, count: UI_INSPIRATION_SITES?.length || 17 },
     { id: 'github', label: 'GitHub Cloud Sync', icon: GitBranch, count: null },
   ];
 

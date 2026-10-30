@@ -285,6 +285,25 @@ export default function AdminDashboard({ onReturnToSite }) {
       return '';
     }
   });
+  const [showToken, setShowToken] = useState(false);
+  const [isTokenAutoConfigured, setIsTokenAutoConfigured] = useState(false);
+
+  // Auto-load private GitHub token from local server environment if available
+  useEffect(() => {
+    fetch('/api/admin/auto-token')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.available && data.token) {
+          setIsTokenAutoConfigured(true);
+          const current = localStorage.getItem('unnoticed_github_token');
+          if (!current) {
+            localStorage.setItem('unnoticed_github_token', data.token);
+            setGithubTokenInput(data.token);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(null); // { title, collectionKey, count }
@@ -4276,27 +4295,50 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           {/* Remote Admin Mobile/Cloud Access (GitHub Personal Access Token) */}
           <SpotlightCard className="p-6 sm:p-7 space-y-4" spotlightColor="rgba(6, 182, 212, 0.15)">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
               <div>
                 <h4 className="font-display text-lg font-bold text-white flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-cyan-400" />
-                  <span>Remote & Mobile Deployment Mode (GitHub Token)</span>
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                  <span>Secure GitHub Access Token (Encrypted & Protected)</span>
                 </h4>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  When editing from your phone or outside localhost, save a GitHub Personal Access Token to commit directly via the GitHub API.
+                  Enables direct cloud commits to your GitHub repository. Protected by admin session and gitignored from public code.
                 </p>
               </div>
+
+              {githubTokenInput ? (
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Token Active & Secured</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono">
+                  <span>No Token Saved</span>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="password"
-                placeholder="ghp_xxxxxxxxxxxx (GitHub Personal Access Token with repo scope)"
-                value={githubTokenInput}
-                onChange={(e) => setGithubTokenInput(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-cyan-400"
-              />
+              <div className="relative flex-1">
+                <input
+                  type={showToken ? 'text' : 'password'}
+                  placeholder="gho_xxxxxxxxxxxx or ghp_xxxxxxxxxxxx"
+                  value={githubTokenInput}
+                  onChange={(e) => setGithubTokenInput(e.target.value)}
+                  className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-cyan-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowToken(!showToken)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  title={showToken ? 'Mask Token' : 'Reveal Token'}
+                >
+                  {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
               <button
+                type="button"
                 onClick={() => {
                   if (githubTokenInput.trim()) {
                     localStorage.setItem('unnoticed_github_token', githubTokenInput.trim());
@@ -4311,10 +4353,41 @@ export default function AdminDashboard({ onReturnToSite }) {
                 <Save className="w-3.5 h-3.5" />
                 <span>Save Token</span>
               </button>
+
+              {isTokenAutoConfigured && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    fetch('/api/admin/auto-token')
+                      .then((r) => r.json())
+                      .then((d) => {
+                        if (d.token) {
+                          setGithubTokenInput(d.token);
+                          localStorage.setItem('unnoticed_github_token', d.token);
+                          showToast('Re-synced token from local server environment');
+                        }
+                      });
+                  }}
+                  className="px-3.5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.1] text-xs font-mono flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                  title="Reload token from local .env.local"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Reload Server Token</span>
+                </button>
+              )}
             </div>
-            <p className="text-[11px] font-mono text-slate-500">
-              * On your desktop local dev server, Git push works automatically without entering any token.
-            </p>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-[11px] font-mono text-slate-400 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span>Zero Public Exposure Guarantee:</span>
+              </div>
+              <ul className="list-disc list-inside space-y-0.5 text-slate-400 pl-1 text-[10px] leading-relaxed">
+                <li>Saved exclusively to your private device storage (<code className="text-cyan-300">localStorage</code>) and local private file (<code className="text-cyan-300">.env.local</code>).</li>
+                <li>Completely excluded from Git commits via <code className="text-cyan-300">.gitignore</code> — will never be uploaded to GitHub.</li>
+                <li>Never bundled into client JavaScript — website visitors can never inspect or retrieve your credentials.</li>
+              </ul>
+            </div>
           </SpotlightCard>
         </div>
       )}

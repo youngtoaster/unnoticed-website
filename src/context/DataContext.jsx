@@ -157,6 +157,19 @@ export function DataProvider({ children }) {
 
     syncFromNetwork();
     refreshGitStatus();
+
+    // Auto-load private GitHub token from local server environment if available
+    try {
+      fetch('/api/admin/auto-token')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((tData) => {
+          if (tData?.available && tData.token && !localStorage.getItem('unnoticed_github_token')) {
+            localStorage.setItem('unnoticed_github_token', tData.token);
+          }
+        })
+        .catch(() => {});
+    } catch {}
+
     return () => {
       isMounted = false;
     };

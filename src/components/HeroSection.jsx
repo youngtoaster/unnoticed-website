@@ -508,8 +508,13 @@ export default function HeroSection({
           </motion.div>
         )}
 
-        {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser */}
-        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 translate-y-5 sm:translate-y-8 ${alignmentContainerClass}`}>
+        {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser ("Bring More Center") */}
+        <div
+          className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-transform duration-500 ease-out ${alignmentContainerClass}`}
+          style={{
+            transform: `translateY(${artistInfo.heroVerticalOffset ?? 60}px)`
+          }}
+        >
 
           {/* Top On Tour Look-At-Me Button */}
           {artistInfo.tourBadge?.enabled !== false && (
@@ -799,7 +804,7 @@ export default function HeroSection({
         </div>
 
         {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt (Anchored to page bottom) */}
-        <div className="absolute bottom-2 sm:bottom-3 inset-x-0 mx-auto w-full flex flex-col items-center z-20 pointer-events-auto">
+        <div className="absolute bottom-3 sm:bottom-4 inset-x-0 mx-auto w-full flex flex-col items-center z-20 pointer-events-auto">
           <motion.button
             onClick={() => {
               const target = sectionsVisibility?.transmissionHub !== false 

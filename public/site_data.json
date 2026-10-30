@@ -101,7 +101,8 @@
       "borderGlowSpread": 55,
       "breatheAura": true,
       "glowColorMode": "sync"
-    }
+    },
+    "heroVerticalOffset": 60
   },
   "tracks": [
     {

@@ -140,6 +140,16 @@
   stroke: var(--theme-on-primary, #08090e) !important;
 }
 
+/* Ensure stroke-based SVG icons inside theme-primary-btn stay unfilled crisp lines */
+.theme-primary-btn svg:not(.fill-current):not([fill="currentColor"]) {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+.theme-primary-btn svg:not(.fill-current):not([fill="currentColor"]) * {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
 /* Bulletproof Contrast Protection when Active Theme is Light / White / Silver */
 [data-theme-light="true"] .theme-primary-btn,
 [data-theme-light="true"] button.theme-primary-btn,
@@ -150,6 +160,10 @@
 [data-theme-light="true"] a.bg-purple-500,
 [data-theme-light="true"] button[class*="bg-purple-600"],
 [data-theme-light="true"] button[class*="from-purple-600"],
+html[data-theme-light="true"] .theme-primary-btn,
+html[data-theme-light="true"] button.theme-primary-btn,
+html[data-theme-light="true"] a.theme-primary-btn,
+:root[data-theme-light="true"] .theme-primary-btn,
 :root[style*="--theme-is-light: 1"] .theme-primary-btn,
 :root[style*="--theme-is-light: 1"] button.theme-primary-btn,
 :root[style*="--theme-is-light: 1"] a.theme-primary-btn,
@@ -176,6 +190,10 @@
 [data-theme-light="true"] a.bg-purple-500 *,
 [data-theme-light="true"] button[class*="bg-purple-600"] *,
 [data-theme-light="true"] button[class*="from-purple-600"] *,
+html[data-theme-light="true"] .theme-primary-btn *,
+html[data-theme-light="true"] button.theme-primary-btn *,
+html[data-theme-light="true"] a.theme-primary-btn *,
+:root[data-theme-light="true"] .theme-primary-btn *,
 :root[style*="--theme-is-light: 1"] .theme-primary-btn *,
 :root[style*="--theme-is-light: 1"] button.theme-primary-btn *,
 :root[style*="--theme-is-light: 1"] a.theme-primary-btn *,

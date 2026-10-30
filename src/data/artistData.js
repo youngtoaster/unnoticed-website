@@ -116,6 +116,7 @@ export const ARTIST_INFO = {
     "flicker": true,
     "glowCaption": true
   },
+  "heroVerticalOffset": 60,
   "heroBackdrop": {
     "enabled": true,
     "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",

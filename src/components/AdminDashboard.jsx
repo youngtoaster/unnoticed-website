@@ -276,6 +276,11 @@ export default function AdminDashboard({ onReturnToSite }) {
   } = useSiteData();
 
   const [activeTab, setActiveTab] = useState('tracks');
+  const isThemeLight = Boolean(
+    (artistInfo?.theme?.id === 'mono') ||
+    (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme-light') === 'true') ||
+    (artistInfo?.theme?.primary && ['#ffffff', '#fff', '#e2e8f0', '#f1f5f9', '#f8fafc', '#cbd5e1'].includes(String(artistInfo.theme.primary).toLowerCase().trim()))
+  );
   const [testOverlayOpen, setTestOverlayOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [customCommitMsg, setCustomCommitMsg] = useState('');
@@ -674,13 +679,20 @@ export default function AdminDashboard({ onReturnToSite }) {
               }
             }}
             disabled={isPushingGit}
-            className="px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className={`px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${
+              isThemeLight ? 'text-[#08090e]' : ''
+            }`}
+            style={isThemeLight ? { color: '#08090e' } : undefined}
             title="Commit & push all CMS content to GitHub so it stays consistent everywhere"
           >
-            <GitBranch className={`w-3.5 h-3.5 ${isPushingGit ? 'animate-spin' : ''}`} />
-            <span className="font-black tracking-tight">{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub'}</span>
+            <GitBranch className={`w-3.5 h-3.5 ${isPushingGit ? 'animate-spin' : ''}`} style={isThemeLight ? { color: '#08090e', stroke: '#08090e' } : undefined} />
+            <span className="font-black tracking-tight" style={isThemeLight ? { color: '#08090e' } : undefined}>
+              {isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub'}
+            </span>
             {gitStatus?.lastCommit?.hash && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 text-current opacity-85">
+              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-bold ${
+                isThemeLight ? 'bg-black/15 text-[#08090e]' : 'bg-black/20 text-current opacity-85'
+              }`}>
                 {gitStatus.lastCommit.hash}
               </span>
             )}
@@ -707,10 +719,14 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           <button
             onClick={onReturnToSite}
-            className="px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer"
+            className={`px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer ${
+              isThemeLight ? 'text-[#08090e]' : ''
+            }`}
+            style={isThemeLight ? { color: '#08090e' } : undefined}
+            title="Preview live site experience"
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span className="font-black tracking-tight">View Live Site</span>
+            <Eye className="w-3.5 h-3.5" style={isThemeLight ? { color: '#08090e', stroke: '#08090e' } : undefined} />
+            <span className="font-black tracking-tight" style={isThemeLight ? { color: '#08090e' } : undefined}>View Live Site</span>
           </button>
 
           <button
@@ -839,15 +855,26 @@ export default function AdminDashboard({ onReturnToSite }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0 ${
                   isActive
-                    ? 'theme-primary-btn font-black shadow-lg ring-2 ring-white/20 border-white/30'
+                    ? `theme-primary-btn font-black shadow-lg ring-2 ring-white/20 border-white/30 ${isThemeLight ? 'text-[#08090e]' : ''}`
                     : 'bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/[0.18]'
                 }`}
+                style={(isActive && isThemeLight) ? { color: '#08090e' } : undefined}
               >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? '' : 'text-purple-400'}`} />
-                <span className={isActive ? 'font-black tracking-tight' : 'font-medium'}>{tab.label}</span>
+                <Icon
+                  className={`w-3.5 h-3.5 shrink-0 ${isActive ? (isThemeLight ? 'text-[#08090e]' : '') : 'text-purple-400'}`}
+                  style={(isActive && isThemeLight) ? { color: '#08090e', stroke: '#08090e' } : undefined}
+                />
+                <span
+                  className={isActive ? 'font-black tracking-tight' : 'font-medium'}
+                  style={(isActive && isThemeLight) ? { color: '#08090e' } : undefined}
+                >
+                  {tab.label}
+                </span>
                 {tab.count !== null && (
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold shrink-0 ${
-                    isActive ? 'bg-black/20 text-current opacity-85' : 'bg-white/[0.08] text-slate-400'
+                    isActive
+                      ? (isThemeLight ? 'bg-black/15 text-[#08090e]' : 'bg-black/20 text-current opacity-85')
+                      : 'bg-white/[0.08] text-slate-400'
                   }`}>
                     {tab.count}
                   </span>
@@ -1312,10 +1339,13 @@ export default function AdminDashboard({ onReturnToSite }) {
               <button
                 type="button"
                 onClick={() => setTestOverlayOpen(true)}
-                className="px-5 py-2.5 rounded-xl font-black text-xs theme-primary-btn flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xl"
+                className={`px-5 py-2.5 rounded-xl font-black text-xs theme-primary-btn flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xl ${
+                  isThemeLight ? 'text-[#08090e]' : ''
+                }`}
+                style={isThemeLight ? { color: '#08090e' } : undefined}
               >
-                <Sparkles className="w-4 h-4 animate-pulse shrink-0" />
-                <span className="font-black tracking-tight">🚀 Test Slam-In Animation</span>
+                <Sparkles className="w-4 h-4 animate-pulse shrink-0" style={isThemeLight ? { color: '#08090e', stroke: '#08090e' } : undefined} />
+                <span className="font-black tracking-tight" style={isThemeLight ? { color: '#08090e' } : undefined}>🚀 Test Slam-In Animation</span>
               </button>
             </div>
           </div>
@@ -1794,6 +1824,85 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </div>
               </div>
             </div>
+
+            {/* Hero Stage Vertical Centering & Position Offset ("Bring More Center") */}
+            <div className="pt-4 border-t border-white/[0.08] space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <label className="text-xs font-mono font-semibold text-slate-200 flex items-center gap-1.5">
+                    <ArrowDown className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Hero Stage Vertical Centering & Position Offset ("Bring More Center")</span>
+                  </label>
+                  <p className="text-[11px] text-slate-400 font-light mt-0.5">
+                    Nudge the artist title, subtitle, and bio cluster down towards the torso/center of the stage background figure.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold">
+                    {(artistInfo.heroVerticalOffset ?? 60) > 0 ? `+${artistInfo.heroVerticalOffset ?? 60}px` : `${artistInfo.heroVerticalOffset ?? 60}px`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateData({ artistInfo: { ...artistInfo, heroVerticalOffset: 60 } });
+                      showToast('Vertical centering reset to optical center (+60px)');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-[10px] font-mono text-slate-400 hover:text-white border border-white/[0.08] cursor-pointer"
+                  >
+                    Reset (60px)
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { offset: 60, label: 'Optical Center', sub: '+60px (Recommended)' },
+                  { offset: 90, label: 'Lower Drama', sub: '+90px (Deep Torso)' },
+                  { offset: 0, label: 'True Midpoint', sub: '0px (Dead Center)' },
+                  { offset: -30, label: 'Upper Stage', sub: '-30px (High Hood)' }
+                ].map((preset) => {
+                  const currentOffset = artistInfo.heroVerticalOffset ?? 60;
+                  const isCurrent = currentOffset === preset.offset;
+                  return (
+                    <button
+                      key={preset.offset}
+                      type="button"
+                      onClick={() => {
+                        updateData({ artistInfo: { ...artistInfo, heroVerticalOffset: preset.offset } });
+                        showToast(`Vertical position set to ${preset.label} (${preset.offset}px)`);
+                      }}
+                      className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer ${
+                        isCurrent
+                          ? 'bg-purple-600/30 border-purple-400 text-white shadow-sm shadow-purple-600/30 ring-1 ring-purple-400/40'
+                          : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      <div className="text-xs font-mono font-bold flex items-center justify-between">
+                        <span>{preset.label}</span>
+                        {isCurrent && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-400 mt-0.5">{preset.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Smooth Slider */}
+              <div className="flex items-center gap-3 pt-1">
+                <span className="text-[10px] font-mono text-slate-500 shrink-0">-40px</span>
+                <input
+                  type="range"
+                  min="-40"
+                  max="140"
+                  step="2"
+                  value={artistInfo.heroVerticalOffset ?? 60}
+                  onChange={(e) => updateData({ artistInfo: { ...artistInfo, heroVerticalOffset: parseInt(e.target.value) } })}
+                  className="w-full accent-purple-500 cursor-pointer h-1.5 rounded-lg bg-white/10"
+                />
+                <span className="text-[10px] font-mono text-slate-500 shrink-0">+140px</span>
+              </div>
+            </div>
           </SpotlightCard>
 
           {/* MASTER VISIBILITY & STAGE SCOPE TOOLBAR */}
@@ -2091,12 +2200,17 @@ export default function AdminDashboard({ onReturnToSite }) {
                 />
               )}
 
-              {/* Overlaid Neon Title in Preview */}
-              <div className={`relative z-10 flex flex-col ${
-                neonConfig.align === 'left' ? 'items-start text-left' :
-                neonConfig.align === 'right' ? 'items-end text-right' :
-                'items-center text-center'
-              } select-none pointer-events-none px-4`}>
+              {/* Overlaid Neon Title in Preview (Simulating Vertical Offset) */}
+              <div
+                className={`relative z-10 flex flex-col ${
+                  neonConfig.align === 'left' ? 'items-start text-left' :
+                  neonConfig.align === 'right' ? 'items-end text-right' :
+                  'items-center text-center'
+                } select-none pointer-events-none px-4 transition-transform duration-300 ease-out`}
+                style={{
+                  transform: `translateY(${((artistInfo.heroVerticalOffset ?? 60) * 0.35)}px)`
+                }}
+              >
                 {/* Radiant Title Aura in Visualizer Preview */}
                 {(backdrop.glowCoverage === 'all' || backdrop.glowCoverage === 'title') && (backdrop.revealGlowMode ?? 'persistent') !== 'fade' && (
                   <div
@@ -4902,10 +5016,13 @@ export default function AdminDashboard({ onReturnToSite }) {
                   }
                 }}
                 disabled={isPushingGit}
-                className="px-6 py-3 rounded-2xl theme-primary-btn font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl disabled:opacity-50 cursor-pointer shrink-0"
+                className={`px-6 py-3 rounded-2xl theme-primary-btn font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl disabled:opacity-50 cursor-pointer shrink-0 ${
+                  isThemeLight ? 'text-[#08090e]' : ''
+                }`}
+                style={isThemeLight ? { color: '#08090e' } : undefined}
               >
-                <GitBranch className={`w-4 h-4 ${isPushingGit ? 'animate-spin' : ''}`} />
-                <span>{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub Now ↗'}</span>
+                <GitBranch className={`w-4 h-4 ${isPushingGit ? 'animate-spin' : ''}`} style={isThemeLight ? { color: '#08090e', stroke: '#08090e' } : undefined} />
+                <span style={isThemeLight ? { color: '#08090e' } : undefined}>{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub Now ↗'}</span>
               </button>
             </div>
 

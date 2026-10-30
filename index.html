@@ -39,11 +39,21 @@
               var lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
               if (lum > 0.52 || isMono) {
                 document.documentElement.setAttribute('data-theme-light', 'true');
-                document.documentElement.style.setProperty('--theme-on-primary', '#06070a');
+                document.documentElement.style.setProperty('--theme-on-primary', '#08090e');
                 document.documentElement.style.setProperty('--theme-is-light', '1');
                 document.documentElement.style.setProperty('--theme-btn-shadow', '0 4px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7)');
+              } else {
+                document.documentElement.setAttribute('data-theme-light', 'false');
+                document.documentElement.style.setProperty('--theme-on-primary', '#ffffff');
+                document.documentElement.style.setProperty('--theme-is-light', '0');
               }
             }
+          } else {
+            // Default site theme is Monochrome Silver
+            document.documentElement.setAttribute('data-theme-light', 'true');
+            document.documentElement.style.setProperty('--theme-on-primary', '#08090e');
+            document.documentElement.style.setProperty('--theme-is-light', '1');
+            document.documentElement.style.setProperty('--theme-btn-shadow', '0 4px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7)');
           }
         } catch(e) {}
       })();

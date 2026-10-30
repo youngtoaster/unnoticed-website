@@ -57,19 +57,28 @@ function pushToGit(commitMsg = 'content: sync CMS updates from site admin') {
     }
     execSync(`git add ${stageTargets.join(' ')}`, { cwd: rootDir, stdio: 'pipe' });
     const diff = execSync('git diff --cached --name-only', { cwd: rootDir, encoding: 'utf-8' }).trim();
-    if (!diff) {
+    
+    if (diff) {
+      const safeMsg = commitMsg.replace(/"/g, '\\"');
+      execSync(`git commit -m "${safeMsg}"`, { cwd: rootDir, stdio: 'pipe' });
+    }
+
+    let unpushed = '';
+    try {
+      unpushed = execSync('git log origin/main..HEAD --oneline', { cwd: rootDir, encoding: 'utf-8' }).trim();
+    } catch {}
+
+    if (!diff && !unpushed) {
       return { success: true, pushed: false, message: 'Already up to date with Git' };
     }
-    const safeMsg = commitMsg.replace(/"/g, '\\"');
-    execSync(`git commit -m "${safeMsg}"`, { cwd: rootDir, stdio: 'pipe' });
 
-    // Standard push via local git credentials; fallback to authenticated token if remote requires it
+    // Push via local git credentials or authenticated token
     try {
       execSync('git push origin main', { cwd: rootDir, stdio: 'pipe' });
     } catch (pushErr) {
       const token = getLocalGithubToken(rootDir);
       if (token) {
-        execSync(`git push https://x-access-token:${token}@github.com/youngtoaster/unnoticed-website.git main`, { cwd: rootDir, stdio: 'pipe' });
+        execSync(`git push https://${token}@github.com/youngtoaster/unnoticed-website.git main`, { cwd: rootDir, stdio: 'pipe' });
       } else {
         throw pushErr;
       }
@@ -304,13 +313,7 @@ function devDataSyncPlugin() {
               }
 
               // Auto-commit new file to Git so GitHub repo preserves the real audio asset
-              try {
-                execSync(`git add "public/uploads/${finalFileName}"`, { cwd: rootDir, stdio: 'pipe' });
-                execSync(`git commit -m "media: upload ${finalFileName}"`, { cwd: rootDir, stdio: 'pipe' });
-                execSync('git push origin main', { cwd: rootDir, stdio: 'pipe' });
-              } catch (gitErr) {
-                console.warn('[devDataSyncPlugin] Git upload push notice:', gitErr.message);
-              }
+              const gitResult = pushToGit(`media: upload ${finalFileName}`);
 
               res.setHeader('Content-Type', 'application/json');
               res.setHeader('Access-Control-Allow-Origin', '*');
@@ -318,8 +321,10 @@ function devDataSyncPlugin() {
               res.end(JSON.stringify({
                 success: true,
                 url: `/uploads/${finalFileName}`,
+                rawUrl: `https://raw.githubusercontent.com/youngtoaster/unnoticed-website/main/public/uploads/${finalFileName}`,
                 fileName: finalFileName,
-                size: fileBuffer.length
+                size: fileBuffer.length,
+                git: gitResult
               }));
             } catch (err) {
               console.error('Error in /api/upload:', err);
@@ -377,6 +382,10 @@ export default defineConfig({
     react(),
     devDataSyncPlugin(),
   ],
+  server: {
+    host: true, // Listen on all network interfaces (0.0.0.0) so phone and external devices can connect
+    port: 5173,
+  },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),

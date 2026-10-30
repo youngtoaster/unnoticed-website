@@ -52,32 +52,102 @@ export default function MediaUploadOrLink({
     setFileName(file.name);
     setFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
     setIsUploading(true);
-    setUploadProgress('Uploading asset to server & Git disk...');
+    setUploadProgress('Uploading asset to server & permanent storage...');
 
-    // 1. Try dedicated server upload endpoint (/api/upload) - guarantees permanent disk persistence & real audio playback
+    let storedToken = localStorage.getItem('unnoticed_github_token');
+    if (!storedToken) {
+      try {
+        const tokenRes = await fetch('/api/admin/auto-token');
+        if (tokenRes.ok) {
+          const tData = await tokenRes.json();
+          if (tData?.token) {
+            storedToken = tData.token;
+            localStorage.setItem('unnoticed_github_token', storedToken);
+          }
+        }
+      } catch {}
+    }
+
+    // 1. Try dedicated server upload endpoint (/api/upload)
     try {
+      const headers = {
+        'X-File-Name': encodeURIComponent(file.name),
+        'Content-Type': file.type || 'application/octet-stream'
+      };
+      if (storedToken) {
+        headers['Authorization'] = `token ${storedToken}`;
+      }
+
       const res = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'X-File-Name': encodeURIComponent(file.name),
-          'Content-Type': file.type || 'application/octet-stream'
-        },
+        headers,
         body: file
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.url) {
+        const finalUrl = json.rawUrl || json.url;
+        if (finalUrl) {
           setIsUploading(false);
           setUploadProgress('');
-          actualOnChange(json.url);
+          actualOnChange(finalUrl);
           return;
         }
       }
     } catch (netErr) {
-      console.warn('[MediaUploadOrLink] Server upload bypassed/offline, using client storage fallback:', netErr);
+      console.warn('[MediaUploadOrLink] Server endpoint offline, trying direct GitHub API upload:', netErr);
     }
 
-    // 2. Client-side fallback for images: resize & compress
+    // 2. Direct GitHub REST API Upload fallback (works on any device, Vercel, or static host)
+    if (storedToken) {
+      try {
+        setUploadProgress('Saving directly to GitHub repository...');
+        const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ext = sanitized.lastIndexOf('.') !== -1 ? sanitized.substring(sanitized.lastIndexOf('.')) : '.bin';
+        const base = sanitized.replace(ext, '');
+        const finalFileName = `${base}_${Date.now()}${ext}`;
+
+        const base64Content = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = String(reader.result || '');
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const ghUrl = `https://api.github.com/repos/youngtoaster/unnoticed-website/contents/public/uploads/${finalFileName}`;
+        const ghRes = await fetch(ghUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${storedToken}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'Unnoticed-App'
+          },
+          body: JSON.stringify({
+            message: `media: upload ${finalFileName} via admin`,
+            content: base64Content,
+            branch: 'main'
+          })
+        });
+
+        if (ghRes.ok) {
+          const permanentUrl = `https://raw.githubusercontent.com/youngtoaster/unnoticed-website/main/public/uploads/${finalFileName}`;
+          setIsUploading(false);
+          setUploadProgress('');
+          actualOnChange(permanentUrl);
+          return;
+        } else {
+          const errData = await ghRes.json().catch(() => ({}));
+          console.warn('[MediaUploadOrLink] Direct GitHub upload rejected:', errData.message);
+        }
+      } catch (ghErr) {
+        console.warn('[MediaUploadOrLink] Direct GitHub upload error:', ghErr);
+      }
+    }
+
+    // 3. Client-side fallback for images: resize & compress
     if (type === 'image' && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -116,7 +186,7 @@ export default function MediaUploadOrLink({
       return;
     }
 
-    // 3. Fallback for audio/video if server is unreachable:
+    // 4. Temporary local session fallback for audio/video if both endpoints are unavailable
     if (file.size <= 4 * 1024 * 1024) {
       const reader = new FileReader();
       reader.onload = (event) => {

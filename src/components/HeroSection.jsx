@@ -221,7 +221,7 @@ export default function HeroSection({
       {/* 1. MAIN HOME VIEWPORT: FULL-HEIGHT CINEMATIC STAGE        */}
       {/* Fills 100vh with centered artist name, subtitle, & bio     */}
       {/* ======================================================== */}
-      <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-center items-center px-4 sm:px-6 pt-16 sm:pt-20 pb-20 sm:pb-24 overflow-hidden z-10">
+      <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-center items-center px-4 sm:px-6 pt-16 pb-16 overflow-hidden z-10">
 
         {/* ======================================================== */}
         {/* HUGE EXPLOSION OF LIGHT EXPANDING OUTWARDS FROM TITLE     */}
@@ -452,7 +452,7 @@ export default function HeroSection({
         )}
 
         {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser */}
-        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 translate-y-3 sm:translate-y-5 ${alignmentContainerClass}`}>
+        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 translate-y-5 sm:translate-y-8 ${alignmentContainerClass}`}>
 
           {/* Top On Tour Look-At-Me Button */}
           {artistInfo.tourBadge?.enabled !== false && (
@@ -717,7 +717,7 @@ export default function HeroSection({
         </div>
 
         {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt (Anchored to page bottom) */}
-        <div className="absolute bottom-3 sm:bottom-5 inset-x-0 mx-auto w-full flex flex-col items-center z-20 pointer-events-auto">
+        <div className="absolute bottom-2 sm:bottom-3 inset-x-0 mx-auto w-full flex flex-col items-center z-20 pointer-events-auto">
           <motion.button
             onClick={() => {
               const target = sectionsVisibility?.transmissionHub !== false 

@@ -262,9 +262,14 @@ export function DataProvider({ children }) {
       // Writes to server disk AND triggers auto-commit/push to GitHub so the repo stays 100% consistent everywhere
       try {
         setSyncStatus('syncing');
+        const storedToken = localStorage.getItem('unnoticed_github_token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (storedToken) {
+          headers['Authorization'] = `token ${storedToken}`;
+        }
         fetch('/api/sync-data', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             ...payload,
             autoGitPush: true,
@@ -300,9 +305,14 @@ export function DataProvider({ children }) {
         _lastUpdated: Date.now(),
         autoGitPush: true
       };
+      const storedToken = localStorage.getItem('unnoticed_github_token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (storedToken) {
+        headers['Authorization'] = `token ${storedToken}`;
+      }
       const res = await fetch('/api/sync-data', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -330,11 +340,29 @@ export function DataProvider({ children }) {
       _lastUpdated: Date.now()
     };
 
+    let storedToken = localStorage.getItem('unnoticed_github_token');
+    if (!storedToken) {
+      try {
+        const tokenRes = await fetch('/api/admin/auto-token');
+        if (tokenRes.ok) {
+          const tData = await tokenRes.json();
+          if (tData?.token) {
+            storedToken = tData.token;
+            localStorage.setItem('unnoticed_github_token', storedToken);
+          }
+        }
+      } catch {}
+    }
+
     // 1. First attempt: Push via local Git CLI endpoint (/api/git-sync)
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (storedToken) {
+        headers['Authorization'] = `token ${storedToken}`;
+      }
       const res = await fetch('/api/git-sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           payload,
           commitMessage: customMsg || `content: sync CMS updates from site admin [${new Date().toLocaleDateString()}]`
@@ -365,7 +393,22 @@ export function DataProvider({ children }) {
     }
 
     // 2. Fallback attempt: Push directly to GitHub REST API (for remote/production deployments)
-    const storedToken = localStorage.getItem('unnoticed_github_token');
+    if (!storedToken) {
+      storedToken = localStorage.getItem('unnoticed_github_token');
+    }
+    if (!storedToken) {
+      try {
+        const tokenRes = await fetch('/api/admin/auto-token');
+        if (tokenRes.ok) {
+          const tData = await tokenRes.json();
+          if (tData?.token) {
+            storedToken = tData.token;
+            localStorage.setItem('unnoticed_github_token', storedToken);
+          }
+        }
+      } catch {}
+    }
+
     if (storedToken) {
       try {
         const owner = 'youngtoaster';
@@ -412,13 +455,55 @@ export function DataProvider({ children }) {
 
         if (putRes.ok) {
           const putData = await putRes.json();
+          const hash = putData.commit?.sha?.slice(0, 7);
+
+          // Also push updated artistData.js code file so repository code stays in sync
+          try {
+            const jsContent = `// Artist data for UNNOTICED (Formerly Ty Sciullo)\n// Auto-synchronized CMS state for production consistency\n\n` + [
+              `export const SECTIONS_VISIBILITY = ${JSON.stringify(payload.sectionsVisibility || {}, null, 2)};\n`,
+              `export const FEATURED_RELEASE = ${JSON.stringify(payload.featuredRelease || {}, null, 2)};\n`,
+              `export const ARTIST_INFO = ${JSON.stringify(payload.artistInfo || {}, null, 2)};\n`,
+              `export const TRACKS = ${JSON.stringify(payload.tracks || [], null, 2)};\n`,
+              `export const BIOGRAPHY_PARAGRAPHS = ${JSON.stringify(payload.biography || [], null, 2)};\n`,
+              `export const VIDEOS = ${JSON.stringify(payload.videos || [], null, 2)};\n`,
+              `export const TOUR_DATES = ${JSON.stringify(payload.tourDates || [], null, 2)};\n`,
+              `export const PAST_TOUR_HIGHLIGHTS = ${JSON.stringify(payload.pastTours || [], null, 2)};\n`,
+              `export const MERCH_PRODUCTS = ${JSON.stringify(payload.merchProducts || [], null, 2)};\n`,
+              `export const GALLERY_IMAGES = ${JSON.stringify(payload.galleryImages || [], null, 2)};\n`,
+              `export const SOCIAL_POSTS = ${JSON.stringify(payload.socialPosts || [], null, 2)};\n`,
+              `export const EPK_DATA = ${JSON.stringify(payload.epkData || {}, null, 2)};\n`
+            ].join('\n');
+            const encodedJs = btoa(unescape(encodeURIComponent(jsContent)));
+            const jsUrl = `https://api.github.com/repos/${owner}/${repo}/contents/src/data/artistData.js`;
+            let jsSha = null;
+            try {
+              const getJs = await fetch(jsUrl, { headers: { Authorization: authHeader } });
+              if (getJs.ok) {
+                const jData = await getJs.json();
+                jsSha = jData.sha;
+              }
+            } catch {}
+            await fetch(jsUrl, {
+              method: 'PUT',
+              headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: `chore: sync artistData.js code defaults [${hash}]`,
+                content: encodedJs,
+                sha: jsSha || undefined,
+                branch: 'main'
+              })
+            });
+          } catch (jsErr) {
+            console.warn('artistData.js GitHub sync skipped:', jsErr);
+          }
+
           setIsPushingGit(false);
           setSyncStatus('synced');
           return {
             success: true,
             method: 'github-api',
-            hash: putData.commit?.sha?.slice(0, 7),
-            message: 'Pushed directly to GitHub repository via GitHub REST API'
+            hash,
+            message: `Pushed commit ${hash} directly to GitHub repository!`
           };
         } else {
           const errData = await putRes.json().catch(() => ({}));
@@ -530,6 +615,17 @@ export function DataProvider({ children }) {
         setIsAdminLoggedIn(true);
         // Persist to localStorage so the device remembers this admin login indefinitely
         localStorage.setItem(AUTH_KEY, 'granted');
+
+        // Automatically fetch and arm GitHub token for remote cloud sync
+        fetch('/api/admin/auto-token')
+          .then((r) => r.json())
+          .then((d) => {
+            if (d?.available && d?.token) {
+              localStorage.setItem('unnoticed_github_token', d.token);
+            }
+          })
+          .catch(() => {});
+
         return true;
       }
       return false;

@@ -672,11 +672,11 @@ export default function AdminDashboard({ onReturnToSite }) {
               }
             }}
             disabled={isPushingGit}
-            className="px-4 py-2 rounded-xl theme-primary-btn font-bold text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
             title="Commit & push all CMS content to GitHub so it stays consistent everywhere"
           >
             <GitBranch className={`w-3.5 h-3.5 ${isPushingGit ? 'animate-spin' : ''}`} />
-            <span>{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub'}</span>
+            <span className="font-black tracking-tight">{isPushingGit ? 'Pushing to GitHub...' : 'Push to GitHub'}</span>
             {gitStatus?.lastCommit?.hash && (
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 text-current opacity-85">
                 {gitStatus.lastCommit.hash}
@@ -705,10 +705,10 @@ export default function AdminDashboard({ onReturnToSite }) {
 
           <button
             onClick={onReturnToSite}
-            className="px-4 py-2 rounded-xl theme-primary-btn font-bold text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-xl theme-primary-btn font-black text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>View Live Site</span>
+            <span className="font-black tracking-tight">View Live Site</span>
           </button>
 
           <button
@@ -837,12 +837,12 @@ export default function AdminDashboard({ onReturnToSite }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0 ${
                   isActive
-                    ? 'theme-primary-btn shadow-lg ring-2 ring-white/20 border-white/30'
+                    ? 'theme-primary-btn font-black shadow-lg ring-2 ring-white/20 border-white/30'
                     : 'bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/[0.18]'
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? '' : 'text-purple-400'}`} />
-                <span>{tab.label}</span>
+                <span className={isActive ? 'font-black tracking-tight' : 'font-medium'}>{tab.label}</span>
                 {tab.count !== null && (
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold shrink-0 ${
                     isActive ? 'bg-black/20 text-current opacity-85' : 'bg-white/[0.08] text-slate-400'
@@ -1310,10 +1310,10 @@ export default function AdminDashboard({ onReturnToSite }) {
               <button
                 type="button"
                 onClick={() => setTestOverlayOpen(true)}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs theme-primary-btn flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xl"
+                className="px-5 py-2.5 rounded-xl font-black text-xs theme-primary-btn flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xl"
               >
                 <Sparkles className="w-4 h-4 animate-pulse shrink-0" />
-                <span>🚀 Test Slam-In Animation</span>
+                <span className="font-black tracking-tight">🚀 Test Slam-In Animation</span>
               </button>
             </div>
           </div>

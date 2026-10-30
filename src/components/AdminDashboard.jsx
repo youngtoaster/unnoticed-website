@@ -2079,12 +2079,36 @@ export default function AdminDashboard({ onReturnToSite }) {
                 </div>
               )}
 
+              {/* Persistent / Post-Reveal Inset Border Glow in Visualizer Preview */}
+              {(backdrop.glowCoverage === 'all' || backdrop.glowCoverage === 'border') && (backdrop.revealGlowMode ?? 'persistent') !== 'fade' && (
+                <div
+                  className="absolute inset-0 pointer-events-none z-10 transition-all duration-500"
+                  style={{
+                    boxShadow: `inset 0 0 ${(backdrop.borderGlowSpread ?? 55) * 0.4}px ${backdrop.glowColorMode === 'white' ? '#ffffff' : (neonConfig.color || '#a855f7')}`,
+                    opacity: ((backdrop.borderGlowIntensity ?? 65) / 100) * ((backdrop.postRevealIntensity ?? 85) / 100),
+                    mixBlendMode: 'screen'
+                  }}
+                />
+              )}
+
               {/* Overlaid Neon Title in Preview */}
               <div className={`relative z-10 flex flex-col ${
                 neonConfig.align === 'left' ? 'items-start text-left' :
                 neonConfig.align === 'right' ? 'items-end text-right' :
                 'items-center text-center'
               } select-none pointer-events-none px-4`}>
+                {/* Radiant Title Aura in Visualizer Preview */}
+                {(backdrop.glowCoverage === 'all' || backdrop.glowCoverage === 'title') && (backdrop.revealGlowMode ?? 'persistent') !== 'fade' && (
+                  <div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 sm:w-80 h-24 sm:h-32 rounded-full pointer-events-none -z-10"
+                    style={{
+                      background: `radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, ${(backdrop.glowColorMode === 'white' ? '#ffffff' : (neonConfig.color || '#a855f7'))}85 35%, transparent 75%)`,
+                      filter: 'blur(20px) drop-shadow(0 0 25px rgba(255,255,255,0.7))',
+                      opacity: ((backdrop.postRevealIntensity ?? 85) / 100) * 0.9,
+                      mixBlendMode: 'screen',
+                    }}
+                  />
+                )}
                 <h1
                   className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} text-4xl sm:text-6xl tracking-tight uppercase`}
                   style={{
@@ -2122,6 +2146,276 @@ export default function AdminDashboard({ onReturnToSite }) {
                 <span>Blur: {backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Off'}</span>
                 <span>•</span>
                 <span>Opacity: {backdrop.opacity ?? 45}%</span>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* ======================================================== */}
+          {/* EXPLOSION GLOW, POST-REVEAL AURA & BORDER ILLUMINATION   */}
+          {/* ======================================================== */}
+          <SpotlightCard className="p-6 space-y-6" tilt={false} spotlightColor="rgba(255, 255, 255, 0.16)">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+              <div>
+                <h3 className="font-display text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Explosion Light Glow & Whole Border Illumination</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Control the blinding explosion glow: keep the radiant light alive across the whole border permanently, adjust it to settle smoothly after the reveal, or turn it off after the animation finishes.
+                </p>
+              </div>
+
+              {/* Status Badge */}
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border flex items-center gap-1.5 ${
+                  (backdrop.revealGlowMode ?? 'persistent') === 'persistent'
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                    : (backdrop.revealGlowMode === 'settle'
+                        ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300'
+                        : 'bg-slate-500/15 border-slate-500/30 text-slate-400')
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${(backdrop.revealGlowMode ?? 'persistent') !== 'fade' ? 'bg-current animate-pulse' : 'bg-slate-500'}`} />
+                  <span>
+                    {(backdrop.revealGlowMode ?? 'persistent') === 'persistent'
+                      ? 'Glow: Persistent (Always On)'
+                      : (backdrop.revealGlowMode === 'settle'
+                          ? 'Glow: Settle After Reveal'
+                          : 'Glow: Off After Reveal')}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            {/* 1. REVEAL GLOW BEHAVIOR MODES (3 Preset Cards) */}
+            <div className="space-y-2">
+              <label className="text-xs font-mono font-semibold text-slate-200 block">
+                1. Post-Animation Glow Behavior
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  {
+                    id: 'persistent',
+                    title: 'Keep Persistent Glow',
+                    tag: 'Always On • Max Atmosphere',
+                    desc: 'Maintains the blinding light explosion radiance and border glow permanently on the stage.',
+                    badge: 'Recommended'
+                  },
+                  {
+                    id: 'settle',
+                    title: 'Adjust / Settle After Reveal',
+                    tag: 'Custom Rest Intensity',
+                    desc: 'Flashes with full explosion brilliance, then smoothly settles into your custom resting intensity.',
+                    badge: 'Custom Balance'
+                  },
+                  {
+                    id: 'fade',
+                    title: 'Turn Off After Animation',
+                    tag: 'Fade Out to Black',
+                    desc: 'Turns off completely once the 2.2-second reveal animation finishes, returning to standard dark backdrop.',
+                    badge: 'Classic Mode'
+                  }
+                ].map((mode) => {
+                  const isSelected = (backdrop.revealGlowMode ?? 'persistent') === mode.id;
+                  return (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      onClick={() => {
+                        updateBackdrop({ revealGlowMode: mode.id });
+                        showToast(`Glow Mode: ${mode.title}`);
+                      }}
+                      className={`p-3.5 rounded-2xl border text-left transition-all relative overflow-hidden cursor-pointer ${
+                        isSelected
+                          ? 'bg-purple-600/20 border-purple-400 shadow-lg shadow-purple-600/20 ring-1 ring-purple-400/40'
+                          : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.15]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-display font-bold text-xs text-white">
+                          {mode.title}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${
+                          isSelected ? 'bg-purple-400 text-black' : 'bg-white/[0.06] text-slate-400'
+                        }`}>
+                          {mode.badge}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-cyan-300 block mb-1">
+                        {mode.tag}
+                      </span>
+                      <p className="text-[11px] text-slate-400 font-light leading-relaxed">
+                        {mode.desc}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 2. GLOW COVERAGE & SPREAD */}
+            <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+              <label className="text-xs font-mono font-semibold text-slate-200 block">
+                2. Glow Scope & Coverage Area
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {[
+                  { id: 'all', label: 'Whole Stage & Border', desc: 'Perimeter border glow + full radial bloom + title aura' },
+                  { id: 'border', label: 'Whole Border Only', desc: 'Luminous glowing border vignette along all viewport edges' },
+                  { id: 'title', label: 'Artist Title Aura Only', desc: 'Concentrated blinding radiant halo behind UNNOTICED' }
+                ].map((cov) => {
+                  const isSelected = (backdrop.glowCoverage ?? 'all') === cov.id;
+                  return (
+                    <button
+                      key={cov.id}
+                      type="button"
+                      onClick={() => {
+                        updateBackdrop({ glowCoverage: cov.id });
+                        showToast(`Glow Scope: ${cov.label}`);
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-white/[0.09] border-white/40 shadow-md text-white'
+                          : 'bg-white/[0.02] border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      <div className="font-display font-bold text-xs text-white mb-0.5">
+                        {cov.label}
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-400 leading-snug">
+                        {cov.desc}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. INTENSITY & SPREAD SLIDERS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-white/[0.06]">
+              {/* Slider 1: Post-Reveal Resting Glow Intensity */}
+              <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-200">
+                  <span>Resting Glow Intensity</span>
+                  <strong className="text-purple-300 font-bold">{backdrop.postRevealIntensity ?? 85}%</strong>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  disabled={(backdrop.revealGlowMode ?? 'persistent') === 'fade'}
+                  value={backdrop.postRevealIntensity ?? 85}
+                  onChange={(e) => updateBackdrop({ postRevealIntensity: parseInt(e.target.value, 10) })}
+                  className="w-full accent-purple-400 cursor-pointer disabled:opacity-30"
+                />
+                <span className="text-[10px] font-mono text-slate-500 block">
+                  Controls how bright the aura stays after reveal
+                </span>
+              </div>
+
+              {/* Slider 2: Whole Border Glow Intensity */}
+              <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-200">
+                  <span>Whole Border Glow</span>
+                  <strong className="text-cyan-300 font-bold">{backdrop.borderGlowIntensity ?? 65}%</strong>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  disabled={(backdrop.revealGlowMode ?? 'persistent') === 'fade' || (backdrop.glowCoverage === 'title')}
+                  value={backdrop.borderGlowIntensity ?? 65}
+                  onChange={(e) => updateBackdrop({ borderGlowIntensity: parseInt(e.target.value, 10) })}
+                  className="w-full accent-cyan-400 cursor-pointer disabled:opacity-30"
+                />
+                <span className="text-[10px] font-mono text-slate-500 block">
+                  Edge perimeter border illumination strength
+                </span>
+              </div>
+
+              {/* Slider 3: Border Glow Spread / Depth */}
+              <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-200">
+                  <span>Border Spread Depth</span>
+                  <strong className="text-emerald-300 font-bold">{backdrop.borderGlowSpread ?? 55}px</strong>
+                </div>
+                <input
+                  type="range"
+                  min="15"
+                  max="120"
+                  step="5"
+                  disabled={(backdrop.revealGlowMode ?? 'persistent') === 'fade' || (backdrop.glowCoverage === 'title')}
+                  value={backdrop.borderGlowSpread ?? 55}
+                  onChange={(e) => updateBackdrop({ borderGlowSpread: parseInt(e.target.value, 10) })}
+                  className="w-full accent-emerald-400 cursor-pointer disabled:opacity-30"
+                />
+                <span className="text-[10px] font-mono text-slate-500 block">
+                  How deep the glow reaches into the viewport
+                </span>
+              </div>
+            </div>
+
+            {/* 4. COLOR & BREATHING PULSE */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/[0.06]">
+              {/* Color Tint Mode */}
+              <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <label className="text-[11px] font-mono font-semibold text-slate-200 block">
+                  Glow Tint & Color Synergy
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'sync', label: 'Theme Sync' },
+                    { id: 'white', label: 'Ice White' },
+                    { id: 'neon', label: 'Neon Gas' }
+                  ].map((tint) => {
+                    const isSelected = (backdrop.glowColorMode ?? 'sync') === tint.id;
+                    return (
+                      <button
+                        key={tint.id}
+                        type="button"
+                        onClick={() => {
+                          updateBackdrop({ glowColorMode: tint.id });
+                          showToast(`Glow Tint: ${tint.label}`);
+                        }}
+                        className={`py-2 px-2 rounded-lg text-[11px] font-mono font-bold text-center border transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-purple-600 text-white border-purple-400 shadow-md'
+                            : 'bg-white/[0.03] text-slate-400 border-white/[0.06] hover:text-white'
+                        }`}
+                      >
+                        {tint.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Living Pulse (Breathing Aura) Toggle */}
+              <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-mono font-bold text-white block">
+                    Gentle Living Pulse (Breathing Aura)
+                  </span>
+                  <p className="text-[10px] font-mono text-slate-400">
+                    Adds a subtle organic breathing rhythm to the persistent title aura and border light.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextVal = backdrop.breatheAura === false;
+                    updateBackdrop({ breatheAura: nextVal });
+                    showToast(nextVal ? 'Living Breath pulse enabled' : 'Living Breath pulse disabled (static glow)');
+                  }}
+                  className={`px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all active:scale-95 cursor-pointer shrink-0 ${
+                    backdrop.breatheAura !== false
+                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                      : 'bg-white/[0.04] border-white/[0.08] text-slate-500'
+                  }`}
+                >
+                  {backdrop.breatheAura !== false ? 'Enabled' : 'Disabled'}
+                </button>
               </div>
             </div>
           </SpotlightCard>

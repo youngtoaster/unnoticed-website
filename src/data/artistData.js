@@ -129,7 +129,14 @@ export const ARTIST_INFO = {
     "blendMode": "screen",
     "vignette": true,
     "illuminateOnGlow": true,
-    "glowIntensity": 85
+    "glowIntensity": 85,
+    "revealGlowMode": "persistent",
+    "glowCoverage": "all",
+    "postRevealIntensity": 85,
+    "borderGlowIntensity": 65,
+    "borderGlowSpread": 55,
+    "breatheAura": true,
+    "glowColorMode": "sync"
   }
 };
 

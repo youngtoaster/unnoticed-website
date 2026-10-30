@@ -195,6 +195,28 @@ export default function HeroSection({
   const isHeroBioVisible = (artistInfo.showHeroBio ?? true) && (sectionsVisibility?.heroBio !== false);
   const heroBioText = artistInfo.heroBio || artistInfo.bio || "Forged in the blue-collar industrial grit of McKees Rocks. Hypnotic basslines, unfiltered vulnerability, and nocturnal melodies for the restless mind.";
 
+  // Persistent / Post-Reveal Glow & Border Illumination Settings
+  const glowMode = backdrop.revealGlowMode || 'persistent'; // 'persistent' | 'settle' | 'fade'
+  const glowCoverage = backdrop.glowCoverage || 'all'; // 'all' | 'border' | 'title'
+  const postRevealIntensity = (backdrop.postRevealIntensity ?? 85) / 100;
+  const borderGlowIntensity = (backdrop.borderGlowIntensity ?? 65) / 100;
+  const borderGlowSpread = backdrop.borderGlowSpread ?? 55;
+  const breatheAura = backdrop.breatheAura !== false;
+  const glowColorMode = backdrop.glowColorMode || 'sync';
+
+  // Determine active glow tint
+  const ambientGlowColor = glowColorMode === 'white'
+    ? '#ffffff'
+    : (glowColorMode === 'neon' ? gasColor : (theme.primary || gasColor || '#ffffff'));
+
+  // Should persistent glow render?
+  const shouldRenderPersistentGlow = canIgnite && (hasRevealed || !explosionActive) && glowMode !== 'fade' && postRevealIntensity > 0;
+  const effectiveGlowOpacity = glowMode === 'persistent' ? postRevealIntensity : postRevealIntensity * 0.7;
+  const effectiveBorderOpacity = (glowMode === 'persistent' ? borderGlowIntensity : borderGlowIntensity * 0.7) * (postRevealIntensity / 0.85);
+
+  const showBorderGlow = shouldRenderPersistentGlow && (glowCoverage === 'all' || glowCoverage === 'border');
+  const showTitleAura = shouldRenderPersistentGlow && (glowCoverage === 'all' || glowCoverage === 'title');
+
   // Dynamic caption illumination (lights up progressively as the neon sign ignites)
   const isCaptionLit = canIgnite && ignitionState.isFullyLit;
   const captionProgress = canIgnite ? ignitionState.progress : 0;
@@ -352,7 +374,42 @@ export default function HeroSection({
           )}
         </AnimatePresence>
 
-        {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
+
+        {/* ======================================================== */}
+        {/* PERSISTENT / POST-REVEAL WHOLE BORDER & VIEWPORT GLOW    */}
+        {/* ======================================================== */}
+        {showBorderGlow && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: effectiveBorderOpacity
+            }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            className="absolute inset-0 pointer-events-none z-10 overflow-hidden"
+          >
+            {/* 1. Viewport Perimeter Whole Border Box Glow */}
+            <div
+              className="absolute inset-0 pointer-events-none transition-all duration-700"
+              style={{
+                boxShadow: `inset 0 0 ${borderGlowSpread}px ${ambientGlowColor}`,
+                opacity: effectiveBorderOpacity,
+                mixBlendMode: 'screen'
+              }}
+            />
+
+            {/* 2. Soft Atmospheric Radiance extending across the whole stage */}
+            <div
+              className="absolute inset-0 pointer-events-none transition-all duration-700"
+              style={{
+                background: `radial-gradient(ellipse 95% 85% at 50% 50%, ${ambientGlowColor}30 0%, ${ambientGlowColor}10 50%, transparent 80%)`,
+                mixBlendMode: 'screen',
+                filter: 'blur(25px)'
+              }}
+            />
+          </motion.div>
+        )}
+
+                {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
         {/* Revealed dynamically by the expanding faceted light pulse, showing only covered areas */}
         {isBackdropVisible && backdrop.image && backdrop.scope === 'hero' && (
           <motion.div
@@ -539,6 +596,31 @@ export default function HeroSection({
 
         {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
         <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
+            {/* Persistent / Post-Reveal Artist Title Radiant Aura */}
+            {showTitleAura && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={breatheAura ? {
+                  opacity: [effectiveGlowOpacity * 0.88, effectiveGlowOpacity * 1.08, effectiveGlowOpacity * 0.88],
+                  scale: [0.99, 1.02, 0.99]
+                } : {
+                  opacity: effectiveGlowOpacity,
+                  scale: 1
+                }}
+                transition={breatheAura ? {
+                  duration: 3.6,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                } : { duration: 0.8 }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] xs:w-[480px] sm:w-[720px] md:w-[920px] h-[160px] xs:h-[220px] sm:h-[300px] rounded-full pointer-events-none -z-10"
+                style={{
+                  background: `radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0%, ${ambientGlowColor}85 30%, ${ambientGlowColor}20 62%, transparent 80%)`,
+                  filter: 'blur(35px) drop-shadow(0 0 50px rgba(255,255,255,0.6))',
+                  mixBlendMode: 'screen',
+                }}
+              />
+            )}
+
 
             {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
             {isBackdropVisible && backdrop.image && backdrop.scope !== 'hero' && (

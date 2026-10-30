@@ -105,6 +105,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
 
   return (
     <section id="showcase" className="relative py-8 sm:py-12 px-4 sm:px-6 max-w-6xl mx-auto scroll-mt-24">
+      <div id="featured-release" className="absolute -top-24 pointer-events-none" />
       {/* Hidden Audio Engine */}
       <audio
         ref={audioRef}

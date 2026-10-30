@@ -372,13 +372,16 @@ export function DataProvider({ children }) {
         const repo = 'unnoticed-website';
         const filePath = 'public/site_data.json';
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+        const authHeader = storedToken.startsWith('Bearer ') || storedToken.startsWith('token ')
+          ? storedToken
+          : `Bearer ${storedToken}`;
 
         // Get current file sha
         let sha = null;
         try {
           const getRes = await fetch(apiUrl, {
             headers: {
-              Authorization: `token ${storedToken}`,
+              Authorization: authHeader,
               Accept: 'application/vnd.github.v3+json'
             }
           });
@@ -395,7 +398,7 @@ export function DataProvider({ children }) {
         const putRes = await fetch(apiUrl, {
           method: 'PUT',
           headers: {
-            Authorization: `token ${storedToken}`,
+            Authorization: authHeader,
             'Content-Type': 'application/json',
             Accept: 'application/vnd.github.v3+json'
           },
@@ -417,9 +420,13 @@ export function DataProvider({ children }) {
             hash: putData.commit?.sha?.slice(0, 7),
             message: 'Pushed directly to GitHub repository via GitHub REST API'
           };
+        } else {
+          const errData = await putRes.json().catch(() => ({}));
+          localErrorMessage = `GitHub API (${putRes.status}): ${errData.message || 'Push failed'}`;
         }
       } catch (apiErr) {
         console.error('GitHub API push failed:', apiErr);
+        localErrorMessage = apiErr?.message || 'GitHub API network connection error';
       }
     }
 

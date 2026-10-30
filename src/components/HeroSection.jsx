@@ -14,7 +14,7 @@ export default function HeroSection({
   togglePlay,
   onSelectTrack
 }) {
-  const { artistInfo, tracks, siteTheme } = useSiteData();
+  const { artistInfo, tracks, siteTheme, sectionsVisibility, toggleSectionVisibility } = useSiteData();
   const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
   const featuredTrack = tracks[0] || currentTrack;
@@ -115,6 +115,7 @@ export default function HeroSection({
     glowIntensity: 85
   };
 
+  const isBackdropVisible = (backdrop.enabled ?? true) && (sectionsVisibility?.heroBackdrop !== false);
   const isIlluminated = backdrop.illuminateOnGlow ?? true;
   const targetOpacity = (backdrop.opacity ?? 45) / 100;
   const blurAmount = backdrop.blurEnabled ? `${(backdrop.blur ?? 6) * 0.4}px` : '0px';
@@ -335,7 +336,7 @@ export default function HeroSection({
 
         {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
         {/* Revealed dynamically by the expanding faceted light pulse, showing only covered areas */}
-        {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
+        {isBackdropVisible && backdrop.image && backdrop.scope === 'hero' && (
           <motion.div
             key={`hero-bg-${explosionKey}`}
             initial={!hasRevealed && isIlluminated ? {
@@ -519,7 +520,7 @@ export default function HeroSection({
         <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
 
             {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
-            {backdrop.enabled && backdrop.image && backdrop.scope !== 'hero' && (
+            {isBackdropVisible && backdrop.image && backdrop.scope !== 'hero' && (
               <motion.div
                 key={`title-bg-${explosionKey}`}
                 initial={!hasRevealed && isIlluminated ? {
@@ -681,11 +682,14 @@ export default function HeroSection({
           </motion.p>
         </div>
 
-        {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt */}
-        <div className="w-full shrink-0 flex justify-center pb-2 sm:pb-4">
+        {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt & Stage Art Toggle */}
+        <div className="w-full shrink-0 flex flex-col items-center gap-2 pb-2 sm:pb-4 z-20">
           <motion.button
             onClick={() => {
-              const el = document.querySelector('#hero-revealed-content');
+              const target = sectionsVisibility?.transmissionHub !== false 
+                ? '#hero-revealed-content' 
+                : (sectionsVisibility?.featuredRelease !== false ? '#featured-release' : '#music');
+              const el = document.querySelector(target);
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             animate={{ y: [0, 4, 0] }}
@@ -705,6 +709,35 @@ export default function HeroSection({
             </div>
             <ArrowDown className="w-3 h-3 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
           </motion.button>
+
+          {/* Quick Stage Art Live View Toggle */}
+          {backdrop.image && (
+            <button
+              onClick={() => {
+                if (toggleSectionVisibility) {
+                  toggleSectionVisibility('heroBackdrop');
+                }
+              }}
+              className="px-3 py-1 rounded-full text-[9px] font-mono tracking-wider border transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer backdrop-blur-md bg-black/40 hover:bg-black/70"
+              style={{
+                borderColor: isBackdropVisible ? `${theme.primary || '#a855f7'}40` : 'rgba(255, 255, 255, 0.1)',
+                color: isBackdropVisible ? '#e2e8f0' : '#64748b'
+              }}
+              title="Toggle viewing hero stage artwork on/off"
+            >
+              {isBackdropVisible ? (
+                <>
+                  <Eye className="w-3 h-3 text-cyan-400" />
+                  <span>Stage Art: <strong className="text-white">Visible</strong></span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-3 h-3 text-slate-500" />
+                  <span>Stage Art: <strong className="text-slate-400">Hidden</strong></span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
       </div>
@@ -713,6 +746,7 @@ export default function HeroSection({
       {/* 2. REVEALED CONTENT ON SCROLL: CONTROLS & BENTO HUB       */}
       {/* Unveils smoothly as user scrolls past main home viewport   */}
       {/* ======================================================== */}
+      {sectionsVisibility?.transmissionHub !== false && (
       <motion.div
         id="hero-revealed-content"
         initial={{ opacity: 0, y: 25 }}
@@ -951,6 +985,7 @@ export default function HeroSection({
         </div>
 
       </motion.div>
+      )}
 
     </section>
   );

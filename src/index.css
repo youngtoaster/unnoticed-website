@@ -147,9 +147,7 @@ a.bg-purple-500 * {
 [data-theme-light="true"] button.bg-purple-600,
 [data-theme-light="true"] button.bg-purple-500,
 [data-theme-light="true"] a.bg-purple-600,
-[data-theme-light="true"] a.bg-purple-500,
-[data-theme-light="true"] [class*="bg-purple-600"],
-[data-theme-light="true"] [class*="bg-purple-500"] {
+[data-theme-light="true"] a.bg-purple-500 {
   color: #050608 !important;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 45%, #cbd5e1 100%) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
@@ -164,11 +162,7 @@ a.bg-purple-500 * {
 [data-theme-light="true"] button.bg-purple-600 *,
 [data-theme-light="true"] button.bg-purple-500 *,
 [data-theme-light="true"] a.bg-purple-600 *,
-[data-theme-light="true"] a.bg-purple-500 *,
-[data-theme-light="true"] [class*="bg-purple-600"] *,
-[data-theme-light="true"] [class*="bg-purple-500"] *,
-[data-theme-light="true"] [style*="--theme-primary"] *,
-[data-theme-light="true"] [style*="var(--theme-primary)"] * {
+[data-theme-light="true"] a.bg-purple-500 * {
   color: #050608 !important;
   fill: #050608 !important;
   stroke: #050608 !important;
@@ -176,17 +170,25 @@ a.bg-purple-500 * {
   text-shadow: none !important;
 }
 
-/* Ensure any pill, badge, or container using bg-purple-600 retains dark contrast when light theme is active */
+/* Ensure any pill, badge, or container using bg-purple maintains dark luxury contrast without being blown out */
+[data-theme-light="true"] span[class*="bg-purple-500"],
+[data-theme-light="true"] span[class*="bg-purple-600"],
+[data-theme-light="true"] div[class*="bg-purple-500"],
+[data-theme-light="true"] div[class*="bg-purple-600"],
 [data-theme-light="true"] .bg-purple-600:not(button):not(a),
 [data-theme-light="true"] .bg-purple-500:not(button):not(a) {
-  background-color: #1e1f2f !important;
-  color: #f8fafc !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  background-color: rgba(30, 31, 47, 0.85) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
+[data-theme-light="true"] span[class*="bg-purple-500"] *,
+[data-theme-light="true"] span[class*="bg-purple-600"] *,
+[data-theme-light="true"] div[class*="bg-purple-500"] *,
+[data-theme-light="true"] div[class*="bg-purple-600"] *,
 [data-theme-light="true"] .bg-purple-600:not(button):not(a) *,
 [data-theme-light="true"] .bg-purple-500:not(button):not(a) * {
-  color: #f8fafc !important;
+  color: #f1f5f9 !important;
 }
 
 /* Tame overblown white shadows and highlights across the entire site */

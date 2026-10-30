@@ -594,12 +594,13 @@ export default function AdminDashboard({ onReturnToSite }) {
     { id: 'tracks', label: 'Music & Audio', icon: Music, count: tracks.length },
     { id: 'lyrics', label: 'Genius Lyrics', icon: FileText, count: tracks.length },
     { id: 'showcase', label: 'Release Showcase', icon: Disc3, count: null },
+    { id: 'backdrop', label: 'Hero Stage Image', icon: ImageIcon, count: null },
     { id: 'theme', label: 'Site Color Theme', icon: Palette, count: null },
     { id: 'profile', label: 'Profile & Bio', icon: Sparkles, count: biography.length },
     { id: 'videos', label: 'Videos & Visuals', icon: Youtube, count: videos.length },
     { id: 'tour', label: 'Tour Schedule', icon: Ticket, count: tourDates.length },
     { id: 'merch', label: 'Merch Catalog', icon: ShoppingBag, count: merchProducts.length },
-    { id: 'gallery', label: 'Gallery Slides', icon: ImageIcon, count: galleryImages.length },
+    { id: 'gallery', label: 'Gallery Slides', icon: Layers, count: galleryImages.length },
     { id: 'social', label: 'Social Feed', icon: Instagram, count: socialPosts.length },
     { id: 'epk', label: 'EPK & Press', icon: Shield, count: null },
     { id: 'github', label: 'GitHub Cloud Sync', icon: GitBranch, count: null },
@@ -1612,6 +1613,678 @@ export default function AdminDashboard({ onReturnToSite }) {
             >
               Save & Synchronize
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB: HERO STAGE & BACKDROP IMAGE STUDIO ================= */}
+      {activeTab === 'backdrop' && (
+        <div className="space-y-6">
+          <SectionControlsHeader
+            title="Hero Stage & Backdrop Image Studio"
+            subtitle="Configure the signature cinematic visual revealed behind UNNOTICED on site load. Upload custom photos, adjust zoom, focal alignment, blur, opacity, lighting, and stage layout."
+            badgeText={backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'Backdrop Active' : 'Backdrop Hidden'}
+            badgeColor={backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'cyan' : 'red'}
+            sectionKey="heroBackdrop"
+            allowDeleteAll={false}
+            allowReset={true}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
+            onResetDefault={() => {
+              updateBackdrop({
+                enabled: true,
+                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+                blur: 6,
+                blurEnabled: true,
+                opacity: 45,
+                zoom: 105,
+                positionX: 50,
+                positionY: 45,
+                scope: "title",
+                blendMode: "screen",
+                vignette: true,
+                illuminateOnGlow: true,
+                glowIntensity: 85
+              });
+              showToast('Reset Hero Backdrop to default stage visual');
+            }}
+          />
+
+          {/* MASTER VISIBILITY & STAGE SCOPE TOOLBAR */}
+          <SpotlightCard className="p-6 space-y-4" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+              <div>
+                <h3 className="font-display text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-cyan-400" />
+                  <span>Stage Display & Placement Scope</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Control whether the backdrop image is visible on the site and choose how it spans across the hero stage.
+                </p>
+              </div>
+
+              {/* Master Enable/Disable Switch */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextVal = backdrop.enabled === false ? true : false;
+                    updateBackdrop({ enabled: nextVal });
+                    if (toggleSectionVisibility && (sectionsVisibility?.heroBackdrop === false) === nextVal) {
+                      toggleSectionVisibility('heroBackdrop');
+                    }
+                    showToast(nextVal ? 'Hero Backdrop enabled on live site' : 'Hero Backdrop hidden from live site');
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition-all active:scale-95 cursor-pointer shadow-md ${
+                    backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false
+                      ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25'
+                      : 'bg-rose-500/15 border-rose-500/30 text-rose-300 hover:bg-rose-500/25'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                  <span>{backdrop.enabled !== false && sectionsVisibility?.heroBackdrop !== false ? 'Backdrop Active on Site' : 'Backdrop Hidden (Disabled)'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {/* Scope Switcher */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
+                <label className="text-[11px] font-mono text-slate-300 font-semibold block flex items-center justify-between">
+                  <span>Backdrop Framing Scope</span>
+                  <span className="text-[10px] font-mono text-fuchsia-400 uppercase font-bold">
+                    {backdrop.scope === 'hero' ? 'Full Hero Viewport' : 'Framed Behind Title'}
+                  </span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateBackdrop({ scope: 'title' });
+                      showToast('Backdrop scope: Framed Behind Artist Title');
+                    }}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
+                      (backdrop.scope ?? 'title') === 'title'
+                        ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
+                        : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    Framed Behind Title
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateBackdrop({ scope: 'hero' });
+                      showToast('Backdrop scope: Full Hero Viewport (Full Screen)');
+                    }}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
+                      backdrop.scope === 'hero'
+                        ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
+                        : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    Full Hero Viewport
+                  </button>
+                </div>
+                <p className="text-[10px] font-mono text-slate-400">
+                  "Full Hero Viewport" spans the full 100vh stage behind title and bio. "Framed Behind Title" isolates the visual to a sleek anamorphic frame.
+                </p>
+              </div>
+
+              {/* Transmission Hub Visibility Toggle */}
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
+                <label className="text-[11px] font-mono text-slate-300 font-semibold block flex items-center justify-between">
+                  <span>Audio Studio & Transmission Hub</span>
+                  <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold">
+                    {sectionsVisibility?.transmissionHub !== false ? 'Enabled on Site' : 'Hidden'}
+                  </span>
+                </label>
+                <div className="flex items-center justify-between pt-1">
+                  <p className="text-[10px] font-mono text-slate-400 max-w-[70%]">
+                    Shows or hides the "Audio Studio & Transmission Hub" (Metamorphosis, Streaming Reach, and Navigation cards) situated directly below the artist hero.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (toggleSectionVisibility) {
+                        toggleSectionVisibility('transmissionHub');
+                        const nextState = sectionsVisibility?.transmissionHub === false;
+                        showToast(nextState ? 'Audio Studio & Transmission Hub enabled' : 'Audio Studio & Transmission Hub hidden');
+                      }
+                    }}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold border transition-all active:scale-95 cursor-pointer ${
+                      sectionsVisibility?.transmissionHub !== false
+                        ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25'
+                        : 'bg-slate-800 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {sectionsVisibility?.transmissionHub !== false ? 'Visible' : 'Hidden'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* REAL-TIME INTERACTIVE STAGE VISUALIZER */}
+          <SpotlightCard className="p-6 space-y-4" tilt={false}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-white/[0.08] gap-3">
+              <div>
+                <h3 className="font-display text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <span>Real-Time Stage Visualizer & Optical Simulation</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Live preview showing how the image, focal point, blur, and neon illumination render together on the public site.
+                </p>
+              </div>
+
+              {/* Simulation Detonation Buttons */}
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTestExplosion(true);
+                    setPreviewIlluminated(true);
+                    setTimeout(() => {
+                      setTestExplosion(false);
+                    }, 2200);
+                  }}
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-mono text-[11px] font-bold shadow-md hover:brightness-110 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  title="Detonate the huge light explosion shockwave expanding outwards to reveal the background"
+                >
+                  <span>💥 Detonate Light Explosion Reveal</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreviewIlluminated(true);
+                    setTestIgnitionStep(0);
+                    let step = 0;
+                    const interval = setInterval(() => {
+                      step++;
+                      setTestIgnitionStep(step);
+                      if (step >= 9) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                          setPreviewIlluminated(false);
+                          setTestIgnitionStep(null);
+                        }, 3200);
+                      }
+                    }, 140);
+                  }}
+                  className="px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-white font-mono text-[11px] font-semibold border border-white/[0.1] active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  title="Test the progressive letter strike sequence"
+                >
+                  <Zap className="w-3 h-3 text-amber-300" />
+                  <span>Letter Strike Sequence</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Scaled Preview Frame */}
+            <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden border border-white/[0.14] bg-[#07080d] flex items-center justify-center shadow-2xl">
+              <div className="absolute top-2.5 right-3.5 z-20 text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-black/80 border border-white/20 text-slate-200">
+                Scope: <strong className="text-fuchsia-300">{backdrop.scope === 'hero' ? 'Full Hero Viewport' : 'Framed Behind Title'}</strong>
+              </div>
+
+              {/* Ambient Room Darkness */}
+              <div className="absolute inset-0 bg-radial from-purple-950/25 via-transparent to-black pointer-events-none" />
+
+              {/* Live Shockwave Explosion Preview in Visualizer Frame */}
+              <AnimatePresence>
+                {testExplosion && (
+                  <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden flex items-center justify-center">
+                    <motion.div
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: [0, 0.45, 1.8, 4.2], opacity: [0, 1, 0.9, 0] }}
+                      transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="w-48 h-48 rounded-full border-[10px] border-white"
+                      style={{
+                        boxShadow: `0 0 40px #ffffff, 0 0 90px ${neonConfig.color || '#a855f7'}, 0 0 160px ${neonConfig.color || '#a855f7'}`,
+                        mixBlendMode: 'screen',
+                      }}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
+
+              {/* The Configured Backdrop Image in Preview */}
+              {backdrop.enabled && backdrop.image ? (
+                <motion.div
+                  animate={
+                    testExplosion
+                      ? {
+                          clipPath: [
+                            'circle(0% at 50% 45%)',
+                            'circle(25% at 50% 45%)',
+                            'circle(80% at 50% 45%)',
+                            'circle(160% at 50% 45%)'
+                          ],
+                          opacity: [0, (backdrop.opacity ?? 45) / 100, (backdrop.opacity ?? 45) / 100],
+                          filter: [
+                            'brightness(3) blur(0px)',
+                            'brightness(2) blur(1px)',
+                            `brightness(1) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`
+                          ]
+                        }
+                      : testIgnitionStep !== null
+                      ? {
+                          clipPath: 'circle(160% at 50% 45%)',
+                          opacity: testIgnitionStep === 0 ? 0 : (testIgnitionStep >= 9 ? (backdrop.opacity ?? 45) / 100 : ((backdrop.opacity ?? 45) / 100) * (0.12 + 0.88 * Math.pow(testIgnitionStep / 9, 0.95))),
+                          filter: testIgnitionStep === 0 ? `brightness(0) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})` : `brightness(${testIgnitionStep >= 9 ? 1.1 : 0.15 + (0.85 * (testIgnitionStep / 9))}) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                          scale: testIgnitionStep >= 9 ? 1.02 : 1
+                        }
+                      : {
+                          clipPath: 'circle(160% at 50% 45%)',
+                          opacity: (backdrop.opacity ?? 45) / 100,
+                          filter: `brightness(1) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
+                          scale: 1
+                        }
+                  }
+                  transition={testExplosion ? { duration: 1.8, ease: [0.16, 1, 0.3, 1] } : { duration: 0.25, ease: 'easeOut' }}
+                  className={
+                    backdrop.scope === 'hero'
+                      ? "absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
+                      : "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-48 rounded-2xl pointer-events-none overflow-hidden border border-white/20 shadow-2xl"
+                  }
+                  style={{
+                    maskImage: backdrop.vignette
+                      ? (backdrop.scope === 'hero'
+                          ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+                          : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
+                      : 'none',
+                    WebkitMaskImage: backdrop.vignette
+                      ? (backdrop.scope === 'hero'
+                          ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
+                          : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
+                      : 'none',
+                  }}
+                >
+                  <img
+                    src={backdrop.image}
+                    alt="Hero Backdrop Preview"
+                    className="w-full h-full object-cover transition-all"
+                    style={{
+                      objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
+                      transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                      mixBlendMode: backdrop.blendMode || 'screen',
+                    }}
+                  />
+
+                  {/* Neon Light Wash when illuminated */}
+                  {(previewIlluminated || (backdrop.illuminateOnGlow ?? true)) && (
+                    <div
+                      className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
+                        testIgnitionStep !== null
+                          ? (testIgnitionStep >= 9 ? 'opacity-100' : 'opacity-25')
+                          : (previewIlluminated ? 'opacity-100' : 'opacity-40')
+                      }`}
+                      style={{
+                        background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}45 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
+                        mixBlendMode: 'color-dodge'
+                      }}
+                    />
+                  )}
+                </motion.div>
+              ) : (
+                <div className="text-center text-slate-500 font-mono text-xs p-6">
+                  No backdrop image selected. Upload a file or paste an image link below.
+                </div>
+              )}
+
+              {/* Overlaid Neon Title in Preview */}
+              <div className={`relative z-10 flex flex-col ${
+                neonConfig.align === 'left' ? 'items-start text-left' :
+                neonConfig.align === 'right' ? 'items-end text-right' :
+                'items-center text-center'
+              } select-none pointer-events-none px-4`}>
+                <h1
+                  className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} text-4xl sm:text-6xl tracking-tight uppercase`}
+                  style={{
+                    color: '#ffffff',
+                    textShadow: previewIlluminated || (testIgnitionStep !== null && testIgnitionStep >= 9)
+                      ? `0 0 8px #ffffff, 0 0 25px ${neonConfig.color || '#a855f7'}, 0 0 60px ${neonConfig.color || '#a855f7'}`
+                      : (testIgnitionStep !== null && testIgnitionStep === 0
+                          ? `0 0 2px ${neonConfig.color || '#a855f7'}30`
+                          : `0 0 4px #ffffff, 0 0 15px ${neonConfig.color || '#a855f7'}`)
+                  }}
+                >
+                  {artistInfo.name || 'UNNOTICED'}
+                </h1>
+                <p
+                  className="text-[10px] font-mono tracking-widest uppercase mt-1 font-bold text-slate-200"
+                  style={{
+                    textShadow: `0 0 6px ${neonConfig.color || '#a855f7'}`
+                  }}
+                >
+                  {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
+                </p>
+              </div>
+
+              {/* Floating Status Pill in Preview */}
+              <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-2 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300">
+                <span>Zoom: {backdrop.zoom ?? 105}%</span>
+                <span>•</span>
+                <span>Focal: {backdrop.positionX ?? 50}%x, {backdrop.positionY ?? 45}%y</span>
+                <span>•</span>
+                <span>Blur: {backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Off'}</span>
+                <span>•</span>
+                <span>Opacity: {backdrop.opacity ?? 45}%</span>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* IMAGE SELECTION, UPLOAD & PRESETS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Left Column: Image Source & Upload */}
+            <div className="space-y-4 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+              <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>1. Image Source & Direct Upload</span>
+              </h4>
+
+              <div>
+                <label className="text-[11px] font-mono text-slate-400 block mb-1">
+                  Custom Image URL or Device File
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="https://images.unsplash.com/... or paste image URL"
+                    value={backdrop.image || ''}
+                    onChange={(e) => updateBackdrop({ image: e.target.value })}
+                    className="flex-1 px-3 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                  <label className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        // Try uploading via /api/upload to save to public/uploads/
+                        try {
+                          const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': file.type,
+                              'X-File-Name': encodeURIComponent(file.name)
+                            },
+                            body: file
+                          });
+                          if (res.ok) {
+                            const data = await res.json();
+                            if (data.url) {
+                              updateBackdrop({ image: data.url });
+                              showToast('Uploaded backdrop image to server uploads!');
+                              return;
+                            }
+                          }
+                        } catch (err) {
+                          console.warn('Server upload fallback to data URL:', err);
+                        }
+
+                        // Fallback: Read as base64 Data URL
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          if (ev.target?.result) {
+                            updateBackdrop({ image: ev.target.result });
+                            showToast('Loaded local backdrop image');
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Curated Presets Grid */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-[10px] font-mono text-slate-400 block uppercase">
+                  Curated Studio Presets (1-Click Apply)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    {
+                      name: 'Nocturnal Angel',
+                      url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop'
+                    },
+                    {
+                      name: 'Moody Cyber Stage',
+                      url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop'
+                    },
+                    {
+                      name: 'Industrial Grit',
+                      url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1600&auto=format&fit=crop'
+                    },
+                    {
+                      name: 'Laser Starburst',
+                      url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'
+                    }
+                  ].map((preset) => (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => {
+                        updateBackdrop({ image: preset.url });
+                        showToast(`Applied "${preset.name}" preset`);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] text-[10px] font-mono text-left truncate transition-colors cursor-pointer"
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Blend Mode & Vignette */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Blend Mode</label>
+                  <select
+                    value={backdrop.blendMode || 'screen'}
+                    onChange={(e) => updateBackdrop({ blendMode: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-[#12131f] border border-white/[0.1] text-xs text-white focus:outline-none"
+                  >
+                    <option value="screen">Screen (Luminous Glow)</option>
+                    <option value="overlay">Overlay (High Contrast)</option>
+                    <option value="soft-light">Soft Light (Subtle Mood)</option>
+                    <option value="color-dodge">Color Dodge (Extreme Neon)</option>
+                    <option value="luminosity">Luminosity (Monochrome)</option>
+                    <option value="normal">Normal (Raw Photo)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-1">Feathered Edge Vignette</label>
+                  <label className="flex items-center gap-2 h-9 px-3 rounded-xl bg-black/40 border border-white/[0.1] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={backdrop.vignette ?? true}
+                      onChange={(e) => updateBackdrop({ vignette: e.target.checked })}
+                      className="rounded accent-purple-500 w-3.5 h-3.5"
+                    />
+                    <span className="text-xs text-slate-200">Fade Into Black</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Optics, Blur, Crop, Opacity & Focal Positioning */}
+            <div className="space-y-4 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+              <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                <Sliders className="w-3.5 h-3.5" />
+                <span>2. Optics, Blur, Crop & Illumination FX</span>
+              </h4>
+
+              {/* Glow Illumination Reveal Toggle */}
+              <div className="p-3 rounded-xl bg-purple-950/25 border border-purple-500/30 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={backdrop.illuminateOnGlow ?? true}
+                      onChange={(e) => updateBackdrop({ illuminateOnGlow: e.target.checked })}
+                      className="rounded accent-purple-500 w-4 h-4"
+                    />
+                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Illuminate on Neon Title Glow</span>
+                    </span>
+                  </label>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                    {backdrop.illuminateOnGlow ? 'Active' : 'Disabled'}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-300 font-light leading-relaxed">
+                  Neon sign strikes cast dynamic physical light onto the background, revealing only the wavefront-covered areas!
+                </p>
+              </div>
+
+              {/* Blur Percentage Setting */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={backdrop.blurEnabled ?? true}
+                      onChange={(e) => updateBackdrop({ blurEnabled: e.target.checked })}
+                      className="rounded accent-purple-500 w-3.5 h-3.5"
+                    />
+                    <span className="text-[11px] font-mono text-slate-300">
+                      Blur Filter: <strong className="text-white">{backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Disabled'}</strong>
+                    </span>
+                  </label>
+                  <span className="text-[10px] font-mono text-slate-500">0% (Sharp) - 100% (Glass)</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  disabled={!backdrop.blurEnabled}
+                  value={backdrop.blur ?? 6}
+                  onChange={(e) => updateBackdrop({ blur: parseInt(e.target.value, 10) })}
+                  className="w-full accent-purple-500 cursor-pointer disabled:opacity-30"
+                />
+              </div>
+
+              {/* Opacity Slider */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
+                  <span>Backdrop Opacity: <strong className="text-white">{backdrop.opacity ?? 45}%</strong></span>
+                  <span className="text-[10px] text-slate-500">0% (Hidden) - 100% (Solid)</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={backdrop.opacity ?? 45}
+                  onChange={(e) => updateBackdrop({ opacity: parseInt(e.target.value, 10) })}
+                  className="w-full accent-purple-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Crop & Zoom Scale Slider */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
+                  <span className="flex items-center gap-1">
+                    <Crop className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Crop Zoom / Scale: <strong className="text-white">{backdrop.zoom ?? 105}%</strong></span>
+                  </span>
+                  <span className="text-[10px] text-slate-500">100% (Original) - 250% (Close-Up)</span>
+                </div>
+                <input
+                  type="range"
+                  min="100"
+                  max="250"
+                  step="5"
+                  value={backdrop.zoom ?? 105}
+                  onChange={(e) => updateBackdrop({ zoom: parseInt(e.target.value, 10) })}
+                  className="w-full accent-purple-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Focal Position X & Y */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
+                    <span>Focal Point X ({backdrop.positionX ?? 50}%)</span>
+                  </div>
+                  <div className="flex gap-1 mb-1">
+                    {[
+                      { label: 'Left', val: 15 },
+                      { label: 'Center', val: 50 },
+                      { label: 'Right', val: 85 }
+                    ].map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => updateBackdrop({ positionX: preset.val })}
+                        className={`flex-1 py-1 text-[9px] font-mono rounded ${
+                          (backdrop.positionX ?? 50) === preset.val
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={backdrop.positionX ?? 50}
+                    onChange={(e) => updateBackdrop({ positionX: parseInt(e.target.value, 10) })}
+                    className="w-full accent-purple-500 cursor-pointer"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
+                    <span>Focal Point Y ({backdrop.positionY ?? 45}%)</span>
+                  </div>
+                  <div className="flex gap-1 mb-1">
+                    {[
+                      { label: 'Top', val: 15 },
+                      { label: 'Center', val: 50 },
+                      { label: 'Bottom', val: 85 }
+                    ].map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => updateBackdrop({ positionY: preset.val })}
+                        className={`flex-1 py-1 text-[9px] font-mono rounded ${
+                          (backdrop.positionY ?? 45) === preset.val
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={backdrop.positionY ?? 45}
+                    onChange={(e) => updateBackdrop({ positionY: parseInt(e.target.value, 10) })}
+                    className="w-full accent-purple-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -2754,558 +3427,32 @@ export default function AdminDashboard({ onReturnToSite }) {
             </div>
           </SpotlightCard>
 
-          {/* ======================================================== */}
-          {/* ARTIST TITLE & HERO BACKDROP ILLUMINATION STUDIO         */}
-          {/* Live visualizer, crop, zoom, blur %, and glow reveal     */}
-          {/* ======================================================== */}
-          <SpotlightCard className="p-6 space-y-6" tilt={false}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
+          {/* Hero Backdrop Stage Quick Portal */}
+          <SpotlightCard className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-purple-500/20 bg-purple-950/15" tilt={false}>
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0">
+                <ImageIcon className="w-5 h-5" />
+              </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <h3 className="font-display text-lg font-bold text-white">
-                    Artist Title & Hero Backdrop Illumination Studio
-                  </h3>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                    Live Visualizer & Crop
+                <h3 className="font-display text-base font-bold text-white flex items-center gap-2">
+                  <span>Hero Stage & Backdrop Image Studio</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    Moved to Dedicated Tab
                   </span>
-                </div>
-                <p className="text-xs text-slate-400">
-                  Place custom imagery behind the neon artist title. Configure crop zoom, focal alignment, blur percentage, and dynamic neon light reveal.
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  The visual backdrop image has its own dedicated admin tab with zoom, blur, focal alignment, upload tools, and live simulation.
                 </p>
               </div>
-
-              {/* Master Enable/Disable Switch */}
-              <label className="flex items-center gap-2 cursor-pointer bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-white/[0.08] self-start sm:self-auto hover:bg-white/[0.08] transition-colors">
-                <input
-                  type="checkbox"
-                  checked={backdrop.enabled ?? true}
-                  onChange={(e) => {
-                    updateBackdrop({ enabled: e.target.checked });
-                    showToast(e.target.checked ? 'Backdrop image enabled' : 'Backdrop image disabled');
-                  }}
-                  className="rounded accent-purple-500 w-4 h-4"
-                />
-                <span className="text-xs font-semibold text-white">
-                  {backdrop.enabled ? 'Backdrop Active' : 'Backdrop Disabled'}
-                </span>
-              </label>
             </div>
-
-            {/* INTERACTIVE LIVE VISUALIZER PREVIEW */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono text-purple-300 font-semibold flex items-center gap-1.5">
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Real-Time Visualizer (Live Crop, Blur & Illumination)</span>
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {testIgnitionStep !== null && (
-                    <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-[10px] font-mono text-purple-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      <span>{testIgnitionStep === 0 ? 'Black Screen (Unlit)' : testIgnitionStep >= 9 ? 'Fully Lit & Illuminated!' : `Revealing: ${testIgnitionStep}/9 Letters Lit`}</span>
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTestExplosion(true);
-                      setPreviewIlluminated(true);
-                      setTimeout(() => {
-                        setTestExplosion(false);
-                      }, 1800);
-                    }}
-                    className="px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-mono text-[11px] font-bold shadow-md hover:brightness-110 active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                    title="Detonate the huge light explosion shockwave expanding outwards to reveal the background"
-                  >
-                    <span>💥 Detonate Light Explosion Reveal</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPreviewIlluminated(true);
-                      setTestIgnitionStep(0);
-                      let step = 0;
-                      const interval = setInterval(() => {
-                        step++;
-                        setTestIgnitionStep(step);
-                        if (step >= 9) {
-                          clearInterval(interval);
-                          setTimeout(() => {
-                            setPreviewIlluminated(false);
-                            setTestIgnitionStep(null);
-                          }, 3200);
-                        }
-                      }, 140);
-                    }}
-                    className="px-3.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-white font-mono text-[11px] font-semibold border border-white/[0.1] active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                    title="Test the progressive letter strike sequence"
-                  >
-                    <Zap className="w-3 h-3 text-amber-300" />
-                    <span>Letter Strike Sequence</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Scaled Preview Frame */}
-              <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/[0.14] bg-[#07080d] flex items-center justify-center shadow-2xl">
-                {/* Scope Badge in Preview Frame */}
-                <div className="absolute top-2.5 right-3.5 z-20 text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-black/80 border border-white/20 text-slate-200">
-                  Scope: <strong className="text-fuchsia-300">{backdrop.scope === 'hero' ? 'Full Hero Section Viewport' : 'Framed Behind Title Only'}</strong>
-                </div>
-
-                {/* Ambient Room Darkness */}
-                <div className="absolute inset-0 bg-radial from-purple-950/25 via-transparent to-black pointer-events-none" />
-
-                {/* Live Shockwave Explosion Preview in Visualizer Frame */}
-                <AnimatePresence>
-                  {testExplosion && (
-                    <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden flex items-center justify-center">
-                      <motion.div
-                        initial={{ scale: 0, opacity: 1 }}
-                        animate={{ scale: [0, 0.4, 1.5, 3.5], opacity: [0, 1, 0.9, 0] }}
-                        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                        className="w-48 h-48 rounded-full border-[10px] border-white"
-                        style={{
-                          boxShadow: `0 0 40px #ffffff, 0 0 90px ${neonConfig.color || '#a855f7'}, 0 0 160px ${neonConfig.color || '#a855f7'}`,
-                          mixBlendMode: 'screen',
-                        }}
-                      />
-                    </div>
-                  )}
-                </AnimatePresence>
-
-                {/* The Configured Backdrop Image in Preview */}
-                {backdrop.enabled && backdrop.image ? (
-                  <motion.div
-                    animate={
-                      testExplosion
-                        ? {
-                            clipPath: [
-                              'circle(0% at 50% 45%)',
-                              'circle(25% at 50% 45%)',
-                              'circle(80% at 50% 45%)',
-                              'circle(160% at 50% 45%)'
-                            ],
-                            opacity: [0, (backdrop.opacity ?? 45) / 100, (backdrop.opacity ?? 45) / 100],
-                            filter: [
-                              'brightness(3) blur(0px)',
-                              'brightness(2) blur(1px)',
-                              `brightness(1) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`
-                            ]
-                          }
-                        : testIgnitionStep !== null
-                        ? {
-                            clipPath: 'circle(160% at 50% 45%)',
-                            opacity: testIgnitionStep === 0 ? 0 : (testIgnitionStep >= 9 ? (backdrop.opacity ?? 45) / 100 : ((backdrop.opacity ?? 45) / 100) * (0.12 + 0.88 * Math.pow(testIgnitionStep / 9, 0.95))),
-                            filter: testIgnitionStep === 0 ? `brightness(0) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})` : `brightness(${testIgnitionStep >= 9 ? 1.1 : 0.15 + (0.85 * (testIgnitionStep / 9))}) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
-                            scale: testIgnitionStep >= 9 ? 1.02 : 1
-                          }
-                        : {
-                            clipPath: 'circle(160% at 50% 45%)',
-                            opacity: (backdrop.opacity ?? 45) / 100,
-                            filter: `brightness(1) blur(${backdrop.blurEnabled ? (backdrop.blur ?? 6) * 0.3 + 'px' : '0px'})`,
-                            scale: 1
-                          }
-                    }
-                    transition={testExplosion ? { duration: 1.4, ease: [0.16, 1, 0.3, 1] } : { duration: 0.25, ease: 'easeOut' }}
-                    className={
-                      backdrop.scope === 'hero'
-                        ? "absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
-                        : "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-44 rounded-2xl pointer-events-none overflow-hidden border border-white/20 shadow-2xl"
-                    }
-                    style={{
-                      maskImage: backdrop.vignette
-                        ? (backdrop.scope === 'hero'
-                            ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
-                            : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
-                        : 'none',
-                      WebkitMaskImage: backdrop.vignette
-                        ? (backdrop.scope === 'hero'
-                            ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
-                            : 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 68%, transparent 96%)')
-                        : 'none',
-                    }}
-                  >
-                    <img
-                      src={backdrop.image}
-                      alt="Hero Backdrop Preview"
-                      className="w-full h-full object-cover transition-all"
-                      style={{
-                        objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
-                        transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
-                        mixBlendMode: backdrop.blendMode || 'screen',
-                      }}
-                    />
-
-                    {/* Neon Light Wash when illuminated */}
-                    {(previewIlluminated || (backdrop.illuminateOnGlow ?? true)) && (
-                      <div
-                        className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
-                          testIgnitionStep !== null
-                            ? (testIgnitionStep >= 9 ? 'opacity-100' : 'opacity-25')
-                            : (previewIlluminated ? 'opacity-100' : 'opacity-40')
-                        }`}
-                        style={{
-                          background: `radial-gradient(ellipse at center, ${neonConfig.color || '#a855f7'}45 0%, ${neonConfig.color || '#a855f7'}15 50%, transparent 80%)`,
-                          mixBlendMode: 'color-dodge'
-                        }}
-                      />
-                    )}
-                  </motion.div>
-                ) : (
-                  <div className="text-center text-slate-500 font-mono text-xs p-6">
-                    No backdrop image selected. Upload a file or paste an image link below.
-                  </div>
-                )}
-
-                {/* Overlaid Neon Title in Preview with Dynamic Alignment & Font */}
-                <div className={`relative z-10 flex flex-col ${
-                  neonConfig.align === 'left' ? 'items-start text-left' :
-                  neonConfig.align === 'right' ? 'items-end text-right' :
-                  'items-center text-center'
-                } select-none pointer-events-none px-4`}>
-                  <h1
-                    className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} text-4xl sm:text-6xl tracking-tight uppercase`}
-                    style={{
-                      color: '#ffffff',
-                      textShadow: previewIlluminated || (testIgnitionStep !== null && testIgnitionStep >= 9)
-                        ? `0 0 8px #ffffff, 0 0 25px ${neonConfig.color || '#a855f7'}, 0 0 60px ${neonConfig.color || '#a855f7'}`
-                        : (testIgnitionStep !== null && testIgnitionStep === 0
-                            ? `0 0 2px ${neonConfig.color || '#a855f7'}30`
-                            : `0 0 4px #ffffff, 0 0 15px ${neonConfig.color || '#a855f7'}`)
-                    }}
-                  >
-                    {artistInfo.name || 'UNNOTICED'}
-                  </h1>
-                  <p
-                    className="text-[10px] font-mono tracking-widest uppercase mt-1 font-bold text-slate-200"
-                    style={{
-                      textShadow: `0 0 6px ${neonConfig.color || '#a855f7'}`
-                    }}
-                  >
-                    {artistInfo.heroSubtitle || "Once Known As Ty Sciullo • Now A Man Unseen"}
-                  </p>
-
-                  {previewIlluminated && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono text-amber-300 font-bold"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      <span>{testIgnitionStep !== null && testIgnitionStep < 9 ? `Black Screen Opening → Revealing Letter ${testIgnitionStep}/9` : 'Neon Glow Fully Illuminating & Revealing Background Image'}</span>
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Floating Status Pill in Preview */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300">
-                  <span>Zoom: {backdrop.zoom ?? 105}%</span>
-                  <span>•</span>
-                  <span>Focal: {backdrop.positionX ?? 50}%x, {backdrop.positionY ?? 45}%y</span>
-                  <span>•</span>
-                  <span>Blur: {backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Off'}</span>
-                  <span>•</span>
-                  <span>Reveal: {backdrop.illuminateOnGlow ? 'ON' : 'OFF'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* SETTINGS CONTROLS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-              
-              {/* Left Column: Image Source & Upload */}
-              <div className="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
-                <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5" />
-                  <span>1. Image Source & Upload</span>
-                </h4>
-
-                <div>
-                  <label className="text-[11px] font-mono text-slate-400 block mb-1">
-                    Image URL or Local Upload
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="https://images.unsplash.com/... or paste link"
-                      value={backdrop.image || ''}
-                      onChange={(e) => updateBackdrop({ image: e.target.value })}
-                      className="flex-1 px-3 py-2 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
-                    />
-                    <label className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0">
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>Upload File</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            if (ev.target?.result) {
-                              updateBackdrop({ image: ev.target.result });
-                              showToast('Uploaded backdrop image');
-                            }
-                          };
-                          reader.readAsDataURL(file);
-                        }}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {/* Framing Scope */}
-                <div>
-                  <label className="text-[11px] font-mono text-slate-300 font-semibold block mb-1.5 flex items-center justify-between">
-                    <span>Backdrop Placement & Framing Scope</span>
-                    <span className="text-[10px] font-mono text-fuchsia-400 uppercase font-bold">
-                      {backdrop.scope === 'hero' ? 'Full Hero Viewport' : 'Title Only'}
-                    </span>
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        updateBackdrop({ scope: 'title' });
-                        showToast('Backdrop scope: Framed Behind Artist Title');
-                      }}
-                      className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
-                        (backdrop.scope ?? 'title') === 'title'
-                          ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
-                          : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
-                      }`}
-                    >
-                      Framed Behind Title
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        updateBackdrop({ scope: 'hero' });
-                        showToast('Backdrop scope: Full Hero Viewport (Full Screen)');
-                      }}
-                      className={`py-2.5 px-3 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
-                        backdrop.scope === 'hero'
-                          ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
-                          : 'bg-white/[0.03] text-slate-300 border-white/[0.08] hover:bg-white/[0.06]'
-                      }`}
-                    >
-                      Full Hero Viewport
-                    </button>
-                  </div>
-                  <p className="text-[9.5px] font-mono text-slate-400 mt-1.5">
-                    "Full Hero Viewport" spans the entire screen behind title, bio, and badge with ambient edge feathering. "Framed Behind Title" keeps it localized to the lettering.
-                  </p>
-                </div>
-
-                {/* Blend Mode & Vignette */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-mono text-slate-400 block mb-1">Blend Mode</label>
-                    <select
-                      value={backdrop.blendMode || 'screen'}
-                      onChange={(e) => updateBackdrop({ blendMode: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-[#12131f] border border-white/[0.1] text-xs text-white focus:outline-none"
-                    >
-                      <option value="screen">Screen (Luminous)</option>
-                      <option value="overlay">Overlay (High Contrast)</option>
-                      <option value="soft-light">Soft Light (Subtle)</option>
-                      <option value="luminosity">Luminosity (Monochrome)</option>
-                      <option value="normal">Normal</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-mono text-slate-400 block mb-1">Edge Vignette</label>
-                    <label className="flex items-center gap-2 h-9 px-3 rounded-xl bg-black/40 border border-white/[0.1] cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={backdrop.vignette ?? true}
-                        onChange={(e) => updateBackdrop({ vignette: e.target.checked })}
-                        className="rounded accent-purple-500 w-3.5 h-3.5"
-                      />
-                      <span className="text-xs text-slate-200">Feathered Edges</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Illumination Reveal, Blur %, Crop & Opacity */}
-              <div className="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
-                <h4 className="font-display font-bold text-xs uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>2. Glow Illumination, Blur & Crop Settings</span>
-                </h4>
-
-                {/* Glow Illumination Reveal Toggle (Requested by User) */}
-                <div className="p-3 rounded-xl bg-purple-950/25 border border-purple-500/30 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={backdrop.illuminateOnGlow ?? true}
-                        onChange={(e) => updateBackdrop({ illuminateOnGlow: e.target.checked })}
-                        className="rounded accent-purple-500 w-4 h-4"
-                      />
-                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <Zap className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Illuminate Image on Neon Title Glow</span>
-                      </span>
-                    </label>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                      {backdrop.illuminateOnGlow ? 'Active' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-300 font-light leading-relaxed">
-                    When turned on, the neon sign strikes on and casts physical neon bloom onto the background image, revealing it through the light!
-                  </p>
-                </div>
-
-                {/* Blur Percentage Setting & On/Off Toggle (Requested by User) */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={backdrop.blurEnabled ?? true}
-                        onChange={(e) => updateBackdrop({ blurEnabled: e.target.checked })}
-                        className="rounded accent-purple-500 w-3.5 h-3.5"
-                      />
-                      <span className="text-[11px] font-mono text-slate-300">
-                        Blur Filter: <strong className="text-white">{backdrop.blurEnabled ? `${backdrop.blur ?? 6}%` : 'Disabled'}</strong>
-                      </span>
-                    </label>
-                    <span className="text-[10px] font-mono text-slate-500">0% (Sharp) - 100% (Abstract)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    disabled={!backdrop.blurEnabled}
-                    value={backdrop.blur ?? 6}
-                    onChange={(e) => updateBackdrop({ blur: parseInt(e.target.value, 10) })}
-                    className="w-full accent-purple-500 cursor-pointer disabled:opacity-30"
-                  />
-                </div>
-
-                {/* Opacity Slider */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
-                    <span>Backdrop Opacity: <strong className="text-white">{backdrop.opacity ?? 45}%</strong></span>
-                    <span className="text-[10px] text-slate-500">0% (Invisible) - 100% (Solid)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="5"
-                    value={backdrop.opacity ?? 45}
-                    onChange={(e) => updateBackdrop({ opacity: parseInt(e.target.value, 10) })}
-                    className="w-full accent-purple-500 cursor-pointer"
-                  />
-                </div>
-
-                {/* Crop & Zoom Scale Slider */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
-                    <span className="flex items-center gap-1">
-                      <Crop className="w-3.5 h-3.5 text-purple-400" />
-                      <span>Crop Zoom / Scale: <strong className="text-white">{backdrop.zoom ?? 105}%</strong></span>
-                    </span>
-                    <span className="text-[10px] text-slate-500">100% (Full) - 250% (Tight)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="100"
-                    max="250"
-                    step="5"
-                    value={backdrop.zoom ?? 105}
-                    onChange={(e) => updateBackdrop({ zoom: parseInt(e.target.value, 10) })}
-                    className="w-full accent-purple-500 cursor-pointer"
-                  />
-                </div>
-
-                {/* Focal Position X & Y */}
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
-                      <span>Focal Point X ({backdrop.positionX ?? 50}%)</span>
-                    </div>
-                    <div className="flex gap-1 mb-1">
-                      {[
-                        { label: 'Left', val: 15 },
-                        { label: 'Center', val: 50 },
-                        { label: 'Right', val: 85 }
-                      ].map((preset) => (
-                        <button
-                          key={preset.label}
-                          type="button"
-                          onClick={() => updateBackdrop({ positionX: preset.val })}
-                          className={`flex-1 py-1 text-[9px] font-mono rounded ${
-                            (backdrop.positionX ?? 50) === preset.val
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-white/[0.04] text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      value={backdrop.positionX ?? 50}
-                      onChange={(e) => updateBackdrop({ positionX: parseInt(e.target.value, 10) })}
-                      className="w-full accent-purple-500 cursor-pointer"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
-                      <span>Focal Point Y ({backdrop.positionY ?? 45}%)</span>
-                    </div>
-                    <div className="flex gap-1 mb-1">
-                      {[
-                        { label: 'Top', val: 15 },
-                        { label: 'Center', val: 50 },
-                        { label: 'Bottom', val: 85 }
-                      ].map((preset) => (
-                        <button
-                          key={preset.label}
-                          type="button"
-                          onClick={() => updateBackdrop({ positionY: preset.val })}
-                          className={`flex-1 py-1 text-[9px] font-mono rounded ${
-                            (backdrop.positionY ?? 45) === preset.val
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-white/[0.04] text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      value={backdrop.positionY ?? 45}
-                      onChange={(e) => updateBackdrop({ positionY: parseInt(e.target.value, 10) })}
-                      className="w-full accent-purple-500 cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('backdrop')}
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0 shadow-md shadow-purple-600/30"
+            >
+              <span>Open Hero Image Studio</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </SpotlightCard>
 
           {/* Biography Paragraphs */}

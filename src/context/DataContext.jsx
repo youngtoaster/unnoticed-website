@@ -25,6 +25,9 @@ const DB_CONFIG_KEY = 'unnoticed_db_config';
 const TARGET_SALT = 'unnoticed_salt_tyler_2026_';
 const TARGET_HASH = '90eeb0b0059529a2ca4bc4b6be0c21b0d3275c1bccba6a7e958b3e336bb1ff17';
 
+const DEFAULT_SUPABASE_URL = 'https://ftinvmrjijnncwzkvgcn.supabase.co';
+const DEFAULT_SUPABASE_KEY = 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV';
+
 // Universal Database Headers Generator (attaches GitHub token & Cloud DB credentials)
 const getDbHeaders = () => {
   const headers = { 'Content-Type': 'application/json' };
@@ -33,13 +36,14 @@ const getDbHeaders = () => {
     if (ghToken) headers['Authorization'] = `token ${ghToken}`;
 
     const rawDb = localStorage.getItem(DB_CONFIG_KEY);
-    if (rawDb) {
-      const parsed = JSON.parse(rawDb);
-      if (parsed.upstashUrl) headers['x-db-upstash-url'] = parsed.upstashUrl;
-      if (parsed.upstashToken) headers['x-db-upstash-token'] = parsed.upstashToken;
-      if (parsed.supabaseUrl) headers['x-db-supabase-url'] = parsed.supabaseUrl;
-      if (parsed.supabaseKey) headers['x-db-supabase-key'] = parsed.supabaseKey;
-    }
+    const parsed = rawDb ? JSON.parse(rawDb) : {};
+    if (parsed.upstashUrl) headers['x-db-upstash-url'] = parsed.upstashUrl;
+    if (parsed.upstashToken) headers['x-db-upstash-token'] = parsed.upstashToken;
+
+    const supaUrl = parsed.supabaseUrl || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL;
+    const supaKey = parsed.supabaseKey || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_KEY;
+    if (supaUrl) headers['x-db-supabase-url'] = supaUrl;
+    if (supaKey) headers['x-db-supabase-key'] = supaKey;
   } catch {}
   return headers;
 };
@@ -145,9 +149,18 @@ export function DataProvider({ children }) {
   const getDbConfig = useCallback(() => {
     try {
       const stored = localStorage.getItem(DB_CONFIG_KEY);
-      return stored ? JSON.parse(stored) : {};
+      const parsed = stored ? JSON.parse(stored) : {};
+      return {
+        upstashUrl: parsed.upstashUrl || '',
+        upstashToken: parsed.upstashToken || '',
+        supabaseUrl: parsed.supabaseUrl || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL,
+        supabaseKey: parsed.supabaseKey || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_KEY
+      };
     } catch {
-      return {};
+      return {
+        supabaseUrl: DEFAULT_SUPABASE_URL,
+        supabaseKey: DEFAULT_SUPABASE_KEY
+      };
     }
   }, []);
 

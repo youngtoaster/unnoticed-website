@@ -46,8 +46,8 @@ function getDbConfig(req) {
   return {
     upstashUrl: (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || headers['x-db-upstash-url'] || '').replace(/\/$/, ''),
     upstashToken: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || headers['x-db-upstash-token'] || '',
-    supabaseUrl: (process.env.SUPABASE_URL || headers['x-db-supabase-url'] || '').replace(/\/$/, ''),
-    supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || headers['x-db-supabase-key'] || '',
+    supabaseUrl: (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || headers['x-db-supabase-url'] || 'https://ftinvmrjijnncwzkvgcn.supabase.co').replace(/\/$/, ''),
+    supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || headers['x-db-supabase-key'] || 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV',
     githubToken: process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN || headers['authorization']?.replace(/^Bearer\s+|^token\s+/i, '') || '',
     githubOwner: process.env.GITHUB_OWNER || 'youngtoaster',
     githubRepo: process.env.GITHUB_REPO || 'unnoticed-website'
@@ -355,7 +355,7 @@ export default async function handler(req, res) {
       // 2. Write to Supabase Postgres
       if (config.supabaseUrl && config.supabaseKey) {
         try {
-          const supaRes = await fetch(`${config.supabaseUrl}/rest/v1/site_data`, {
+          const supaRes = await fetch(`${config.supabaseUrl}/rest/v1/site_data?on_conflict=id`, {
             method: 'POST',
             headers: {
               'apikey': config.supabaseKey,

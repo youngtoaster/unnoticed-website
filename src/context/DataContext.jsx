@@ -19,10 +19,31 @@ const DataContext = createContext(null);
 const STORAGE_KEY = 'unnoticed_cms_v1_data';
 // Persistent admin authorization token stored in localStorage so credentials survive tab/browser restarts
 const AUTH_KEY = 'unnoticed_admin_persistent_auth_v2';
+const DB_CONFIG_KEY = 'unnoticed_db_config';
 
 // Salted SHA-256 administrative authentication credential hash
 const TARGET_SALT = 'unnoticed_salt_tyler_2026_';
 const TARGET_HASH = '90eeb0b0059529a2ca4bc4b6be0c21b0d3275c1bccba6a7e958b3e336bb1ff17';
+
+// Universal Database Headers Generator (attaches GitHub token & Cloud DB credentials)
+const getDbHeaders = () => {
+  const headers = { 'Content-Type': 'application/json' };
+  try {
+    const ghToken = localStorage.getItem('unnoticed_github_token');
+    if (ghToken) headers['Authorization'] = `token ${ghToken}`;
+
+    const rawDb = localStorage.getItem(DB_CONFIG_KEY);
+    if (rawDb) {
+      const parsed = JSON.parse(rawDb);
+      if (parsed.upstashUrl) headers['x-db-upstash-url'] = parsed.upstashUrl;
+      if (parsed.upstashToken) headers['x-db-upstash-token'] = parsed.upstashToken;
+      if (parsed.supabaseUrl) headers['x-db-supabase-url'] = parsed.supabaseUrl;
+      if (parsed.supabaseKey) headers['x-db-supabase-key'] = parsed.supabaseKey;
+    }
+  } catch {}
+  return headers;
+};
+
 
 export function DataProvider({ children }) {
   // Load saved data or fallback to defaults
@@ -79,6 +100,57 @@ export function DataProvider({ children }) {
 
   // Multi-device synchronization state indicator
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+    // Universal Database Connection State
+  const [dbStatus, setDbStatus] = useState({
+    connected: false,
+    activeProvider: 'detecting',
+    latencyMs: null,
+    lastSynced: null,
+    providers: {}
+  });
+
+  // Check Database Connection & Provider Health
+  const checkDbHealth = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/db?check=1&t=${Date.now()}`, {
+        headers: getDbHeaders()
+      });
+      if (res.ok) {
+        const info = await res.json();
+        setDbStatus((prev) => ({
+          ...prev,
+          connected: true,
+          activeProvider: info.activeProvider || 'github_cloud_db',
+          providers: info.providers || {},
+          lastSynced: info.timestamp || Date.now()
+        }));
+        return info;
+      }
+    } catch (e) {
+      setDbStatus((prev) => ({ ...prev, connected: false }));
+    }
+    return null;
+  }, []);
+
+  const saveDbConfig = useCallback((cfg) => {
+    try {
+      localStorage.setItem(DB_CONFIG_KEY, JSON.stringify(cfg));
+      checkDbHealth();
+      return true;
+    } catch {
+      return false;
+    }
+  }, [checkDbHealth]);
+
+  const getDbConfig = useCallback(() => {
+    try {
+      const stored = localStorage.getItem(DB_CONFIG_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  }, []);
+
   const [gitStatus, setGitStatus] = useState({
     isGit: false,
     branch: 'main',
@@ -106,7 +178,15 @@ export function DataProvider({ children }) {
     const syncFromNetwork = async () => {
       try {
         setSyncStatus('syncing');
-        const res = await fetch(`/site_data.json?t=${Date.now()}`);
+        let res = null;
+        try {
+          res = await fetch(`/api/db?t=${Date.now()}`, {
+            headers: getDbHeaders()
+          });
+        } catch {}
+        if (!res || !res.ok) {
+          res = await fetch(`/site_data.json?t=${Date.now()}`);
+        }
         if (res.ok) {
           const remoteData = await res.json();
           if (remoteData && typeof remoteData === 'object' && isMounted) {
@@ -145,6 +225,15 @@ export function DataProvider({ children }) {
               });
             }
             setSyncStatus('synced');
+            if (remoteData._source) {
+              setDbStatus((prev) => ({
+                ...prev,
+                connected: true,
+                activeProvider: remoteData._source,
+                latencyMs: remoteData._readLatencyMs || prev.latencyMs,
+                lastSynced: Date.now()
+              }));
+            }
           }
         } else {
           setSyncStatus('synced');
@@ -170,10 +259,31 @@ export function DataProvider({ children }) {
         .catch(() => {});
     } catch {}
 
+    // Real-Time Multi-Device Persistence Sync:
+    // When returning to tab on any device (phone, laptop, desktop), immediately check database
+    const handleFocusSync = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncFromNetwork();
+      }
+    };
+    window.addEventListener('focus', handleFocusSync);
+    document.addEventListener('visibilitychange', handleFocusSync);
+
+    // Periodic database heartbeat sync every 35s
+    const dbPollTimer = setInterval(() => {
+      syncFromNetwork();
+    }, 35000);
+
+    // Initial DB Health check
+    checkDbHealth();
+
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleFocusSync);
+      document.removeEventListener('visibilitychange', handleFocusSync);
+      clearInterval(dbPollTimer);
     };
-  }, [refreshGitStatus]);
+  }, [refreshGitStatus, checkDbHealth]);
 
   // Dynamic CSS variables injection for Global Site Color Theme
   useEffect(() => {
@@ -267,9 +377,10 @@ export function DataProvider({ children }) {
         if (storedToken) {
           headers['Authorization'] = `token ${storedToken}`;
         }
-        fetch('/api/sync-data', {
+        // Save to Universal Database Engine (Upstash, Supabase, GitHub, Disk)
+        fetch('/api/db', {
           method: 'POST',
-          headers,
+          headers: getDbHeaders(),
           body: JSON.stringify({
             ...payload,
             autoGitPush: true,
@@ -722,6 +833,10 @@ export function DataProvider({ children }) {
         isPushingGit,
         pushToGitHub,
         refreshGitStatus,
+        dbStatus,
+        checkDbHealth,
+        saveDbConfig,
+        getDbConfig,
         toggleSectionVisibility,
         setSectionVisibility,
         clearSection,

@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import fs from 'fs'
 import { execSync } from 'child_process'
+import dbHandler from './api/db.js'
 
 // Helper to write data back to src/data/artistData.js so code repository matches live CMS
 function syncArtistDataFile(data, rootDir) {
@@ -98,6 +99,9 @@ function devDataSyncPlugin() {
   return {
     name: 'dev-data-sync',
     configureServer(server) {
+      // 0. UNIFIED DATABASE API (/api/db) - Real-time persistence across all platforms
+      server.middlewares.use('/api/db', dbHandler);
+
       // 1. DATA SYNC ENDPOINT (/api/sync-data)
       server.middlewares.use('/api/sync-data', async (req, res) => {
         if (req.method === 'OPTIONS') {

@@ -235,16 +235,16 @@ export default function MusicSection({
                         }}
                         className={`absolute inset-0 m-auto w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           isThisPlaying
-                            ? 'bg-purple-600 text-white shadow-xl shadow-purple-600/60 scale-100 opacity-100'
-                            : 'bg-black/60 text-white border border-white/30 backdrop-blur-md opacity-0 group-hover:opacity-100 group-hover:scale-100 hover:bg-purple-600 hover:border-purple-400'
+                            ? 'theme-primary-btn scale-100 opacity-100'
+                            : 'bg-black/60 text-white border border-white/30 backdrop-blur-md opacity-0 group-hover:opacity-100 group-hover:scale-100 hover:scale-105'
                         }`}
                         title={isThisPlaying ? 'Pause Studio Preview' : 'Play Studio Preview'}
                         aria-label={`Play preview for ${track.title}`}
                       >
                         {isThisPlaying ? (
-                          <Pause className="w-6 h-6 fill-white" />
+                          <Pause className="w-6 h-6 fill-current" />
                         ) : (
-                          <Play className="w-6 h-6 fill-white ml-0.5" />
+                          <Play className="w-6 h-6 fill-current ml-0.5" />
                         )}
                       </button>
 
@@ -430,19 +430,25 @@ export default function MusicSection({
                       {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY */}
                       {/* Disc slides out prominently with dramatic exposure */}
                       <div className="relative w-full max-w-[340px] xl:max-w-[380px] mx-auto pt-2 pb-3 flex items-center justify-center">
-                        {/* Vinyl Disc Sliding Out Prominently Behind Sleeve */}
+                        {/* Vinyl Disc Sliding Out Prominently Behind Sleeve When Playing, Put Away Inside Sleeve When Paused */}
                         <motion.div
                           animate={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { rotate: 360 }
-                              : { rotate: 0 }
+                              ? { rotate: 360, x: 80 }
+                              : { rotate: 0, x: 0 }
                           }
                           transition={
                             isPlaying && currentTrack?.id === focusedTrack.id
-                              ? { duration: 4.5, repeat: Infinity, ease: 'linear' }
-                              : { duration: 0.5 }
+                              ? {
+                                  rotate: { duration: 4.5, repeat: Infinity, ease: 'linear' },
+                                  x: { type: 'spring', stiffness: 120, damping: 18 }
+                                }
+                              : {
+                                  rotate: { duration: 0.4 },
+                                  x: { type: 'spring', stiffness: 140, damping: 20 }
+                                }
                           }
-                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 translate-x-20 sm:translate-x-24"
+                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
                           style={{
                             boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
                             backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
@@ -460,8 +466,16 @@ export default function MusicSection({
                           </div>
                         </motion.div>
 
-                        {/* Main High-Res Album Jacket / Sleeve (Balanced offset for extended vinyl disc) */}
-                        <div className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16] -translate-x-12 sm:-translate-x-14">
+                        {/* Main High-Res Album Jacket / Sleeve (Smoothly slides left when playing, centered when not playing) */}
+                        <motion.div
+                          animate={
+                            isPlaying && currentTrack?.id === focusedTrack.id
+                              ? { x: -46 }
+                              : { x: 0 }
+                          }
+                          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+                          className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16]"
+                        >
                           <img
                             src={focusedTrack.cover}
                             alt={focusedTrack.title}
@@ -495,18 +509,18 @@ export default function MusicSection({
                             }}
                             className={`absolute inset-0 m-auto w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
                               isPlaying && currentTrack?.id === focusedTrack.id
-                                ? 'bg-purple-600/90 text-white shadow-xl shadow-purple-600/60 scale-100 opacity-100'
-                                : 'bg-black/65 text-white border border-white/30 backdrop-blur-md opacity-0 group-hover:opacity-100 hover:bg-purple-600 hover:scale-105'
+                                ? 'theme-primary-btn scale-100 opacity-100'
+                                : 'bg-black/65 text-white border border-white/30 backdrop-blur-md opacity-0 group-hover:opacity-100 hover:scale-105'
                             }`}
                             title={isPlaying && currentTrack?.id === focusedTrack.id ? 'Pause Preview' : 'Play Preview'}
                           >
                             {isPlaying && currentTrack?.id === focusedTrack.id ? (
-                              <Pause className="w-5 h-5 fill-white" />
+                              <Pause className="w-5 h-5 fill-current" />
                             ) : (
-                              <Play className="w-5 h-5 fill-white ml-0.5" />
+                              <Play className="w-5 h-5 fill-current ml-0.5" />
                             )}
                           </button>
-                        </div>
+                        </motion.div>
                       </div>
 
                       {/* Track Identity Header */}
@@ -521,7 +535,12 @@ export default function MusicSection({
                         </h3>
 
                         <p className="text-xs text-slate-300 font-mono mt-0.5">
-                          <span className="text-white font-semibold">UNNOTICED</span> {focusedTrack.featuring && <span className="text-purple-300 font-normal">• feat. {focusedTrack.featuring}</span>}
+                          <span className="text-white font-semibold">UNNOTICED</span>{' '}
+                          {focusedTrack.featuring && !focusedTrack.featuring.toLowerCase().includes('unnoticed') && (
+                            <span className="text-purple-300 font-normal">
+                              • feat. {focusedTrack.featuring.replace(/^(feat\.|ft\.)\s*/i, '')}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -537,21 +556,21 @@ export default function MusicSection({
                             togglePlay();
                           }
                         }}
-                        className="w-full h-11 sm:h-12 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/35 border border-white/20 active:scale-95 transition-all cursor-pointer"
+                        className="w-full h-11 sm:h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 active:scale-95 transition-all cursor-pointer theme-primary-btn"
                       >
                         {isPlaying && currentTrack?.id === focusedTrack.id ? (
                           <>
-                            <Pause className="w-4 h-4 fill-white shrink-0" />
+                            <Pause className="w-4 h-4 fill-current shrink-0" />
                             <span>Pause Studio Preview</span>
                             <span className="flex items-center gap-0.5 h-3 ml-1 shrink-0">
-                              <span className="w-0.5 h-2.5 bg-white rounded-full animate-equalizer-1" />
-                              <span className="w-0.5 h-3.5 bg-white rounded-full animate-equalizer-2" />
-                              <span className="w-0.5 h-2 bg-white rounded-full animate-equalizer-3" />
+                              <span className="w-0.5 h-2.5 bg-current rounded-full animate-equalizer-1" />
+                              <span className="w-0.5 h-3.5 bg-current rounded-full animate-equalizer-2" />
+                              <span className="w-0.5 h-2 bg-current rounded-full animate-equalizer-3" />
                             </span>
                           </>
                         ) : (
                           <>
-                            <Play className="w-4 h-4 fill-white ml-0.5 shrink-0" />
+                            <Play className="w-4 h-4 fill-current ml-0.5 shrink-0" />
                             <span>Play Studio Preview ({focusedTrack.duration})</span>
                           </>
                         )}
@@ -612,7 +631,7 @@ export default function MusicSection({
                         <button
                           onClick={() => setFilterMode('all')}
                           className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold transition-all active:scale-95 cursor-pointer ${
-                            filterMode === 'all' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                            filterMode === 'all' ? 'theme-primary-btn font-bold' : 'text-slate-400 hover:text-slate-200'
                           }`}
                         >
                           All ({selectedTrackForLyrics.lyrics?.length || 0})

@@ -425,11 +425,11 @@ export default function MusicSection({
                   {/* ======================================================== */}
                   {/* COLUMN 1: PROMINENT VINYL ARTWORK & AUDIO STUDIO DECK     */}
                   {/* ======================================================== */}
-                  <div className="lg:w-[350px] xl:w-[390px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden">
+                  <div className="lg:w-[370px] xl:w-[410px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden">
                     <div>
                       {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY */}
-                      {/* Disc slides out prominently without horizontal jumping during playback */}
-                      <div className="relative w-full max-w-[300px] xl:max-w-[340px] mx-auto pt-2 pb-3 flex items-center justify-center">
+                      {/* Disc slides out prominently with dramatic exposure */}
+                      <div className="relative w-full max-w-[340px] xl:max-w-[380px] mx-auto pt-2 pb-3 flex items-center justify-center">
                         {/* Vinyl Disc Sliding Out Prominently Behind Sleeve */}
                         <motion.div
                           animate={
@@ -442,7 +442,7 @@ export default function MusicSection({
                               ? { duration: 4.5, repeat: Infinity, ease: 'linear' }
                               : { duration: 0.5 }
                           }
-                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 translate-x-14 sm:translate-x-18"
+                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 translate-x-20 sm:translate-x-24"
                           style={{
                             boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
                             backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
@@ -461,7 +461,7 @@ export default function MusicSection({
                         </motion.div>
 
                         {/* Main High-Res Album Jacket / Sleeve (Balanced offset for extended vinyl disc) */}
-                        <div className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16] -translate-x-8 sm:-translate-x-10">
+                        <div className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-2xl overflow-hidden border border-white/[0.18] shadow-[0_20px_50px_rgba(0,0,0,0.85)] group shrink-0 bg-[#0c0d16] -translate-x-12 sm:-translate-x-14">
                           <img
                             src={focusedTrack.cover}
                             alt={focusedTrack.title}
@@ -842,7 +842,7 @@ export default function MusicSection({
 
                       <button
                         onClick={() => setFocusedTrack(null)}
-                        className="px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-all active:scale-95 cursor-pointer shadow-lg shadow-purple-600/30"
+                        className="px-5 py-2 rounded-full font-bold text-xs theme-primary-btn transition-all active:scale-95 cursor-pointer"
                       >
                         Done Reading
                       </button>

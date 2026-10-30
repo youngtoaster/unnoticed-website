@@ -147,7 +147,7 @@ export default function MerchSection({
             <div className="pt-3 border-t border-white/[0.06] flex items-center gap-2">
               <button
                 onClick={() => handleAddToCart(product, product.sizes[0])}
-                className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md shadow-purple-600/30 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 active:scale-95 theme-primary-btn"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 <span>Add To Cart</span>
@@ -240,7 +240,7 @@ export default function MerchSection({
                   {/* Add to Cart button */}
                   <button
                     onClick={() => handleAddToCart(quickViewProduct, selectedSize)}
-                    className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/40 flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 theme-primary-btn"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     <span>Add To Cart ({selectedSize || quickViewProduct.sizes[0]})</span>
@@ -351,7 +351,7 @@ export default function MerchSection({
                     href="https://unnoticed.shop"
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95"
+                    className="w-full py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 theme-primary-btn"
                   >
                     <span>Proceed to Checkout</span>
                     <ArrowRight className="w-4 h-4" />

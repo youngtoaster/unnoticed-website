@@ -145,7 +145,7 @@ export default function AdminLoginModal({ isOpen, onClose, onSuccess }) {
                 <button
                   type="submit"
                   disabled={isVerifying}
-                  className="w-full py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="w-full py-3.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer theme-primary-btn"
                 >
                   {isVerifying ? (
                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

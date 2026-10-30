@@ -160,14 +160,45 @@ export function DataProvider({ children }) {
       return '168, 85, 247';
     };
 
+    const getLuminance = (hex) => {
+      if (!hex) return 0.3;
+      const clean = hex.replace('#', '');
+      let r, g, b;
+      if (clean.length === 3) {
+        r = parseInt(clean[0] + clean[0], 16) / 255;
+        g = parseInt(clean[1] + clean[1], 16) / 255;
+        b = parseInt(clean[2] + clean[2], 16) / 255;
+      } else if (clean.length === 6) {
+        r = parseInt(clean.substring(0, 2), 16) / 255;
+        g = parseInt(clean.substring(2, 4), 16) / 255;
+        b = parseInt(clean.substring(4, 6), 16) / 255;
+      } else {
+        return 0.3;
+      }
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    const primaryHex = theme.primary || '#a855f7';
+    const lum = getLuminance(primaryHex);
+    const isLight = lum > 0.6;
+    const onPrimary = isLight ? '#06070a' : '#ffffff';
+    const shadowRgb = isLight ? '0, 0, 0' : hexToRgb(primaryHex);
+    const btnShadow = isLight
+      ? '0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 0 10px rgba(255, 255, 255, 0.12)'
+      : `0 10px 25px -5px rgba(${hexToRgb(primaryHex)}, 0.4)`;
+
     const root = document.documentElement;
-    root.style.setProperty('--theme-primary', theme.primary || '#a855f7');
-    root.style.setProperty('--theme-primary-rgb', hexToRgb(theme.primary));
+    root.style.setProperty('--theme-primary', primaryHex);
+    root.style.setProperty('--theme-primary-rgb', hexToRgb(primaryHex));
     root.style.setProperty('--theme-secondary', theme.secondary || '#6366f1');
     root.style.setProperty('--theme-secondary-rgb', hexToRgb(theme.secondary));
     root.style.setProperty('--theme-accent', theme.accent || '#06b6d4');
     root.style.setProperty('--theme-accent-rgb', hexToRgb(theme.accent));
-    root.style.setProperty('--theme-glow', theme.glow || theme.primary || '#a855f7');
+    root.style.setProperty('--theme-glow', theme.glow || primaryHex);
+    root.style.setProperty('--theme-on-primary', onPrimary);
+    root.style.setProperty('--theme-is-light', isLight ? '1' : '0');
+    root.style.setProperty('--theme-shadow-rgb', shadowRgb);
+    root.style.setProperty('--theme-btn-shadow', btnShadow);
   }, [data.artistInfo?.theme, data.artistInfo?.neonSign?.color]);
 
   // Universal Data Updater:

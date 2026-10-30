@@ -88,7 +88,7 @@ export default function BioSection() {
                 onClick={() => setActiveBioTab(idx)}
                 className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all active:scale-95 ${
                   activeBioTab === idx
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                    ? 'theme-primary-btn'
                     : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]'
                 }`}
               >

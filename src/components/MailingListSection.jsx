@@ -101,10 +101,10 @@ export default function MailingListSection() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/40 transition-all hover:scale-105 shrink-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-sm theme-primary-btn transition-all hover:scale-105 shrink-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? (
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <span>Join Syndicate</span>

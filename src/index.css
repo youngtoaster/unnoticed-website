@@ -86,6 +86,10 @@
   --theme-accent: #06b6d4;
   --theme-accent-rgb: 6, 182, 212;
   --theme-glow: #a855f7;
+  --theme-on-primary: #ffffff;
+  --theme-is-light: 0;
+  --theme-shadow-rgb: 168, 85, 247;
+  --theme-btn-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
 }
 
 ::selection {
@@ -107,6 +111,48 @@
 .theme-text-glow {
   color: var(--theme-primary);
   text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.5);
+}
+
+/* Luxury Theme Primary Button - Guarantees 100% contrast & zero blown-out blinding white blocks */
+.theme-primary-btn {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%) !important;
+  color: var(--theme-on-primary, #ffffff) !important;
+  box-shadow: var(--theme-btn-shadow, 0 10px 25px -5px rgba(0, 0, 0, 0.4)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+.theme-primary-btn:hover {
+  filter: brightness(1.08);
+}
+
+.theme-primary-btn * {
+  color: inherit !important;
+  fill: currentColor;
+}
+
+/* Ensure buttons using purple-600 background never have invisible white-on-white text */
+button.bg-purple-600,
+button.bg-purple-500,
+a.bg-purple-600,
+a.bg-purple-500 {
+  color: var(--theme-on-primary, #ffffff) !important;
+}
+
+button.bg-purple-600 svg,
+button.bg-purple-500 svg,
+a.bg-purple-600 svg,
+a.bg-purple-500 svg {
+  stroke: var(--theme-on-primary, #ffffff) !important;
+}
+
+/* Tame overblown white shadows and highlights when theme primary is light or white */
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/40,
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/30,
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/50,
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/60,
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/20,
+:root[style*="--theme-is-light: 1"] .shadow-purple-600\/10 {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 
 @layer base {

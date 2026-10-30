@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 export default function SpotlightCard({
   children,
   className = '',
+  innerClassName = '',
   spotlightColor = 'rgba(var(--theme-primary-rgb, 168, 85, 247), 0.22)',
   tilt = true,
   onClick
@@ -68,7 +69,7 @@ export default function SpotlightCard({
           background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${resolvedSpotlight}, transparent 50%)`,
         }}
       />
-      <div className="relative z-10 h-full">{children}</div>
+      <div className={`relative z-10 h-full ${innerClassName}`}>{children}</div>
     </motion.div>
   );
 }

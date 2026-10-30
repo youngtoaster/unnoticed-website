@@ -126,16 +126,17 @@ export default function StreamingHubSection() {
         </div>
       </div>
 
-      {/* 4-Column DSP Grid */}
+      {/* 4-Column DSP Grid - Equal Height & Pixel-Aligned Buttons Across All Columns */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
         {platforms.map((platform) => (
           <SpotlightCard
             key={platform.id}
             spotlightColor={platform.accentColor ? `${platform.accentColor}33` : 'rgba(168, 85, 247, 0.18)'}
             tilt={false}
-            className="p-5 sm:p-6 flex flex-col justify-between border-white/[0.1] hover:border-white/[0.25] transition-all duration-300 group"
+            className="p-5 sm:p-6 border-white/[0.1] hover:border-white/[0.25] transition-all duration-300 group h-full"
+            innerClassName="h-full flex flex-col justify-between"
           >
-            <div>
+            <div className="flex-1 flex flex-col">
               {/* Card Header: Platform Icon + Badge */}
               <div className="flex items-center justify-between mb-4">
                 <div
@@ -154,32 +155,32 @@ export default function StreamingHubSection() {
                 </span>
               </div>
 
-              {/* Title & Tagline */}
-              <h3 className="font-display text-xl font-bold text-white mb-1 group-hover:text-white transition-colors">
+              {/* Title & Tagline with standardized min-heights */}
+              <h3 className="font-display text-xl font-bold text-white mb-1 group-hover:text-white transition-colors min-h-[28px] flex items-center">
                 {platform.name}
               </h3>
-              <p className="text-[11px] font-mono font-semibold text-purple-300 mb-2">
+              <p className="text-[11px] font-mono font-semibold text-purple-300 mb-2.5 min-h-[18px] flex items-center">
                 {platform.tagline}
               </p>
 
-              {/* Metric Pill */}
-              <div className="text-[10px] font-mono text-slate-400 bg-white/[0.03] border border-white/[0.06] px-2.5 py-1 rounded-lg mb-3">
-                {platform.metrics}
+              {/* Metric Pill - Locked to consistent 44px min-height across all 4 cards */}
+              <div className="min-h-[44px] flex items-center text-[10px] font-mono text-slate-400 bg-white/[0.03] border border-white/[0.06] px-2.5 py-1.5 rounded-lg mb-3">
+                <span className="leading-snug">{platform.metrics}</span>
               </div>
 
-              {/* Description */}
-              <p className="text-xs text-slate-300 leading-relaxed font-light mb-6">
+              {/* Description - Locked to consistent 64px min-height across all 4 cards */}
+              <p className="min-h-[64px] text-xs text-slate-300 leading-relaxed font-light mb-4">
                 {platform.description}
               </p>
             </div>
 
-            {/* Launch Action Button */}
-            <div className="pt-4 border-t border-white/[0.08]">
+            {/* Launch Action Button - Guaranteed strictly pixel-aligned at the bottom */}
+            <div className="mt-auto pt-4 border-t border-white/[0.08]">
               <a
                 href={platform.url}
                 target="_blank"
                 rel="noreferrer"
-                className={`w-full py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer ${platform.buttonClass}`}
+                className={`w-full h-11 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer ${platform.buttonClass}`}
               >
                 <span>Listen on {platform.name}</span>
                 <ExternalLink className="w-3.5 h-3.5" />

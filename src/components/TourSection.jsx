@@ -158,7 +158,7 @@ export default function TourSection() {
                       href={show.ticketLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/30 transition-all active:scale-95"
+                      className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 theme-primary-btn"
                     >
                       <span>Tickets</span>
                       <ExternalLink className="w-3.5 h-3.5" />

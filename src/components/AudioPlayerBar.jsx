@@ -629,7 +629,7 @@ export default function AudioPlayerBar({
                   onClick={() => setMobileTab(mobileTab === 'player' ? 'lyrics' : 'player')}
                   className={`px-4 py-2.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 active:scale-95 border ${
                     mobileTab === 'lyrics'
-                      ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/30'
+                      ? 'theme-primary-btn border-white/20'
                       : 'bg-white/[0.06] text-slate-200 border-white/[0.1]'
                   }`}
                 >
@@ -798,7 +798,7 @@ export default function AudioPlayerBar({
                     onClick={() => setDesktopLyricsOpen(!desktopLyricsOpen)}
                     className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                       desktopLyricsOpen
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                        ? 'theme-primary-btn'
                         : 'bg-white/[0.05] hover:bg-white/[0.1] text-purple-300 border border-purple-500/30'
                     }`}
                     title="Toggle Synchronized Lyrics"

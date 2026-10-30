@@ -25,21 +25,21 @@ export default function TourSection() {
   };
 
   return (
-    <section id="tour" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <section id="tour" className="relative py-14 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
       
       {/* Background ambient lighting */}
       <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[320px] sm:w-[600px] h-[250px] sm:h-[300px] bg-purple-600/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
             <Ticket className="w-3.5 h-3.5" /> LIVE EXPERIENCES
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
             TOUR DATES & STAGE
           </h2>
-          <p className="text-slate-400 text-xs sm:text-base mt-2 max-w-xl">
+          <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-lg">
             Catch UNNOTICED live in intimate venues and iconic stages across North America.
           </p>
         </div>

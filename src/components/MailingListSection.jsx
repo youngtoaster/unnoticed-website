@@ -35,27 +35,27 @@ export default function MailingListSection() {
   };
 
   return (
-    <section id="newsletter" className="relative py-16 sm:py-24 px-4 sm:px-6 max-w-5xl mx-auto">
+    <section id="newsletter" className="relative py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
       
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       <SpotlightCard
-        className="p-8 sm:p-14 relative overflow-hidden text-center"
+        className="p-6 sm:p-10 relative overflow-hidden text-center"
         spotlightColor="rgba(168, 85, 247, 0.22)"
       >
-        <div className="relative z-10 max-w-2xl mx-auto">
+        <div className="relative z-10 max-w-xl mx-auto">
           
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
             <Sparkles className="w-3.5 h-3.5 text-purple-400" /> THE UNSEEN SYNDICATE
           </div>
 
-          <h2 className="font-display text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
             JOIN THE INNER CIRCLE
           </h2>
 
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
+          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
             Get exclusive access to unreleased midnight studio leaks, pre-sale concert ticket codes, secret pop-up listening parties, and private merch drops.
           </p>
 

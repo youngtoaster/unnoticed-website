@@ -37,7 +37,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
     font: 'font-display',
-    size: 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]',
+    size: 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]',
     fontWeight: 'font-black',
     flicker: true
   };
@@ -1082,7 +1082,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <div>
                     <span className="text-[10px] font-mono text-slate-400 block mb-1">Sign Scale Preset</span>
                     <select
-                      value={neonConfig.size || 'text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]'}
+                      value={neonConfig.size || 'text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]'}
                       onChange={(e) => {
                         updateData({
                           artistInfo: {
@@ -1094,10 +1094,10 @@ export default function AdminDashboard({ onReturnToSite }) {
                       }}
                       className="w-full px-3 py-2 rounded-xl bg-[#141522] border border-white/[0.1] text-xs text-white focus:outline-none font-mono"
                     >
-                      <option value="text-[clamp(2.35rem,11.2vw,9.5rem)] sm:text-8xl md:text-9xl lg:text-[10rem]">Monumental Hero (Mobile Fluid 10rem)</option>
-                      <option value="text-[clamp(2.1rem,9.8vw,8.5rem)] sm:text-7xl md:text-8xl lg:text-9xl">Massive Stage (Mobile Fluid 9xl)</option>
-                      <option value="text-[clamp(1.9rem,8.6vw,7.5rem)] sm:text-6xl md:text-7xl lg:text-8xl">Bold Large (Mobile Fluid 8xl)</option>
-                      <option value="text-[clamp(1.7rem,7.5vw,6.5rem)] sm:text-5xl md:text-6xl lg:text-7xl">Compact Club (Mobile Fluid 7xl)</option>
+                      <option value="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem]">Sleek Monumental (Default • 5.25rem)</option>
+                      <option value="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl">Refined Stage (4.5rem)</option>
+                      <option value="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl">Clean Modern (3.75rem)</option>
+                      <option value="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl">Compact Club (3rem)</option>
                     </select>
                   </div>
                 </div>

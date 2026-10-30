@@ -86,34 +86,34 @@ export default function Navbar({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 z-40 flex justify-center px-3 sm:px-6 transition-all duration-300 ${
-          scrolled ? 'pt-2.5 pb-2' : 'pt-3.5 pb-2.5 sm:pt-5'
+          scrolled ? 'pt-2 pb-1.5' : 'pt-3 pb-2 sm:pt-4'
         }`}
       >
-        <div className="relative flex items-center justify-between w-full max-w-7xl px-3 sm:px-5 py-2 rounded-full border border-white/[0.12] bg-[#07080e]/90 backdrop-blur-2xl shadow-2xl shadow-black/80">
+        <div className="relative flex items-center justify-between w-full max-w-6xl px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/[0.12] bg-[#07080e]/90 backdrop-blur-2xl shadow-xl shadow-black/80">
           
           {/* Left: Brand Identity */}
           <button
             onClick={handleLogoClick}
-            className="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-none shrink-0"
+            className="flex items-center gap-2 text-left group cursor-pointer focus:outline-none shrink-0"
           >
-            <div className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1.5px] shadow-lg shadow-purple-500/25">
+            <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1.5px] shadow-md shadow-purple-500/20">
               <div className="w-full h-full rounded-full bg-[#08090f] flex items-center justify-center overflow-hidden">
-                <span className="font-display font-black text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-cyan-200">
+                <span className="font-display font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-cyan-200">
                   U
                 </span>
               </div>
             </div>
 
             <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2">
-                <span className="font-display font-black tracking-wider text-sm sm:text-base text-white group-hover:text-purple-300 transition-colors">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-black tracking-wider text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">
                   UNNOTICED
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-mono tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 uppercase font-semibold">
+                <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-mono tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 uppercase font-semibold">
                   Ty Sciullo
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-mono tracking-wide hidden sm:block">
+              <p className="text-[9.5px] text-slate-400 font-mono tracking-wide hidden sm:block">
                 Official Artist Experience
               </p>
             </div>

@@ -9,7 +9,7 @@ export default function BioSection() {
   const [activeBioTab, setActiveBioTab] = useState(0);
 
   return (
-    <section id="bio" className="relative py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <section id="bio" className="relative py-14 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
       
       {/* Background subtle glow */}
       <div className="absolute right-6 top-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-purple-600/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
@@ -69,13 +69,13 @@ export default function BioSection() {
         <div className="lg:col-span-7 space-y-5 sm:space-y-6">
           
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
               <Calendar className="w-3.5 h-3.5" /> ARTIST CHRONICLE
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
               FROM McKEES ROCKS TO THE UNSEEN
             </h2>
-            <p className="text-purple-300 font-tech text-xs sm:text-base font-medium mt-1">
+            <p className="text-purple-300 font-tech text-xs sm:text-sm font-medium mt-1">
               "Once known as Ty Sciullo, now a man unseen."
             </p>
           </div>

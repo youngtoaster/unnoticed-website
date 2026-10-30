@@ -37,7 +37,12 @@ function syncArtistDataFile(data, rootDir) {
 function pushToGit(commitMsg = 'content: sync CMS updates from site admin') {
   try {
     const rootDir = process.cwd();
-    execSync('git add public/site_data.json src/data/artistData.js public/uploads/', { cwd: rootDir, stdio: 'pipe' });
+    const stageTargets = ['public/site_data.json', 'src/data/artistData.js'];
+    const uploadsDir = path.resolve(rootDir, 'public/uploads');
+    if (fs.existsSync(uploadsDir)) {
+      stageTargets.push('public/uploads/');
+    }
+    execSync(`git add ${stageTargets.join(' ')}`, { cwd: rootDir, stdio: 'pipe' });
     const diff = execSync('git diff --cached --name-only', { cwd: rootDir, encoding: 'utf-8' }).trim();
     if (!diff) {
       return { success: true, pushed: false, message: 'Already up to date with Git' };

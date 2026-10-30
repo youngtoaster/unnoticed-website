@@ -166,7 +166,9 @@ a.bg-purple-500 * {
 [data-theme-light="true"] a.bg-purple-600 *,
 [data-theme-light="true"] a.bg-purple-500 *,
 [data-theme-light="true"] [class*="bg-purple-600"] *,
-[data-theme-light="true"] [class*="bg-purple-500"] * {
+[data-theme-light="true"] [class*="bg-purple-500"] *,
+[data-theme-light="true"] [style*="--theme-primary"] *,
+[data-theme-light="true"] [style*="var(--theme-primary)"] * {
   color: #050608 !important;
   fill: #050608 !important;
   stroke: #050608 !important;

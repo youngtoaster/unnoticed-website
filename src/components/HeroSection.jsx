@@ -71,10 +71,12 @@ export default function HeroSection({
     setHasRevealed(false);
     setExplosionActive(true);
     setExplosionKey((prev) => prev + 1);
+    // 2.2s allows the wavefront to expand completely past screen edges,
+    // settle its brightness, and smoothly fade back into the final resting backdrop exposure
     setTimeout(() => {
       setHasRevealed(true);
       setExplosionActive(false);
-    }, 1750);
+    }, 2200);
   }, []);
 
   // When ignition reaches full completion on page load, add a pre-detonation tension pause:
@@ -208,15 +210,18 @@ export default function HeroSection({
         {/* ======================================================== */}
         <AnimatePresence>
           {explosionActive && (
-            <div
+            <motion.div
               key={`explosion-fx-${explosionKey}`}
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
               className="absolute inset-0 pointer-events-none z-30 overflow-hidden flex items-center justify-center"
             >
-              {/* 1. Full Viewport Blinding Detonation Flash */}
+              {/* 1. Full Viewport Blinding Detonation Flash with Soft Dissipation Bloom */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.85, 0] }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
+                animate={{ opacity: [0, 0.85, 0.4, 0] }}
+                transition={{ duration: 1.8, times: [0, 0.1, 0.4, 1], ease: 'easeOut' }}
                 className="absolute inset-0 bg-radial from-white via-purple-500/30 to-transparent mix-blend-screen"
               />
 
@@ -324,7 +329,7 @@ export default function HeroSection({
                   }}
                 />
               ))}
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
 
@@ -343,16 +348,16 @@ export default function HeroSection({
                     clipPath: FACETED_WAVEFRONT_KEYFRAMES,
                     opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
                     filter: [
-                      `brightness(3.5) blur(0px) contrast(1.4)`,
-                      `brightness(2.7) blur(1px) contrast(1.25)`,
-                      `brightness(1.8) blur(${blurAmount}) contrast(1.1)`,
-                      `brightness(1.25) blur(${blurAmount}) contrast(1.02)`,
+                      `brightness(3.2) blur(0px) contrast(1.35)`,
+                      `brightness(2.4) blur(1px) contrast(1.2)`,
+                      `brightness(1.6) blur(${blurAmount}) contrast(1.08)`,
+                      `brightness(1.2) blur(${blurAmount}) contrast(1.02)`,
                       `brightness(1.05) blur(${blurAmount}) contrast(1)`
                     ]
                   }
                 : hasRevealed || !isIlluminated
                 ? {
-                    clipPath: 'polygon(-25% -25%, 125% -25%, 125% 125%, -25% 125%)',
+                    clipPath: FACETED_WAVEFRONT_KEYFRAMES[4],
                     opacity: targetOpacity,
                     filter: `brightness(1.05) blur(${blurAmount})`
                   }
@@ -365,11 +370,11 @@ export default function HeroSection({
             transition={
               explosionActive
                 ? {
-                    duration: 1.75,
+                    duration: 2.2,
                     ease: [0.16, 1, 0.3, 1],
-                    times: [0, 0.18, 0.48, 0.78, 1]
+                    times: [0, 0.16, 0.44, 0.74, 1]
                   }
-                : { duration: 0.3 }
+                : { duration: 0.8, ease: 'easeOut' }
             }
             className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden"
             style={{
@@ -527,16 +532,16 @@ export default function HeroSection({
                         clipPath: FACETED_WAVEFRONT_KEYFRAMES,
                         opacity: [0, targetOpacity * 0.9, targetOpacity, targetOpacity, targetOpacity],
                         filter: [
-                          `brightness(3.5) blur(0px) contrast(1.4)`,
-                          `brightness(2.7) blur(1px) contrast(1.25)`,
-                          `brightness(1.8) blur(${blurAmount}) contrast(1.1)`,
-                          `brightness(1.25) blur(${blurAmount}) contrast(1.02)`,
+                          `brightness(3.2) blur(0px) contrast(1.35)`,
+                          `brightness(2.4) blur(1px) contrast(1.2)`,
+                          `brightness(1.6) blur(${blurAmount}) contrast(1.08)`,
+                          `brightness(1.2) blur(${blurAmount}) contrast(1.02)`,
                           `brightness(1.05) blur(${blurAmount}) contrast(1)`
                         ]
                       }
                     : hasRevealed || !isIlluminated
                     ? {
-                        clipPath: 'polygon(-25% -25%, 125% -25%, 125% 125%, -25% 125%)',
+                        clipPath: FACETED_WAVEFRONT_KEYFRAMES[4],
                         opacity: targetOpacity,
                         filter: `brightness(1.05) blur(${blurAmount})`
                       }
@@ -549,11 +554,11 @@ export default function HeroSection({
                 transition={
                   explosionActive
                     ? {
-                        duration: 1.75,
+                        duration: 2.2,
                         ease: [0.16, 1, 0.3, 1],
-                        times: [0, 0.18, 0.48, 0.78, 1]
+                        times: [0, 0.16, 0.44, 0.74, 1]
                       }
-                    : { duration: 0.3 }
+                    : { duration: 0.8, ease: 'easeOut' }
                 }
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 overflow-hidden w-full max-w-4xl h-[260px] sm:h-[320px] md:h-[380px]"
                 style={{

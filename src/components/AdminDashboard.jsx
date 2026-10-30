@@ -126,7 +126,7 @@ function SectionControlsHeader({
             </button>
           )}
 
-          {allowReset && collectionKey && (
+          {allowReset && (
             <button
               onClick={() => onResetDefault(collectionKey, title)}
               className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold text-slate-300 border border-white/[0.08] flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
@@ -1608,6 +1608,8 @@ export default function AdminDashboard({ onReturnToSite }) {
             sectionKey="theme"
             allowDeleteAll={false}
             allowReset={true}
+            sectionsVisibility={sectionsVisibility}
+            toggleSectionVisibility={toggleSectionVisibility}
             onResetDefault={() => {
               updateSiteTheme(THEME_PRESETS[0], true);
               showToast('Reset theme to Electric Violet (Default)');

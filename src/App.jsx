@@ -4,6 +4,7 @@ import FluidCanvas from './components/FluidCanvas';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import MusicSection from './components/MusicSection';
+import StreamingHubSection from './components/StreamingHubSection';
 import BioSection from './components/BioSection';
 import MediaSection from './components/MediaSection';
 import TourSection from './components/TourSection';
@@ -229,7 +230,7 @@ function AppContent() {
                 onSelectTrack={onSelectTrack}
               />
 
-              {/* 2. Music: Self-Hosted Preview Clips, Genius Lyric Annotations, Spotify Embeds */}
+              {/* 2. Music: Discography Studio Cuts & Inspect Lyrics Pop-Up */}
               {sectionsVisibility?.music !== false && (
                 <MusicSection
                   currentTrack={currentTrack || tracks[0]}
@@ -237,6 +238,11 @@ function AppContent() {
                   togglePlay={togglePlay}
                   onSelectTrack={onSelectTrack}
                 />
+              )}
+
+              {/* 2B. Stream Locations: Dedicated Streaming Platforms Directory */}
+              {sectionsVisibility?.streaming !== false && (
+                <StreamingHubSection />
               )}
 
               {/* 3. Bio: McKees Rocks Roots, Ty Sciullo Era, Rebirth into Unnoticed */}

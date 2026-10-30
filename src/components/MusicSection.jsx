@@ -26,8 +26,6 @@ export default function MusicSection({
   const [activeLyricText, setActiveLyricText] = useState(
     (tracks[0] || currentTrack)?.lyrics?.find((l) => l.annotated)?.text || ''
   );
-  const [activeTab, setActiveTab] = useState('tracks'); // 'tracks', 'spotifyEmbed', 'platforms'
-  const [mobileSubTab, setMobileSubTab] = useState('list'); // 'list' or 'lyrics'
   const [filterMode, setFilterMode] = useState('all'); // 'all' | 'annotated' | 'focus'
   const [copiedQuote, setCopiedQuote] = useState(false);
 
@@ -150,39 +148,23 @@ export default function MusicSection({
           </p>
         </div>
 
-        {/* View Switcher Tabs (Planes-Style Sliding Segmented Control) */}
-        <div className="flex items-center p-1 rounded-full bg-[#0e0f18] border border-white/[0.12] self-start md:self-auto overflow-x-auto no-scrollbar max-w-full shadow-lg shadow-black">
-          {[
-            { id: 'tracks', label: `Studio Tracks (${tracks.length})` },
-            { id: 'spotifyEmbed', label: 'Spotify Player' },
-            { id: 'platforms', label: 'Streaming Hub' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`relative px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors duration-200 active:scale-95 ${
-                activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="musicTabPill"
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-600/30"
-                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-                />
-              )}
-              <span className="relative z-10">{tab.label}</span>
-            </button>
-          ))}
+        {/* Direct Navigation to Stream Locations Section */}
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <a
+            href="#stream-locations"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0e0f18] hover:bg-[#181928] text-xs font-mono font-semibold text-purple-300 border border-white/[0.12] transition-colors active:scale-95 shadow-md shadow-black"
+          >
+            <Radio className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Where to Stream →</span>
+          </a>
         </div>
       </div>
 
       {/* ======================================================== */}
-      {/* TAB 1: STUDIO TRACKS DISCOGRAPHY CATALOG GRID            */}
+      {/* STUDIO TRACKS DISCOGRAPHY CATALOG GRID                  */}
       {/* Clicking any track opens the Inspect Lyrics Pop-Up Menu  */}
       {/* ======================================================== */}
-      {activeTab === 'tracks' && (
-        <div className="space-y-6">
+      <div className="space-y-6">
           {/* Discography Grid Sub-Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/[0.08] gap-3">
             <div className="flex items-center gap-2">
@@ -346,122 +328,6 @@ export default function MusicSection({
             })}
           </div>
         </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* TAB 2: SPOTIFY OFFICIAL EMBEDDED PLAYER                 */}
-      {/* ======================================================== */}
-      {activeTab === 'spotifyEmbed' && (
-        <SpotlightCard className="p-5 sm:p-10" spotlightColor="rgba(16, 185, 129, 0.18)">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-white/[0.08] gap-4">
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Spotify Official Player
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-white">
-                  Listen to Full Releases on Spotify
-                </h3>
-              </div>
-
-              <a
-                href={artistInfo.socials.spotify}
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-2 rounded-full bg-emerald-500 text-slate-950 font-semibold text-xs hover:bg-emerald-400 transition-colors flex items-center gap-1.5 self-start sm:self-auto"
-              >
-                Follow on Spotify <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            {/* Official Spotify Iframe Player */}
-            <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-white/[0.1]">
-              <iframe
-                title="Spotify Embed Player"
-                src="https://open.spotify.com/embed/album/5R2zsn8QgVVOpFY8NUVCcp?utm_source=generator&theme=0"
-                width="100%"
-                height="380"
-                frameBorder="0"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                className="rounded-2xl"
-              />
-            </div>
-            
-            <p className="text-xs text-slate-400 mt-4 text-center font-mono">
-              Requires Spotify app or account for full song lengths. For instant self-hosted snippets, tap play on any track card!
-            </p>
-          </div>
-        </SpotlightCard>
-      )}
-
-      {/* ======================================================== */}
-      {/* TAB 3: STREAMING PLATFORM LINKS HUB                     */}
-      {/* ======================================================== */}
-      {activeTab === 'platforms' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              name: 'Spotify',
-              desc: 'Official artist catalog, curated playlists, and algorithmic radio.',
-              url: artistInfo.socials.spotify,
-              badge: 'Most Popular',
-              accent: 'bg-emerald-500'
-            },
-            {
-              name: 'Apple Music',
-              desc: 'Lossless audio streaming, Spatial Audio masters, and artist radio.',
-              url: artistInfo.socials.appleMusic,
-              badge: 'Lossless Audio',
-              accent: 'bg-pink-500'
-            },
-            {
-              name: 'YouTube Music',
-              desc: 'Official music videos, visualizers, live performance sessions.',
-              url: artistInfo.socials.youtube,
-              badge: 'Video & Audio',
-              accent: 'bg-red-500'
-            },
-            {
-              name: 'SoundCloud',
-              desc: 'Exclusive early demo snippets, unreleased beats, and bootleg mixes.',
-              url: artistInfo.socials.soundcloud,
-              badge: 'Underground',
-              accent: 'bg-amber-500'
-            }
-          ].map((platform) => (
-            <SpotlightCard
-              key={platform.name}
-              className="p-5 sm:p-6 flex flex-col justify-between"
-              spotlightColor="rgba(255, 255, 255, 0.08)"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`w-3 h-3 rounded-full ${platform.accent}`} />
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.05] text-slate-300">
-                    {platform.badge}
-                  </span>
-                </div>
-                <h4 className="font-display text-xl font-bold text-white mb-2">
-                  {platform.name}
-                </h4>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
-                  {platform.desc}
-                </p>
-              </div>
-
-              <a
-                href={platform.url}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-95"
-              >
-                Open {platform.name} <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </SpotlightCard>
-          ))}
-        </div>
-      )}
 
       {/* ======================================================== */}
       {/* INSPECT LYRICS POP-UP OVERLAY (OVERLAYS SITE MENU BAR)   */}

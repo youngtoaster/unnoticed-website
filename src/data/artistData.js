@@ -3,6 +3,7 @@
 
 export const SECTIONS_VISIBILITY = {
   music: true,
+  streaming: true,
   bio: true,
   media: true,
   tour: true,

@@ -713,6 +713,7 @@
   },
   "sectionsVisibility": {
     "music": true,
+    "streaming": true,
     "bio": true,
     "media": true,
     "tour": true,

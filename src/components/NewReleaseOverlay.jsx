@@ -8,12 +8,26 @@ import { useSiteData } from '../context/DataContext';
 import { SpotifyIcon } from './SocialIcons';
 import ShinyText from './reactbits/ShinyText';
 
+// Procedural waveform frequency distribution for authentic studio spectrum
+const WAVEFORM_HEIGHTS = [
+  25, 40, 65, 85, 45, 60, 90, 100, 75, 55, 70, 85, 95, 80, 65, 50, 75, 90,
+  100, 85, 60, 45, 70, 85, 95, 70, 50, 65, 80, 60, 40, 55, 70, 45, 30, 20
+];
+
+function formatTime(seconds) {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
 export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
   const { featuredRelease } = useSiteData();
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [shockwave, setShockwave] = useState(false);
   const audioRef = useRef(null);
@@ -66,40 +80,99 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.currentTime = sampleStart;
+    let isSubscribed = true;
+
+    const applySampleStartTime = () => {
+      try {
+        const dur = audio.duration;
+        const validStart = (dur && sampleStart < dur) ? sampleStart : 0;
+        audio.currentTime = validStart;
+      } catch (err) {
+        console.warn('Could not set initial sample start time:', err);
+      }
+    };
+
+    if (audio.readyState >= 1) {
+      applySampleStartTime();
+    } else {
+      audio.addEventListener('loadedmetadata', applySampleStartTime, { once: true });
+    }
 
     const attemptPlay = async () => {
       try {
         await audio.play();
-        setIsPlaying(true);
-        setAutoplayBlocked(false);
+        if (isSubscribed) {
+          setIsPlaying(true);
+          setAutoplayBlocked(false);
+        }
       } catch (err) {
         console.warn('Autoplay restricted by browser policy:', err);
-        setAutoplayBlocked(true);
-        setIsPlaying(false);
+        if (isSubscribed) {
+          setAutoplayBlocked(true);
+          setIsPlaying(false);
+        }
       }
     };
 
     attemptPlay();
 
     const handleTimeUpdate = () => {
+      if (!isSubscribed) return;
       const current = audio.currentTime;
-      const elapsed = current - sampleStart;
-      if (elapsed >= sampleDuration) {
-        // Loop back to sample start
-        audio.currentTime = sampleStart;
+      let effectiveStart = sampleStart;
+      if (audio.duration && sampleStart >= audio.duration) {
+        effectiveStart = 0;
       }
-      const pct = Math.min(100, Math.max(0, (elapsed / sampleDuration) * 100));
-      setProgress(pct);
+      const rawElapsed = current - effectiveStart;
+      const elapsed = Math.max(0, rawElapsed);
+      setElapsedTime(elapsed);
+
+      const effectiveDuration = Math.min(
+        sampleDuration,
+        audio.duration ? Math.max(1, audio.duration - effectiveStart) : sampleDuration
+      );
+
+      if (elapsed >= effectiveDuration && effectiveDuration > 0) {
+        // Loop back to sample start
+        try {
+          audio.currentTime = effectiveStart;
+          setElapsedTime(0);
+          setProgress(0);
+        } catch {}
+      } else {
+        const pct = effectiveDuration > 0 ? Math.min(100, Math.max(0, (elapsed / effectiveDuration) * 100)) : 0;
+        setProgress(pct);
+      }
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
+      isSubscribed = false;
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.pause();
     };
   }, [isOpen, release.audioUrl, sampleStart, sampleDuration]);
+
+  // Interactive scrubber on waveform
+  const handleSeekWaveform = (e) => {
+    if (!audioRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+    const targetElapsed = ratio * sampleDuration;
+    const effectiveStart = (audioRef.current.duration && sampleStart >= audioRef.current.duration) ? 0 : sampleStart;
+    try {
+      audioRef.current.currentTime = effectiveStart + targetElapsed;
+      setProgress(ratio * 100);
+      setElapsedTime(targetElapsed);
+      if (!isPlaying) {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(console.warn);
+      }
+    } catch (err) {
+      console.warn('Seek failed:', err);
+    }
+  };
 
   // Escape key listener & body lock
   useEffect(() => {
@@ -229,8 +302,16 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
             {/* Main Stage: Dual Column Luxury Bento Display */}
             <div className="flex-1 p-5 sm:p-8 flex flex-col md:flex-row items-center gap-6 sm:gap-10 overflow-y-auto custom-scrollbar min-h-0">
               
-              {/* Left Column: Prominent 3D Vinyl Artwork with Slide-out Grooves */}
+              {/* Left Column: Prominent 3D Vinyl Artwork with Slide-out Grooves & Live Sonic Ripples */}
               <div className="relative shrink-0 w-60 h-60 sm:w-72 sm:h-72 xl:w-80 xl:h-80 flex items-center justify-center">
+                {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
+                {isPlaying && (
+                  <>
+                    <div className="absolute inset-0 m-auto w-56 h-56 sm:w-68 sm:h-68 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                    <div className="absolute inset-0 m-auto w-64 h-64 sm:w-76 sm:h-76 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
+                  </>
+                )}
+
                 {/* Vinyl Disc - Prominently Exposed and Spinning During Preview Playback */}
                 <motion.div
                   initial={false}
@@ -244,13 +325,16 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
                     scale: { duration: 0.25 },
                     opacity: { duration: 0.2 }
                   }}
-                  className="absolute w-52 h-52 sm:w-64 sm:h-64 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
+                  className={`absolute w-52 h-52 sm:w-64 sm:h-64 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 ${
+                    isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                  }`}
                   style={{
                     boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95)',
                     backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
                   }}
                 >
-                  <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
                     <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
                     <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
                   </div>
@@ -269,15 +353,18 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.12] to-transparent pointer-events-none" />
                   
-                  {/* Play Overlay */}
+                  {/* Play Overlay with Audio Sonic Pulse Indicator */}
                   <button
                     onClick={handleTogglePlay}
-                    className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/30 backdrop-blur-md flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-xl"
+                    className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-black/75 hover:bg-black/90 text-white border border-white/30 backdrop-blur-md flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-2xl relative"
                   >
                     {isPlaying ? (
-                      <Pause className="w-6 h-6 fill-current" />
+                      <Pause className="w-6 h-6 fill-current text-white" />
                     ) : (
-                      <Play className="w-6 h-6 fill-current ml-0.5" />
+                      <Play className="w-6 h-6 fill-current ml-0.5 text-white" />
+                    )}
+                    {isPlaying && (
+                      <span className="absolute -inset-1.5 rounded-full border border-cyan-400/60 animate-ping pointer-events-none" style={{ animationDuration: '2s' }} />
                     )}
                   </button>
                 </motion.div>
@@ -304,7 +391,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
                   </p>
                 </div>
 
-                {/* Sample Player Controller Deck */}
+                {/* Sample Player Controller Deck with Dynamic Live Audio Waveform Visualizer */}
                 <div className="mt-5 p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-md space-y-3">
                   <div className="flex items-center justify-between text-xs font-mono">
                     <div className="flex items-center gap-2">
@@ -314,21 +401,28 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
                       >
                         {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
                       </button>
-                      <span className="text-purple-300 font-bold">
-                        {isPlaying ? 'Playing Sample Preview' : 'Preview Paused'}
+                      <span className="text-purple-300 font-bold flex items-center gap-2">
+                        {isPlaying ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                            <span>Playing Studio Sample</span>
+                          </>
+                        ) : (
+                          <span>Preview Paused</span>
+                        )}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-slate-400">
-                      {/* Equalizer animation */}
-                      {isPlaying && (
-                        <span className="flex items-center gap-0.5 h-3">
-                          <span className="w-0.5 h-2 bg-purple-400 animate-pulse rounded-full" />
-                          <span className="w-0.5 h-3.5 bg-cyan-400 animate-bounce rounded-full" />
-                          <span className="w-0.5 h-1.5 bg-amber-400 animate-pulse rounded-full" />
-                          <span className="w-0.5 h-3 bg-purple-400 animate-bounce rounded-full" />
-                        </span>
-                      )}
+                    <div className="flex items-center gap-3 text-slate-400">
+                      {/* Animated Dancing Equalizer Bars */}
+                      <span className="flex items-center gap-0.5 h-3.5">
+                        <span className={`w-0.5 rounded-full ${isPlaying ? 'bg-cyan-400 animate-equalizer-1' : 'h-1.5 bg-slate-600'}`} style={{ height: isPlaying ? undefined : '6px' }} />
+                        <span className={`w-0.5 rounded-full ${isPlaying ? 'bg-purple-400 animate-equalizer-2' : 'h-2 bg-slate-600'}`} style={{ height: isPlaying ? undefined : '10px' }} />
+                        <span className={`w-0.5 rounded-full ${isPlaying ? 'bg-pink-400 animate-equalizer-3' : 'h-1 bg-slate-600'}`} style={{ height: isPlaying ? undefined : '4px' }} />
+                        <span className={`w-0.5 rounded-full ${isPlaying ? 'bg-cyan-400 animate-equalizer-4' : 'h-2.5 bg-slate-600'}`} style={{ height: isPlaying ? undefined : '12px' }} />
+                        <span className={`w-0.5 rounded-full ${isPlaying ? 'bg-indigo-400 animate-equalizer-1' : 'h-1.5 bg-slate-600'}`} style={{ height: isPlaying ? undefined : '7px' }} />
+                      </span>
+
                       <button
                         onClick={handleToggleMute}
                         className="p-1 hover:text-white transition-colors cursor-pointer"
@@ -336,16 +430,58 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce }) {
                       >
                         {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4" />}
                       </button>
-                      <span>{sampleDuration}s Clip</span>
+
+                      {/* Real-time Time Readout */}
+                      <span className="text-xs font-mono font-bold text-slate-200 tabular-nums">
+                        {formatTime(elapsedTime)} / {formatTime(sampleDuration)}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Sample Progress Bar */}
-                  <div className="w-full h-1.5 bg-white/[0.1] rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400"
+                  {/* Dynamic 36-Bar Interactive Waveform Visualizer */}
+                  <div
+                    onClick={handleSeekWaveform}
+                    className="relative w-full h-12 flex items-end gap-[3px] sm:gap-1 px-1.5 py-1.5 rounded-xl bg-black/50 border border-white/[0.08] cursor-pointer group select-none overflow-hidden"
+                    title="Click anywhere to scrub audio sample"
+                  >
+                    {/* Background Ambient Progress Glow */}
+                    <div
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-transparent pointer-events-none transition-all duration-100"
                       style={{ width: `${progress}%` }}
                     />
+
+                    {/* 36 Waveform Frequency Bars */}
+                    {WAVEFORM_HEIGHTS.map((baseH, idx) => {
+                      const barPercent = (idx / WAVEFORM_HEIGHTS.length) * 100;
+                      const isPlayed = barPercent <= progress;
+                      const animClass = isPlaying ? `animate-equalizer-${(idx % 4) + 1}` : '';
+                      return (
+                        <div
+                          key={idx}
+                          className="flex-1 flex flex-col justify-end items-center h-full relative"
+                        >
+                          <div
+                            className={`w-full rounded-full transition-all duration-150 ${
+                              isPlayed
+                                ? 'bg-gradient-to-t from-cyan-400 via-indigo-400 to-purple-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]'
+                                : 'bg-white/[0.12] group-hover:bg-white/[0.22]'
+                            } ${animClass}`}
+                            style={{
+                              height: `${baseH}%`,
+                              minHeight: '4px'
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+
+                    {/* Live Playhead Needle */}
+                    <div
+                      className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_#ffffff] pointer-events-none transition-all duration-100"
+                      style={{ left: `${progress}%` }}
+                    >
+                      <div className="absolute top-0 -left-1 w-2.5 h-1.5 bg-cyan-400 rounded-full shadow-sm" />
+                    </div>
                   </div>
 
                   {/* Autoplay prompt if blocked by browser policy */}

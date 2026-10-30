@@ -430,6 +430,14 @@ export default function MusicSection({
                       {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY (Fixed Height Container: Zero Layout Jitter) */}
                       {/* Disc slides out prominently with dramatic exposure */}
                       <div className="relative w-full max-w-[340px] xl:max-w-[380px] h-48 sm:h-52 xl:h-56 mx-auto my-2 flex items-center justify-center shrink-0">
+                        {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
+                        {isPlaying && currentTrack?.id === focusedTrack.id && (
+                          <>
+                            <div className="absolute inset-0 m-auto w-44 h-44 sm:w-48 sm:h-48 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                            <div className="absolute inset-0 m-auto w-52 h-52 sm:w-56 sm:h-56 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
+                          </>
+                        )}
+
                         {/* Vinyl Disc Sliding Out Prominently Behind Sleeve When Playing, Put Away Inside Sleeve When Paused */}
                         <motion.div
                           initial={false}
@@ -443,14 +451,17 @@ export default function MusicSection({
                             scale: { duration: 0.25 },
                             opacity: { duration: 0.2 }
                           }}
-                          className="absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
+                          className={`absolute w-44 h-44 sm:w-48 sm:h-48 xl:w-52 xl:h-52 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 ${
+                            isPlaying && currentTrack?.id === focusedTrack.id ? 'animate-[spin_4.5s_linear_infinite]' : ''
+                          }`}
                           style={{
                             boxShadow: '0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.9)',
                             backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
                           }}
                         >
-                          {/* Vinyl Center Label & Grooves - Only Spins When Audio Is Active */}
-                          <div className={`w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying && currentTrack?.id === focusedTrack.id ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
+                          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+                          {/* Vinyl Center Label & Grooves */}
+                          <div className="w-18 h-18 sm:w-20 sm:h-20 xl:w-22 xl:h-22 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
                             <img
                               src={focusedTrack.cover}
                               alt="Vinyl Center"

@@ -133,6 +133,14 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
           {/* LEFT: 3D VINYL SLEEVE & DISC DISPLAY                     */}
           {/* ======================================================== */}
           <div className="relative shrink-0 w-56 h-56 sm:w-68 sm:h-68 lg:w-76 lg:h-76 flex items-center justify-center">
+            {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
+            {isPlaying && (
+              <>
+                <div className="absolute inset-0 m-auto w-52 h-52 sm:w-64 sm:h-64 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                <div className="absolute inset-0 m-auto w-60 h-60 sm:w-72 sm:h-72 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
+              </>
+            )}
+
             {/* Spinning Vinyl Disc with Grooves */}
             <motion.div
               initial={false}
@@ -146,13 +154,16 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
                 scale: { duration: 0.25 },
                 opacity: { duration: 0.2 }
               }}
-              className="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0"
+              className={`absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#0d0e14] border-[7px] border-[#161722] shadow-2xl flex items-center justify-center pointer-events-none z-0 ${
+                isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''
+              }`}
               style={{
                 boxShadow: '0 20px 50px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.95)',
                 backgroundImage: 'repeating-radial-gradient(circle, #0e0f16 0px, #0e0f16 2px, #181926 3px, #0e0f16 4px)'
               }}
             >
-              <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center ${isPlaying ? 'animate-[spin_4.5s_linear_infinite]' : ''}`}>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-purple-400/40 relative shadow-inner flex items-center justify-center">
                 <img src={release.cover} alt="Vinyl Center" className="w-full h-full object-cover" />
                 <div className="absolute w-4 h-4 rounded-full bg-[#07080e] border border-white/50 shadow-sm" />
               </div>

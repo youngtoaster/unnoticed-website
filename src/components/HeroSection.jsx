@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap, Eye, EyeOff } from 'lucide-react';
+import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';
@@ -221,7 +221,7 @@ export default function HeroSection({
       {/* 1. MAIN HOME VIEWPORT: FULL-HEIGHT CINEMATIC STAGE        */}
       {/* Fills 100vh with centered artist name, subtitle, & bio     */}
       {/* ======================================================== */}
-      <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between items-center px-4 sm:px-6 pt-20 sm:pt-24 pb-6 sm:pb-8 overflow-hidden z-10">
+      <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-center items-center px-4 sm:px-6 pt-16 sm:pt-20 pb-20 sm:pb-24 overflow-hidden z-10">
 
         {/* ======================================================== */}
         {/* HUGE EXPLOSION OF LIGHT EXPANDING OUTWARDS FROM TITLE     */}
@@ -451,11 +451,8 @@ export default function HeroSection({
           </motion.div>
         )}
 
-        {/* Top spacer to balance the bottom scroll prompt so the middle is dead-center */}
-        <div className={`w-full shrink-0 pointer-events-none transition-all duration-500 ${isHeroBioVisible ? 'h-4 sm:h-8' : 'h-8 sm:h-14'}`} />
-
         {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser */}
-        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 ${alignmentContainerClass}`}>
+        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-all duration-500 translate-y-3 sm:translate-y-5 ${alignmentContainerClass}`}>
 
           {/* Top On Tour Look-At-Me Button */}
           {artistInfo.tourBadge?.enabled !== false && (
@@ -719,8 +716,8 @@ export default function HeroSection({
           </AnimatePresence>
         </div>
 
-        {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt & Stage Art Toggle */}
-        <div className="w-full shrink-0 flex flex-col items-center gap-2 pb-2 sm:pb-4 z-20">
+        {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt (Anchored to page bottom) */}
+        <div className="absolute bottom-3 sm:bottom-5 inset-x-0 mx-auto w-full flex flex-col items-center z-20 pointer-events-auto">
           <motion.button
             onClick={() => {
               const target = sectionsVisibility?.transmissionHub !== false 
@@ -750,38 +747,6 @@ export default function HeroSection({
             </div>
             <ArrowDown className="w-3 h-3 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
           </motion.button>
-
-          {/* Quick Stage Art Live View Toggle */}
-          {backdrop.image && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={canIgnite ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 }}
-              onClick={() => {
-                if (toggleSectionVisibility) {
-                  toggleSectionVisibility('heroBackdrop');
-                }
-              }}
-              className="px-3 py-1 rounded-full text-[9px] font-mono tracking-wider border transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer backdrop-blur-md bg-black/40 hover:bg-black/70"
-              style={{
-                borderColor: isBackdropVisible ? `${theme.primary || '#a855f7'}40` : 'rgba(255, 255, 255, 0.1)',
-                color: isBackdropVisible ? '#e2e8f0' : '#64748b'
-              }}
-              title="Toggle viewing hero stage artwork on/off"
-            >
-              {isBackdropVisible ? (
-                <>
-                  <Eye className="w-3 h-3 text-cyan-400" />
-                  <span>Stage Art: <strong className="text-white">Visible</strong></span>
-                </>
-              ) : (
-                <>
-                  <EyeOff className="w-3 h-3 text-slate-500" />
-                  <span>Stage Art: <strong className="text-slate-400">Hidden</strong></span>
-                </>
-              )}
-            </motion.button>
-          )}
         </div>
 
       </div>

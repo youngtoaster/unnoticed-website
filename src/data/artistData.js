@@ -11,7 +11,9 @@ export const SECTIONS_VISIBILITY = {
   "gallery": true,
   "social": true,
   "newsletter": true,
-  "featuredRelease": true
+  "featuredRelease": true,
+  "heroBackdrop": true,
+  "transmissionHub": true
 };
 
 export const FEATURED_RELEASE = {

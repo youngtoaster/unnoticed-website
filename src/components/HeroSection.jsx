@@ -140,77 +140,81 @@ export default function HeroSection({
       />
 
       {/* ======================================================== */}
-      {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
-      {/* Spans the entire hero section viewport behind all elements*/}
+      {/* 1. MAIN HOME VIEWPORT: FULL-HEIGHT CINEMATIC STAGE        */}
+      {/* Fills 100vh with centered artist name, subtitle, & bio     */}
       {/* ======================================================== */}
-      {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
-        <div
-          className="absolute inset-x-0 top-0 h-[88vh] min-h-[620px] pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out"
-          style={{
-            opacity: currentBackdropOpacity,
-            filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
-            maskImage: backdrop.vignette
-              ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
-              : 'none',
-            WebkitMaskImage: backdrop.vignette
-              ? 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, transparent 100%)'
-              : 'none',
-          }}
-        >
-          <img
-            src={backdrop.image}
-            alt="Full Hero Backdrop"
-            className="w-full h-full object-cover transition-transform duration-700 ease-out"
+      <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between items-center px-4 sm:px-6 pt-20 sm:pt-24 pb-6 sm:pb-8 overflow-hidden z-10">
+
+        {/* 1A. FULL HERO VIEWPORT BACKDROP IMAGE (SCOPE === 'HERO') */}
+        {/* Spans the entire hero section viewport edge-to-edge behind all elements */}
+        {backdrop.enabled && backdrop.image && backdrop.scope === 'hero' && (
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden transition-[opacity,filter] duration-300 ease-out"
             style={{
-              objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 45}%`,
-              transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
-              mixBlendMode: backdrop.blendMode || 'screen',
+              opacity: currentBackdropOpacity,
+              filter: `brightness(${currentBackdropBrightness}) blur(${blurAmount})`,
+              maskImage: backdrop.vignette
+                ? 'radial-gradient(ellipse 95% 90% at 50% 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.6) 80%, transparent 100%)'
+                : 'none',
+              WebkitMaskImage: backdrop.vignette
+                ? 'radial-gradient(ellipse 95% 90% at 50% 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.6) 80%, transparent 100%)'
+                : 'none',
             }}
-          />
-
-          {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
-          {letterBloomOverlay && (
-            <div
-              className="absolute inset-0 pointer-events-none transition-all duration-200"
-              style={{
-                backgroundImage: letterBloomOverlay,
-                mixBlendMode: 'screen',
-              }}
-            />
-          )}
-
-          {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop when fully lit */}
-          {isIlluminated && (
-            <div
-              className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-              style={{
-                opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
-                background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
-                mixBlendMode: 'color-dodge'
-              }}
-            />
-          )}
-
-          {/* Smooth bottom & top ambient fades into deep black background */}
-          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#060608] via-[#060608]/85 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#060608]/75 to-transparent pointer-events-none" />
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* 1. MAIN HOME VIEWPORT: CINEMATIC TITLE & BIO             */}
-      {/* Dynamic Alignment (Left, Center, Right) & Scalable Scale */}
-      {/* ======================================================== */}
-      <div className={`min-h-[82vh] sm:min-h-[88vh] flex flex-col justify-center px-4 sm:px-6 pt-16 sm:pt-20 pb-8 sm:pb-10 relative z-10 w-full max-w-5xl mx-auto ${alignmentContainerClass}`}>
-
-        {/* Top On Tour Look-At-Me Button */}
-        {artistInfo.tourBadge?.enabled !== false && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className={`mb-4 sm:mb-5 ${tourBadgeAlignClass}`}
           >
+            <img
+              src={backdrop.image}
+              alt="Full Hero Backdrop"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out"
+              style={{
+                objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 50}%`,
+                transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                mixBlendMode: backdrop.blendMode || 'screen',
+              }}
+            />
+
+            {/* Dynamic Letter Spotlight Blooms radiating from ignited letters during progressive strike */}
+            {letterBloomOverlay && (
+              <div
+                className="absolute inset-0 pointer-events-none transition-all duration-200"
+                style={{
+                  backgroundImage: letterBloomOverlay,
+                  mixBlendMode: 'screen',
+                }}
+              />
+            )}
+
+            {/* Dynamic Neon Gas Wall Wash Blooming Over Backdrop when fully lit */}
+            {isIlluminated && (
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-700"
+                style={{
+                  opacity: ignitionState.isFullyLit ? 1 : (ignitionState.progress * 0.4),
+                  background: `radial-gradient(ellipse at center, ${gasColor}40 0%, ${gasColor}15 50%, transparent 80%)`,
+                  mixBlendMode: 'color-dodge'
+                }}
+              />
+            )}
+
+            {/* Smooth bottom & top ambient fades into deep black background */}
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/70 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#060608]/75 to-transparent pointer-events-none" />
+          </div>
+        )}
+
+        {/* Top spacer to balance the bottom scroll prompt so the middle is dead-center */}
+        <div className="w-full shrink-0 h-4 sm:h-8 pointer-events-none" />
+
+        {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser */}
+        <div className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto ${alignmentContainerClass}`}>
+
+          {/* Top On Tour Look-At-Me Button */}
+          {artistInfo.tourBadge?.enabled !== false && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className={`mb-4 sm:mb-5 ${tourBadgeAlignClass}`}
+            >
             <motion.a
               href={artistInfo.tourBadge?.link || '#tour'}
               onClick={(e) => {
@@ -283,11 +287,8 @@ export default function HeroSection({
           </motion.div>
         )}
 
-        {/* Center Main Stage: Artist Title + Subtitle + Bio Teaser */}
-        <div className={`w-full flex flex-col ${alignmentContainerClass}`}>
-
-          {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
-          <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
+        {/* Main Kinetic Title with Planes Neon Sign & Backdrop Illumination */}
+        <div className={`relative mb-2 sm:mb-3 w-full flex flex-col ${alignmentContainerClass}`}>
 
             {/* 1B. TITLE-ONLY BACKDROP IMAGE (localized right behind artist name when scope === 'title') */}
             {backdrop.enabled && backdrop.image && backdrop.scope !== 'hero' && (
@@ -411,7 +412,7 @@ export default function HeroSection({
         </div>
 
         {/* Bottom of Main Home Viewport: Animated "Scroll to Explore" Prompt */}
-        <div className="w-full flex justify-center mt-6 sm:mt-8">
+        <div className="w-full shrink-0 flex justify-center pb-2 sm:pb-4">
           <motion.button
             onClick={() => {
               const el = document.querySelector('#hero-revealed-content');

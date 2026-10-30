@@ -318,8 +318,8 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                 {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
                 {isPlaying && (
                   <>
-                    <div className="absolute inset-0 m-auto w-56 h-56 sm:w-68 sm:h-68 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
-                    <div className="absolute inset-0 m-auto w-64 h-64 sm:w-76 sm:h-76 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
+                    <div className="hidden sm:block absolute inset-0 m-auto w-56 h-56 sm:w-68 sm:h-68 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                    <div className="hidden sm:block absolute inset-0 m-auto w-64 h-64 sm:w-76 sm:h-76 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
                   </>
                 )}
 

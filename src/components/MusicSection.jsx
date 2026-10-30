@@ -28,6 +28,7 @@ export default function MusicSection({
     (tracks[0] || currentTrack)?.lyrics?.find((l) => l.annotated)?.text || ''
   );
   const [filterMode, setFilterMode] = useState('all'); // 'all' | 'annotated' | 'focus'
+  const [modalMobileTab, setModalMobileTab] = useState('lyrics'); // 'lyrics' | 'deck'
   const [copiedQuote, setCopiedQuote] = useState(false);
 
   // Keep selectedTrack and focusedTrack in sync if tracks update from CMS
@@ -368,8 +369,8 @@ export default function MusicSection({
                 </div>
 
                 {/* Ambient Radial Lights */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/15 rounded-full blur-[110px] pointer-events-none -z-10" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/15 rounded-full blur-[110px] pointer-events-none -z-10" />
+                <div className="hidden sm:block absolute top-0 right-0 w-96 h-96 bg-purple-600/15 rounded-full blur-[110px] pointer-events-none -z-10" />
+                <div className="hidden sm:block absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/15 rounded-full blur-[110px] pointer-events-none -z-10" />
 
                 {/* 2. OVERHAULED MODAL FLOATING TOP BAR */}
                 <div className="shrink-0 px-4 sm:px-6 py-3 border-b border-white/[0.08] flex items-center justify-between gap-3 bg-white/[0.03] backdrop-blur-md">
@@ -419,13 +420,39 @@ export default function MusicSection({
                   </div>
                 </div>
 
+                {/* Mobile View Switcher (Lyrics vs Deck) */}
+                <div className="lg:hidden shrink-0 px-4 py-2 bg-black/40 border-b border-white/[0.08] flex items-center justify-center">
+                  <div className="flex items-center p-0.5 rounded-xl bg-white/[0.04] border border-white/[0.08] w-full max-w-xs">
+                    <button
+                      onClick={() => setModalMobileTab('lyrics')}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                        modalMobileTab === 'lyrics'
+                          ? 'bg-white text-[#08090e] shadow-sm font-bold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Lyrics & Notes
+                    </button>
+                    <button
+                      onClick={() => setModalMobileTab('deck')}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                        modalMobileTab === 'deck'
+                          ? 'bg-white text-[#08090e] shadow-sm font-bold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Track Deck & Audio
+                    </button>
+                  </div>
+                </div>
+
                 {/* 3. MAIN CONTENT STAGE (3 COLUMNS ON DESKTOP, BALANCED & SCALED) */}
                 <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden min-h-0">
                   
                   {/* ======================================================== */}
                   {/* COLUMN 1: PROMINENT VINYL ARTWORK & AUDIO STUDIO DECK     */}
                   {/* ======================================================== */}
-                  <div className="lg:w-[370px] xl:w-[410px] shrink-0 p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden">
+                  <div className={`lg:w-[370px] xl:w-[410px] shrink-0 p-4 sm:p-5 xl:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-black/35 backdrop-blur-md overflow-hidden ${modalMobileTab === "deck" ? "flex" : "hidden lg:flex"}`}>
                     <div>
                       {/* PROMINENT 3D VINYL SLEEVE & DISC DISPLAY (Fixed Height Container: Zero Layout Jitter) */}
                       {/* Disc slides out prominently with dramatic exposure */}
@@ -433,7 +460,7 @@ export default function MusicSection({
                         {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
                         {isPlaying && currentTrack?.id === focusedTrack.id && (
                           <>
-                            <div className="absolute inset-0 m-auto w-44 h-44 sm:w-48 sm:h-48 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                            <div className="hidden sm:block absolute inset-0 m-auto w-44 h-44 sm:w-48 sm:h-48 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
                             <div className="absolute inset-0 m-auto w-52 h-52 sm:w-56 sm:h-56 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
                           </>
                         )}
@@ -626,7 +653,7 @@ export default function MusicSection({
                   {/* ======================================================== */}
                   {/* COLUMN 2: OVERHAULED GENIUS SYNCHRONIZED LYRICS          */}
                   {/* ======================================================== */}
-                  <div className="flex-1 p-5 xl:p-6 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col min-h-0 bg-black/15">
+                  <div className={`flex-1 p-4 sm:p-5 xl:p-6 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col min-h-0 bg-black/15 ${modalMobileTab === "lyrics" ? "flex" : "hidden lg:flex"}`}>
                     {/* Lyrics Header & Filter Pills */}
                     <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3 shrink-0">
                       <div>
@@ -756,7 +783,7 @@ export default function MusicSection({
                   {/* ======================================================== */}
                   {/* COLUMN 3: OVERHAULED GENIUS VERIFIED ARTIST DOSSIER      */}
                   {/* ======================================================== */}
-                  <div className="lg:w-[340px] xl:w-[380px] shrink-0 p-5 xl:p-6 flex flex-col min-h-0 bg-black/35 backdrop-blur-md">
+                  <div className={`lg:w-[340px] xl:w-[380px] shrink-0 p-4 sm:p-5 xl:p-6 flex flex-col min-h-0 bg-black/35 backdrop-blur-md ${modalMobileTab === "lyrics" ? "flex" : "hidden lg:flex"}`}>
                     {/* Header: Verified Artist Badge & Note Navigation */}
                     <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3 shrink-0">
                       <div className="flex items-center gap-2.5">

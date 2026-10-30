@@ -516,13 +516,13 @@ export default function HeroSection({
           }}
         >
 
-          {/* Top On Tour Look-At-Me Button */}
+          {/* Top On Tour Look-At-Me Button (Unslopped on Mobile) */}
           {artistInfo.tourBadge?.enabled !== false && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={canIgnite ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className={`mb-4 sm:mb-5 ${tourBadgeAlignClass}`}
+              className={`mb-3 sm:mb-5 ${tourBadgeAlignClass}`}
             >
             <motion.a
               href={artistInfo.tourBadge?.link || '#tour'}
@@ -531,20 +531,12 @@ export default function HeroSection({
                 const el = document.querySelector('#tour');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              animate={{
-                y: [0, -2.5, 0]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }}
-              className="relative inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-purple-400/40 hover:border-emerald-400/70 bg-gradient-to-r from-purple-950/80 via-[#0e0a1f]/90 to-purple-950/80 backdrop-blur-xl group shadow-lg shadow-purple-900/25 cursor-pointer transition-all hover:scale-105 active:scale-95 max-w-[95vw] overflow-hidden"
+              className="relative inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-white/[0.14] sm:border-purple-400/40 bg-[#0c0e17]/95 sm:bg-gradient-to-r sm:from-purple-950/80 sm:via-[#0e0a1f]/90 sm:to-purple-950/80 backdrop-blur-xl group shadow-sm sm:shadow-lg cursor-pointer transition-all active:scale-95 max-w-[94vw] overflow-hidden"
               title="Explore Stage Dates & Tickets"
             >
-              {/* Dynamic Multicolored Pulsing Aura / Radial Glow */}
+              {/* Dynamic Multicolored Pulsing Aura / Radial Glow (Desktop only) */}
               <motion.div
-                className="absolute -inset-1 rounded-full blur-md pointer-events-none -z-10"
+                className="hidden sm:block absolute -inset-1 rounded-full blur-md pointer-events-none -z-10"
                 style={{
                   background: 'linear-gradient(to right, var(--theme-accent, #06b6d4) 0%, var(--theme-primary, #a855f7) 50%, var(--theme-secondary, #6366f1) 100%)',
                 }}
@@ -559,8 +551,8 @@ export default function HeroSection({
                 }}
               />
 
-              {/* Sweeping Fluid Light Glint / Sheen across badge */}
-              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+              {/* Sweeping Fluid Light Glint / Sheen across badge (Desktop only) */}
+              <div className="hidden sm:block absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                 <motion.div
                   className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
                   animate={{
@@ -575,26 +567,23 @@ export default function HeroSection({
                 />
               </div>
 
-              {/* Dual Concentric Radar Beacon */}
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="animate-pulse absolute -inset-0.5 rounded-full bg-emerald-400/30" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-tr from-emerald-400 to-teal-200 shadow-md shadow-emerald-400/80" />
+              {/* Live Status Beacon */}
+              <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 shrink-0">
+                <span className="hidden sm:inline-flex animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-emerald-400" />
               </span>
 
               {/* Mini Tag: LIVE */}
-              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 border border-emerald-400/40 text-[8.5px] font-mono font-black uppercase text-emerald-300 tracking-wider shrink-0">
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 border border-emerald-400/40 text-[8.5px] font-mono font-bold uppercase text-emerald-300 tracking-wider shrink-0">
                 LIVE
               </span>
 
-              {/* Fluid Text */}
-              <ShinyText
-                text={artistInfo.tourBadge?.text || "ON TOUR NOW • 2026-2027 STAGE DATES • GET TICKETS"}
-                className="text-[10px] sm:text-[11px] font-mono font-bold tracking-wide text-purple-100 whitespace-nowrap"
-                speed={4}
-              />
+              {/* Typography Badge Text */}
+              <span className="text-[10px] sm:text-[11px] font-mono font-medium tracking-wide text-slate-200 sm:text-purple-100 whitespace-nowrap truncate max-w-[210px] xs:max-w-none">
+                {artistInfo.tourBadge?.text || "ON TOUR • 2026-2027 STAGE DATES"}
+              </span>
 
-              <ArrowRight className="w-3 h-3 text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
+              <ArrowRight className="w-3 h-3 text-emerald-300 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </motion.a>
           </motion.div>
         )}

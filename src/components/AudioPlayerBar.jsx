@@ -318,8 +318,8 @@ export default function AudioPlayerBar({
       </AnimatePresence>
 
       {/* ======================================================== */}
-      {/* FULL-SCREEN EXPANDABLE MOBILE PLAYER SHEET               */}
-      {/* With fluid tab switcher between 'player' & 'lyrics'      */}
+      {/* FULL-SCREEN EXPANDABLE MOBILE PLAYER SHEET (UNSLOPPED)    */}
+      {/* With clean tab switcher between 'player' & 'lyrics'       */}
       {/* ======================================================== */}
       <AnimatePresence>
         {isPlayerVisible && isMobileExpanded && (
@@ -328,58 +328,55 @@ export default function AudioPlayerBar({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="fixed inset-0 z-50 md:hidden bg-[#090a12] p-5 flex flex-col justify-between overflow-hidden safe-bottom"
+            className="fixed inset-0 z-50 md:hidden bg-[#07080e] p-5 flex flex-col justify-between overflow-hidden safe-bottom"
           >
-            {/* Ambient lighting in mobile sheet */}
-            <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-            {/* Top Drag Handle & Segmented View Switcher (Planes style) */}
+            {/* Top Drag Handle & Segmented View Switcher */}
             <div className="shrink-0 mb-3">
               <div className="flex flex-col items-center mb-3">
                 <button
                   onClick={() => setIsMobileExpanded(false)}
-                  className="w-12 h-1.5 rounded-full bg-white/25 mb-3 active:scale-95"
+                  className="w-12 h-1.5 rounded-full bg-white/20 mb-3 active:scale-95 cursor-pointer"
                   aria-label="Collapse Player"
                 />
               </div>
 
               {/* Segmented Control Pill Bar */}
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center p-1 rounded-full bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
+                <div className="flex items-center p-1 rounded-xl bg-white/[0.04] border border-white/[0.08]">
                   <button
                     onClick={() => setMobileTab('player')}
-                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
-                      mobileTab === 'player' ? 'text-white' : 'text-slate-400'
+                    className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+                      mobileTab === 'player' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {mobileTab === 'player' && (
                       <motion.div
                         layoutId="mobilePlayerViewPill"
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-md shadow-purple-600/30"
+                        className="absolute inset-0 rounded-lg bg-white/[0.12] border border-white/[0.12] shadow-sm"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}
                     <span className="relative z-10 flex items-center gap-1.5">
-                      <Music className="w-3 h-3" />
+                      <Music className="w-3.5 h-3.5" />
                       Now Playing
                     </span>
                   </button>
 
                   <button
                     onClick={() => setMobileTab('lyrics')}
-                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
-                      mobileTab === 'lyrics' ? 'text-white' : 'text-slate-400'
+                    className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+                      mobileTab === 'lyrics' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {mobileTab === 'lyrics' && (
                       <motion.div
                         layoutId="mobilePlayerViewPill"
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-md shadow-purple-600/30"
+                        className="absolute inset-0 rounded-lg bg-white/[0.12] border border-white/[0.12] shadow-sm"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}
                     <span className="relative z-10 flex items-center gap-1.5">
-                      <Quote className="w-3 h-3" />
+                      <Quote className="w-3.5 h-3.5" />
                       Lyrics {annotatedCount > 0 && `(${annotatedCount})`}
                     </span>
                   </button>
@@ -399,7 +396,7 @@ export default function AudioPlayerBar({
                       setIsMobileExpanded(false);
                       if (onClosePlayer) onClosePlayer();
                     }}
-                    className="p-2 rounded-full bg-white/[0.08] hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 active:scale-90 border border-white/[0.08]"
+                    className="p-2 rounded-full bg-white/[0.06] hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 active:scale-90 border border-white/[0.08]"
                     aria-label="Close Player"
                     title="Close Player"
                   >
@@ -415,33 +412,33 @@ export default function AudioPlayerBar({
                 {mobileTab === 'player' ? (
                   <motion.div
                     key="tab-player"
-                    initial={{ opacity: 0, scale: 0.96 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.3 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.25 }}
                     className="flex flex-col justify-center items-center h-full text-center py-4"
                   >
-                    {/* Large Album Art with Ambient Glow */}
-                    <div className="relative aspect-square w-full max-w-[260px] rounded-3xl overflow-hidden border border-white/[0.14] shadow-2xl shadow-purple-600/30 mb-6">
+                    {/* Large Album Art with Clean Depth */}
+                    <div className="relative aspect-square w-full max-w-[260px] rounded-2xl overflow-hidden border border-white/[0.12] shadow-2xl shadow-black mb-6 bg-[#0c0d16]">
                       <img
                         src={currentTrack.cover}
                         alt={currentTrack.title}
                         className="w-full h-full object-cover"
                       />
                       {isPlaying && (
-                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-[10px] font-mono text-purple-300">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                          <span>Playing Preview</span>
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/15 flex items-center gap-1.5 text-[10px] font-mono text-slate-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span>Previewing</span>
                         </div>
                       )}
                     </div>
 
                     {/* Track Meta */}
                     <div className="mb-4">
-                      <h3 className="font-display text-2xl font-black text-white">
+                      <h3 className="font-display text-2xl font-bold text-white tracking-tight">
                         {currentTrack.title}
                       </h3>
-                      <p className="text-sm text-purple-300 font-semibold mt-1">
+                      <p className="text-sm text-slate-300 font-medium mt-1">
                         UNNOTICED {currentTrack.featuring && `(${currentTrack.featuring})`}
                       </p>
                       <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -561,9 +558,9 @@ export default function AudioPlayerBar({
             {/* Bottom Controls Bar (always visible in sheet) */}
             <div className="shrink-0 pt-3 border-t border-white/[0.08]">
               {/* Scrubbable Progress Bar */}
-              <div className="relative h-2 bg-white/10 rounded-full overflow-hidden cursor-pointer mb-2">
+              <div className="relative h-1.5 bg-white/10 rounded-full overflow-hidden cursor-pointer mb-2">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400"
+                  className="h-full bg-white/90 rounded-full"
                   style={{ width: `${progressPercent}%` }}
                 />
                 <input
@@ -578,35 +575,38 @@ export default function AudioPlayerBar({
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-3">
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-3 tabular-nums">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)} (Preview)</span>
               </div>
 
-              {/* Main Playback Buttons */}
+              {/* Main Playback Buttons (Tactile Obsidian / White Craft) */}
               <div className="flex items-center justify-center gap-6 mb-3">
                 <button
                   onClick={onPrevTrack}
-                  className="w-11 h-11 rounded-full bg-white/[0.05] text-slate-200 flex items-center justify-center active:scale-90"
+                  className="w-11 h-11 rounded-full bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center active:scale-90"
+                  aria-label="Previous track"
                 >
                   <SkipBack className="w-5 h-5 fill-current" />
                 </button>
 
                 <motion.button
-                  whileTap={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={togglePlay}
-                  className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white flex items-center justify-center shadow-2xl shadow-purple-600/50"
+                  className="w-16 h-16 rounded-full bg-white text-[#08090e] hover:bg-slate-200 flex items-center justify-center shadow-2xl border border-white/60 active:scale-95 font-bold cursor-pointer"
+                  aria-label={isPlaying ? 'Pause preview' : 'Play preview'}
                 >
                   {isPlaying ? (
-                    <Pause className="w-7 h-7 fill-white" />
+                    <Pause className="w-7 h-7 fill-current" />
                   ) : (
-                    <Play className="w-7 h-7 fill-white ml-0.5" />
+                    <Play className="w-7 h-7 fill-current ml-0.5" />
                   )}
                 </motion.button>
 
                 <button
                   onClick={onNextTrack}
-                  className="w-11 h-11 rounded-full bg-white/[0.05] text-slate-200 flex items-center justify-center active:scale-90"
+                  className="w-11 h-11 rounded-full bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center active:scale-90"
+                  aria-label="Next track"
                 >
                   <SkipForward className="w-5 h-5 fill-current" />
                 </button>
@@ -759,17 +759,13 @@ export default function AudioPlayerBar({
                   <motion.button
                     whileTap={{ scale: 0.92 }}
                     onClick={togglePlay}
-                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center shadow-lg border border-white/20 active:scale-90"
-                    style={{
-                      background: `linear-gradient(to top right, ${theme.primary}, ${theme.secondary})`,
-                      boxShadow: `0 0 15px ${theme.primary}60`
-                    }}
+                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#08090e] hover:bg-slate-200 flex items-center justify-center shadow-md border border-white/60 active:scale-90 cursor-pointer font-bold shrink-0"
                     title={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
-                      <Pause className="w-4 h-4 fill-white" />
+                      <Pause className="w-4 h-4 fill-current" />
                     ) : (
-                      <Play className="w-4 h-4 fill-white ml-0.5" />
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
                     )}
                   </motion.button>
 

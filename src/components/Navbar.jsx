@@ -175,26 +175,17 @@ export default function Navbar({
               <ShoppingBag className="w-3.5 h-3.5" />
               {cartCount > 0 && (
                 <span
-                  className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold text-white shadow-md border border-white/20"
-                  style={{
-                    background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary})`,
-                    boxShadow: `0 0 8px ${theme.primary}60`
-                  }}
+                  className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold text-[#08090e] bg-white border border-white/60 shadow-sm tabular-nums"
                 >
                   {cartCount}
                 </span>
               )}
             </button>
 
-            {/* Mobile Hamburger Button with Fluid Tap Feedback */}
+            {/* Mobile Hamburger Button with Quiet Neutral Chrome */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full border text-white active:scale-90 transition-all cursor-pointer"
-              style={{
-                backgroundColor: `${theme.primary}20`,
-                borderColor: `${theme.primary}40`,
-                color: '#ffffff'
-              }}
+              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full border border-white/[0.14] bg-white/[0.06] text-white active:scale-90 transition-all cursor-pointer hover:bg-white/[0.12]"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -210,8 +201,8 @@ export default function Navbar({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 lg:hidden bg-[#060608]/96 backdrop-blur-3xl flex flex-col justify-between p-6 overflow-y-auto safe-bottom"
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 lg:hidden bg-[#07080e]/98 backdrop-blur-3xl flex flex-col justify-between p-6 overflow-y-auto safe-bottom"
           >
             {/* Top Bar inside Menu */}
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
@@ -219,16 +210,17 @@ export default function Navbar({
                 <h4 className="font-display font-black text-white text-base tracking-wider">
                   {artistInfo.name || 'UNNOTICED'}
                 </h4>
-                <p className="text-[10px] text-purple-300 font-mono">
+                <p className="text-[10px] text-slate-400 font-mono">
                   {artistInfo.tagline || 'Formerly Ty Sciullo • McKees Rocks, PA'}
                 </p>
               </div>
 
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-white flex items-center justify-center active:scale-90 transition-all"
+                className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-white flex items-center justify-center active:scale-90 transition-all"
+                aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -237,32 +229,32 @@ export default function Navbar({
               {navLinks.map((link, idx) => (
                 <motion.button
                   key={link.label}
-                  initial={{ opacity: 0, x: -25 }}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * idx, duration: 0.3 }}
+                  transition={{ delay: 0.04 * idx, duration: 0.25 }}
                   onClick={() => handleNavClick(link.href)}
-                  className="flex items-center justify-between w-full py-3 px-4 rounded-2xl bg-white/[0.02] hover:bg-purple-600/15 border border-transparent hover:border-purple-500/30 text-left transition-all active:scale-[0.98]"
+                  className="flex items-center justify-between w-full py-3.5 px-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.04] hover:border-white/[0.12] text-left transition-all active:scale-[0.98]"
                 >
                   <div className="flex items-baseline gap-3">
-                    <span className="font-mono text-xs text-purple-400 font-semibold">
+                    <span className="font-mono text-xs text-slate-400 font-semibold tabular-nums">
                       {link.num}
                     </span>
-                    <span className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    <span className="font-display text-lg font-bold text-white tracking-tight">
                       {link.label}
                     </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
                 </motion.button>
               ))}
             </div>
 
-            {/* Now Playing Mini-Card inside Menu */}
+            {/* Now Playing Mini-Card inside Menu (Quiet Craft) */}
             <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] mb-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-mono text-purple-300 uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-purple-400" /> Currently Loaded Track
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Disc3 className="w-3 h-3 text-slate-400" /> Current Track
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">{currentTrack.duration}</span>
+                <span className="text-[10px] font-mono text-slate-400 tabular-nums">{currentTrack.duration}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -279,31 +271,32 @@ export default function Navbar({
 
                 <button
                   onClick={togglePlay}
-                  className="w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0 active:scale-90 shadow-md shadow-purple-600/40"
+                  className="w-9 h-9 rounded-full bg-white text-[#08090e] hover:bg-slate-200 flex items-center justify-center shrink-0 active:scale-90 shadow-md font-bold"
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+                  {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
                 </button>
               </div>
             </div>
 
             {/* Social Icons Footer */}
             <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <a href={info.socials?.instagram || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+              <div className="flex items-center gap-2.5">
+                <a href={info.socials?.instagram || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white active:scale-90" aria-label="Instagram">
                   <InstagramIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={info.socials?.twitter || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.twitter || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white active:scale-90" aria-label="Twitter">
                   <TwitterIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={info.socials?.youtube || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.youtube || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white active:scale-90" aria-label="YouTube">
                   <YoutubeIcon className="w-3.5 h-3.5" />
                 </a>
-                <a href={info.socials?.spotify || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 active:scale-90">
+                <a href={info.socials?.spotify || '#'} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white active:scale-90" aria-label="Spotify">
                   <SpotifyIcon className="w-3.5 h-3.5" />
                 </a>
               </div>
 
-              <span className="text-[10px] font-mono text-slate-500">
+              <span className="text-[10px] font-mono text-slate-400">
                 © 2026 UNNOTICED
               </span>
             </div>

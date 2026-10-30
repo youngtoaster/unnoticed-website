@@ -15,6 +15,51 @@
   --font-monoton: "Monoton", cursive, sans-serif;
   --font-unbounded: "Unbounded", sans-serif;
   --font-russo: "Russo One", sans-serif;
+
+  --color-purple-50: color-mix(in srgb, var(--theme-primary) 10%, transparent);
+  --color-purple-100: color-mix(in srgb, var(--theme-primary) 20%, #ffffff);
+  --color-purple-200: color-mix(in srgb, var(--theme-primary) 40%, #ffffff);
+  --color-purple-300: color-mix(in srgb, var(--theme-primary) 65%, #ffffff);
+  --color-purple-400: color-mix(in srgb, var(--theme-primary) 85%, #ffffff);
+  --color-purple-500: var(--theme-primary);
+  --color-purple-600: var(--theme-primary);
+  --color-purple-700: color-mix(in srgb, var(--theme-primary) 80%, #000000);
+  --color-purple-800: color-mix(in srgb, var(--theme-primary) 60%, #000000);
+  --color-purple-900: color-mix(in srgb, var(--theme-primary) 40%, #000000);
+  --color-purple-950: color-mix(in srgb, var(--theme-primary) 20%, #000000);
+
+  --color-fuchsia-400: color-mix(in srgb, var(--theme-primary) 85%, #ffffff);
+  --color-fuchsia-500: var(--theme-primary);
+  --color-fuchsia-600: var(--theme-primary);
+  --color-fuchsia-950: color-mix(in srgb, var(--theme-primary) 20%, #000000);
+
+  --color-indigo-400: color-mix(in srgb, var(--theme-secondary) 85%, #ffffff);
+  --color-indigo-500: var(--theme-secondary);
+  --color-indigo-600: var(--theme-secondary);
+  --color-indigo-950: color-mix(in srgb, var(--theme-secondary) 20%, #000000);
+
+  --color-violet-300: color-mix(in srgb, var(--theme-primary) 65%, #ffffff);
+  --color-violet-400: color-mix(in srgb, var(--theme-primary) 85%, #ffffff);
+  --color-violet-500: var(--theme-primary);
+  --color-violet-600: var(--theme-primary);
+  --color-violet-950: color-mix(in srgb, var(--theme-primary) 20%, #000000);
+
+  --color-cyan-50: color-mix(in srgb, var(--theme-accent) 10%, transparent);
+  --color-cyan-100: color-mix(in srgb, var(--theme-accent) 20%, #ffffff);
+  --color-cyan-200: color-mix(in srgb, var(--theme-accent) 40%, #ffffff);
+  --color-cyan-300: color-mix(in srgb, var(--theme-accent) 65%, #ffffff);
+  --color-cyan-400: color-mix(in srgb, var(--theme-accent) 85%, #ffffff);
+  --color-cyan-500: var(--theme-accent);
+  --color-cyan-600: var(--theme-accent);
+  --color-cyan-700: color-mix(in srgb, var(--theme-accent) 80%, #000000);
+  --color-cyan-800: color-mix(in srgb, var(--theme-accent) 60%, #000000);
+  --color-cyan-900: color-mix(in srgb, var(--theme-accent) 40%, #000000);
+  --color-cyan-950: color-mix(in srgb, var(--theme-accent) 20%, #000000);
+
+  --color-sky-400: color-mix(in srgb, var(--theme-accent) 85%, #ffffff);
+  --color-sky-500: var(--theme-accent);
+  --color-sky-600: var(--theme-accent);
+  --color-sky-950: color-mix(in srgb, var(--theme-accent) 20%, #000000);
 }
 
 /* Explicit font family utility classes */
@@ -150,9 +195,9 @@
   background: linear-gradient(
     90deg,
     #ffffff 0%,
-    #a855f7 25%,
-    #38bdf8 50%,
-    #a855f7 75%,
+    var(--theme-primary) 25%,
+    var(--theme-accent) 50%,
+    var(--theme-primary) 75%,
     #ffffff 100%
   );
   background-size: 200% auto;
@@ -205,8 +250,8 @@
 /* Lyric highlight pulse - touch friendly padding */
 .lyric-annotated {
   position: relative;
-  background: linear-gradient(120deg, rgba(168, 85, 247, 0.18) 0%, rgba(168, 85, 247, 0.08) 100%);
-  border-bottom: 2px dashed rgba(168, 85, 247, 0.7);
+  background: linear-gradient(120deg, rgba(var(--theme-primary-rgb), 0.18) 0%, rgba(var(--theme-primary-rgb), 0.08) 100%);
+  border-bottom: 2px dashed rgba(var(--theme-primary-rgb), 0.7);
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 3px 6px;
@@ -215,10 +260,10 @@
   margin: 2px 0;
 }
 .lyric-annotated:hover, .lyric-annotated.active {
-  background: rgba(168, 85, 247, 0.35);
-  border-bottom-color: #c084fc;
+  background: rgba(var(--theme-primary-rgb), 0.35);
+  border-bottom-color: var(--theme-accent);
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 16px rgba(var(--theme-primary-rgb), 0.35);
 }
 
 /* Mobile bottom safe area */

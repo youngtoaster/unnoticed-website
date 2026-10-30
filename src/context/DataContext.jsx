@@ -140,11 +140,12 @@ export function DataProvider({ children }) {
 
   // Dynamic CSS variables injection for Global Site Color Theme
   useEffect(() => {
-    const theme = data.artistInfo?.theme || {
-      primary: '#a855f7',
-      secondary: '#6366f1',
-      accent: '#06b6d4',
-      glow: '#a855f7'
+    const rawPrimary = data.artistInfo?.theme?.primary || data.artistInfo?.neonSign?.color || '#a855f7';
+    const theme = {
+      primary: rawPrimary,
+      secondary: data.artistInfo?.theme?.secondary || '#6366f1',
+      accent: data.artistInfo?.theme?.accent || '#06b6d4',
+      glow: data.artistInfo?.theme?.glow || rawPrimary
     };
 
     const hexToRgb = (hex) => {
@@ -167,7 +168,7 @@ export function DataProvider({ children }) {
     root.style.setProperty('--theme-accent', theme.accent || '#06b6d4');
     root.style.setProperty('--theme-accent-rgb', hexToRgb(theme.accent));
     root.style.setProperty('--theme-glow', theme.glow || theme.primary || '#a855f7');
-  }, [data.artistInfo?.theme]);
+  }, [data.artistInfo?.theme, data.artistInfo?.neonSign?.color]);
 
   // Universal Data Updater:
   // Saves to localStorage immediately AND synchronizes to server disk (/api/sync-data)

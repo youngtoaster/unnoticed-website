@@ -1867,16 +1867,25 @@ export default function AdminDashboard({ onReturnToSite }) {
                         key={preset.hex}
                         type="button"
                         onClick={() => {
-                          updateData({
-                            artistInfo: {
-                              ...artistInfo,
-                              neonSign: { ...neonConfig, color: preset.hex }
-                            }
-                          });
-                          showToast(`Neon color set to ${preset.name}`);
+                          const matching = THEME_PRESETS.find(
+                            (p) => p.primary.toLowerCase() === preset.hex.toLowerCase() || p.name.toLowerCase() === preset.name.toLowerCase()
+                          );
+                          if (matching) {
+                            updateSiteTheme(matching, true);
+                          } else {
+                            updateSiteTheme({
+                              id: 'custom',
+                              name: preset.name,
+                              primary: preset.hex,
+                              secondary: preset.hex,
+                              accent: preset.hex,
+                              glow: preset.hex
+                            }, true);
+                          }
+                          showToast(`Site theme & neon set to ${preset.name}`);
                         }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-mono flex items-center gap-2 border transition-all cursor-pointer ${
-                          (neonConfig.color || '#a855f7').toLowerCase() === preset.hex.toLowerCase()
+                          (neonConfig.color || currentTheme.primary || '#a855f7').toLowerCase() === preset.hex.toLowerCase()
                             ? 'border-white bg-white/10 text-white shadow-md'
                             : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]'
                         }`}
@@ -1894,32 +1903,38 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <div className="flex items-center gap-2 pt-1">
                     <input
                       type="color"
-                      value={neonConfig.color || '#a855f7'}
+                      value={neonConfig.color || currentTheme.primary || '#a855f7'}
                       onChange={(e) => {
-                        updateData({
-                          artistInfo: {
-                            ...artistInfo,
-                            neonSign: { ...neonConfig, color: e.target.value }
-                          }
-                        });
+                        const val = e.target.value;
+                        updateSiteTheme({
+                          id: 'custom',
+                          name: 'Custom Palette',
+                          primary: val,
+                          secondary: val,
+                          accent: val,
+                          glow: val
+                        }, true);
                       }}
                       className="w-10 h-9 rounded-xl bg-black border border-white/[0.15] cursor-pointer p-0.5"
                     />
                     <input
                       type="text"
                       placeholder="#a855f7"
-                      value={neonConfig.color || '#a855f7'}
+                      value={neonConfig.color || currentTheme.primary || '#a855f7'}
                       onChange={(e) => {
-                        updateData({
-                          artistInfo: {
-                            ...artistInfo,
-                            neonSign: { ...neonConfig, color: e.target.value }
-                          }
-                        });
+                        const val = e.target.value;
+                        updateSiteTheme({
+                          id: 'custom',
+                          name: 'Custom Palette',
+                          primary: val,
+                          secondary: val,
+                          accent: val,
+                          glow: val
+                        }, true);
                       }}
                       className="w-36 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white font-mono focus:outline-none"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono">Custom hex code</span>
+                    <span className="text-[10px] text-slate-400 font-mono">Applies to whole site</span>
                   </div>
                 </div>
 

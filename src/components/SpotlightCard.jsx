@@ -13,6 +13,11 @@ export default function SpotlightCard({
   const [isHovered, setIsHovered] = useState(false);
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
+  // Dynamically resolve hardcoded default purple to active theme CSS variable
+  const resolvedSpotlight = spotlightColor.includes('168, 85, 247')
+    ? spotlightColor.replace('168, 85, 247', 'var(--theme-primary-rgb, 168, 85, 247)')
+    : spotlightColor;
+
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -60,7 +65,7 @@ export default function SpotlightCard({
         className="pointer-events-none absolute -inset-px transition-opacity duration-300"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${spotlightColor}, transparent 50%)`,
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${resolvedSpotlight}, transparent 50%)`,
         }}
       />
       <div className="relative z-10 h-full">{children}</div>

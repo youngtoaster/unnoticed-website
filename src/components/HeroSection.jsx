@@ -81,15 +81,15 @@ export default function HeroSection({
     if (!isIlluminated || ignitionState.isFullyLit || ignitionState.ignitedIndices.length === 0) {
       return null;
     }
-    const gasColor = neonConfig.color || '#a855f7';
+    const gasColor = neonConfig.color || theme?.primary || '#a855f7';
     return ignitionState.ignitedIndices.map((idx) => {
       const pct = 14 + (idx / Math.max(1, ignitionState.totalCount - 1)) * 72;
       return `radial-gradient(ellipse at ${pct}% 45%, ${gasColor}66 0%, ${gasColor}20 35%, transparent 68%)`;
     }).join(', ');
-  }, [isIlluminated, ignitionState, neonConfig.color]);
+  }, [isIlluminated, ignitionState, neonConfig.color, theme?.primary]);
 
   const align = neonConfig.align || 'center';
-  const gasColor = neonConfig.color || '#a855f7';
+  const gasColor = neonConfig.color || theme?.primary || '#a855f7';
 
   // Dynamic alignment classes for hero stage
   const alignmentContainerClass = 
@@ -235,7 +235,10 @@ export default function HeroSection({
             >
               {/* Dynamic Multicolored Pulsing Aura / Radial Glow */}
               <motion.div
-                className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500/40 via-purple-600/50 to-pink-500/40 blur-md pointer-events-none -z-10"
+                className="absolute -inset-1 rounded-full blur-md pointer-events-none -z-10"
+                style={{
+                  background: 'linear-gradient(to right, var(--theme-accent, #06b6d4) 0%, var(--theme-primary, #a855f7) 50%, var(--theme-secondary, #6366f1) 100%)',
+                }}
                 animate={{
                   opacity: [0.4, 0.85, 0.4],
                   scale: [0.98, 1.04, 0.98]

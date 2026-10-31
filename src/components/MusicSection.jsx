@@ -140,13 +140,13 @@ export default function MusicSection({
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
             <Music className="w-3.5 h-3.5" />
-            <ShinyText text="SONIC ARCHIVE & TELEMETRY" speed={4} />
+            <span>Studio Cuts & Lyrics</span>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            DISCOGRAPHY & GENIUS INSIGHTS
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+            Discography & Lyrics
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-lg">
-            Stream high-fidelity studio previews, dissect verified line-by-line Genius breakdowns, or launch external DSPs.
+            Listen to studio cuts, inspect annotated lyric breakdowns, and stream official releases.
           </p>
         </div>
 
@@ -157,7 +157,7 @@ export default function MusicSection({
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0e0f18] hover:bg-[#181928] text-xs font-mono font-semibold text-purple-300 border border-white/[0.12] transition-colors active:scale-95 shadow-md shadow-black"
           >
             <Radio className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Where to Stream →</span>
+            <span>Streaming Platforms →</span>
           </a>
         </div>
       </div>
@@ -180,7 +180,7 @@ export default function MusicSection({
               </span>
             </div>
             <span className="text-[11px] font-mono text-slate-400">
-              24-Bit Studio Masters • Verified Songwriting Telemetry
+              24-Bit Studio Masters • Lyrics & Annotations
             </span>
           </div>
 
@@ -217,9 +217,9 @@ export default function MusicSection({
                           #{trackIdx < 9 ? `0${trackIdx + 1}` : trackIdx + 1} • {track.releaseYear}
                         </span>
                         {trackAnnotatedCount > 0 && (
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/90 text-slate-950 font-bold shadow-md flex items-center gap-1">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            {trackAnnotatedCount} Genius Notes
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-amber-300 border border-amber-500/30 font-medium shadow-md flex items-center gap-1">
+                            <Quote className="w-2.5 h-2.5 text-amber-400" />
+                            {trackAnnotatedCount} Notes
                           </span>
                         )}
                       </div>
@@ -274,7 +274,11 @@ export default function MusicSection({
                         </h3>
                       </div>
                       <p className="text-xs text-slate-400 font-mono truncate">
-                        UNNOTICED {track.featuring ? `(feat. ${track.featuring})` : '• Solo Release'}
+                        UNNOTICED {(() => {
+                        const feat = (track.featuring || '').replace(/^(feat\.?|ft\.?)\s*/i, '').trim();
+                        if (!feat || feat.toLowerCase() === 'unnoticed') return '• Solo Release';
+                        return `(feat. ${feat})`;
+                      })()}
                       </p>
 
                       {/* Lyric Excerpt Teaser */}

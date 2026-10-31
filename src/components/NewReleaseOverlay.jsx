@@ -314,7 +314,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
             <div className="flex-1 p-5 sm:p-8 flex flex-col md:flex-row items-center gap-6 sm:gap-10 overflow-y-auto custom-scrollbar min-h-0">
               
               {/* Left Column: Prominent 3D Vinyl Artwork with Slide-out Grooves & Live Sonic Ripples */}
-              <div className="relative shrink-0 w-60 h-60 sm:w-72 sm:h-72 xl:w-80 xl:h-80 flex items-center justify-center">
+              <div className="relative shrink-0 w-40 h-40 xs:w-48 xs:h-48 sm:w-72 sm:h-72 xl:w-80 xl:h-80 flex items-center justify-center">
                 {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
                 {isPlaying && (
                   <>
@@ -336,7 +336,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                     scale: { duration: 0.25 },
                     opacity: { duration: 0.2 }
                   }}
-                  className="absolute w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center pointer-events-none z-0"
+                  className="absolute w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64 flex items-center justify-center pointer-events-none z-0"
                 >
                   {/* Dedicated rotating vinyl body: separated DOM layer prevents CSS spin transform from overriding Framer Motion translateX */}
                   <div
@@ -360,7 +360,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                 <motion.div
                   animate={isPlaying ? { x: -35 } : { x: 0 }}
                   transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-                  className="relative z-10 w-52 h-52 sm:w-64 sm:h-64 rounded-2xl overflow-hidden border border-white/[0.22] shadow-[0_25px_60px_rgba(0,0,0,0.9)] group shrink-0 bg-[#0c0d16]"
+                  className="relative z-10 w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64 rounded-2xl overflow-hidden border border-white/[0.22] shadow-[0_25px_60px_rgba(0,0,0,0.9)] group shrink-0 bg-[#0c0d16]"
                 >
                   <img
                     src={release.cover}
@@ -513,7 +513,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                 </div>
 
                 {/* Destination Action Buttons */}
-                <div className="mt-5 flex flex-wrap items-center gap-3">
+                <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                   <a
                     href={release.spotifyUrl}
                     target="_blank"

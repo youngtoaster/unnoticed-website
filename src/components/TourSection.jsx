@@ -34,10 +34,10 @@ export default function TourSection() {
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
-            <Ticket className="w-3.5 h-3.5" /> LIVE EXPERIENCES
+            <Ticket className="w-3.5 h-3.5" /> Live Dates & Stages
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            TOUR DATES & STAGE
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+            Tour Dates & Live Shows
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-lg">
             Catch UNNOTICED live in intimate venues and iconic stages across North America.

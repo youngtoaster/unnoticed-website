@@ -35,9 +35,9 @@ export default function BioSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
 
               {/* Holographic Badge */}
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/[0.15] text-[10px] sm:text-[11px] font-mono text-purple-300">
-                <Sparkles className="w-3 h-3 text-purple-400" />
-                <span>ARCHIVE PORTRAIT</span>
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/[0.15] text-[10px] sm:text-[11px] font-mono text-slate-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span>Archive Portrait</span>
               </div>
 
               {/* Bottom Details Overlay */}
@@ -59,8 +59,8 @@ export default function BioSection() {
 
             {/* Sub-card: Verified Origin Info */}
             <div className="mt-2.5 p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-400">
-              <span>LAT/LONG: 40.46° N, 80.07° W</span>
-              <span className="text-purple-300">#RustBeltRoots</span>
+              <span>McKees Rocks, Pennsylvania</span>
+              <span className="text-slate-400 font-mono">Est. 2016</span>
             </div>
           </SpotlightCard>
         </div>
@@ -72,8 +72,8 @@ export default function BioSection() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
               <Calendar className="w-3.5 h-3.5" /> ARTIST CHRONICLE
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-              FROM McKEES ROCKS TO THE UNSEEN
+            <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+              From McKees Rocks to the Unseen
             </h2>
             <p className="text-purple-300 font-tech text-xs sm:text-sm font-medium mt-1">
               "Once known as Ty Sciullo, now a man unseen."
@@ -92,7 +92,13 @@ export default function BioSection() {
                     : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]'
                 }`}
               >
-                0{idx + 1}. {para.title.split(':')[0].replace('The Industrial Roots of ', '')}
+                0{idx + 1}. {(() => {
+                const raw = para.title || '';
+                if (raw.toLowerCase().includes('roots')) return 'McKees Rocks';
+                if (raw.toLowerCase().includes('ty sciullo')) return 'Ty Sciullo Era';
+                if (raw.toLowerCase().includes('metamorphosis') || raw.toLowerCase().includes('unnoticed')) return 'Rebirth (UNNOTICED)';
+                return raw.split(':')[0];
+              })()}
               </button>
             ))}
           </div>
@@ -104,7 +110,7 @@ export default function BioSection() {
                 Chapter 0{activeBioTab + 1} {biography[activeBioTab]?.era ? `• ${biography[activeBioTab].era}` : ''}
               </span>
               <span className="text-[10px] sm:text-xs font-mono text-slate-400">
-                Verified Historical Context
+                Origins & Evolution
               </span>
             </div>
 

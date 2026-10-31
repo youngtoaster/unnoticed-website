@@ -137,8 +137,8 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
             {/* Sonic Audio Ripples (Radiate outward while audio is playing) */}
             {isPlaying && (
               <>
-                <div className="absolute inset-0 m-auto w-52 h-52 sm:w-64 sm:h-64 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
-                <div className="absolute inset-0 m-auto w-60 h-60 sm:w-72 sm:h-72 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
+                <div className="hidden sm:block absolute inset-0 m-auto w-52 h-52 sm:w-64 sm:h-64 rounded-full border border-cyan-400/40 animate-ping pointer-events-none -z-10" style={{ animationDuration: '3s' }} />
+                <div className="hidden sm:block absolute inset-0 m-auto w-60 h-60 sm:w-72 sm:h-72 rounded-full border border-purple-500/30 animate-pulse pointer-events-none -z-10" />
               </>
             )}
 

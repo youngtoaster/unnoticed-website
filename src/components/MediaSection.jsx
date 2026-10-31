@@ -64,9 +64,9 @@ export default function MediaSection() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
             <Film className="w-3.5 h-3.5" />
-            <ShinyText text="VISUAL & MEDIA ARCHIVE" speed={4} />
+            Visual & Media Archive
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
             VIDEOS & PHOTO EXHIBIT
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-lg">

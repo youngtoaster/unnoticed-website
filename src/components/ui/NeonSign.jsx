@@ -162,8 +162,24 @@ export function NeonSign({
     };
   }, [flicker, characters, isInView, shouldReduceMotion, canIgnite, ignitedIndices.length]);
 
-  // Neon shadows calculated dynamically based on gas color
+  // Responsive neon shadows: tight, crisp physical glass tubes on mobile; expansive atmospheric aura on desktop
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const litShadow = useMemo(() => {
+    if (isMobile) {
+      return [
+        `0 0 2px #ffffff`,
+        `0 0 6px #ffffff`,
+        `0 0 12px ${color}`,
+        `0 0 22px ${color}a0`
+      ].join(', ');
+    }
     return [
       `0 0 4px #ffffff`,
       `0 0 10px #ffffff`,
@@ -172,16 +188,23 @@ export function NeonSign({
       `0 0 80px ${color}`,
       `0 0 120px ${color}`
     ].join(', ');
-  }, [color]);
+  }, [color, isMobile]);
 
   const flashShadow = useMemo(() => {
+    if (isMobile) {
+      return [
+        `0 0 4px #ffffff`,
+        `0 0 12px #ffffff`,
+        `0 0 24px ${color}`
+      ].join(', ');
+    }
     return [
       `0 0 6px #ffffff`,
       `0 0 16px #ffffff`,
       `0 0 35px ${color}`,
       `0 0 70px ${color}`
     ].join(', ');
-  }, [color]);
+  }, [color, isMobile]);
 
   const brownoutShadow = useMemo(() => {
     return [
@@ -207,10 +230,10 @@ export function NeonSign({
         aria-hidden="true"
         className="absolute inset-0 -z-10 pointer-events-none transition-opacity duration-1000 ease-out"
         style={{
-          opacity: ignitedIndices.length > 0 ? 0.45 : 0,
-          background: `radial-gradient(ellipse at center, ${color}40 0%, ${color}15 45%, transparent 75%)`,
-          filter: 'blur(36px)',
-          transform: 'scale(1.35)'
+          opacity: ignitedIndices.length > 0 ? (isMobile ? 0.45 : 0.45) : 0,
+          background: `radial-gradient(ellipse at center, rgba(255,255,255,0.65) 0%, ${color}50 35%, transparent 75%)`,
+          filter: isMobile ? 'blur(20px)' : 'blur(36px)',
+          transform: isMobile ? 'scale(1.25)' : 'scale(1.35)'
         }}
       />
 

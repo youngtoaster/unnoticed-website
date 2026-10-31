@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap } from 'lucide-react';
+import { Play, Pause, ArrowDown, ChevronDown, Sparkles, MapPin, Radio, Headphones, Layers, Film, Ticket, ShoppingBag, ArrowRight, Zap } from 'lucide-react';
 import { useSiteData } from '../context/DataContext';
 import SpotlightCard from './SpotlightCard';
 import ShinyText from './reactbits/ShinyText';
@@ -35,6 +35,15 @@ export default function HeroSection({
   const [hasRevealed, setHasRevealed] = useState(false);
   const [explosionKey, setExplosionKey] = useState(0);
   const hasTriggeredInitialRef = useRef(false);
+
+  // Responsive mobile viewport tracking (unslopped mobile scale & centering)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Faceted Anamorphic Supersonic Wavefront Keyframes
   // Replaces the boring geometric circle with a sleek cybernetic 12-vertex polygonal shockwave
@@ -473,8 +482,9 @@ export default function HeroSection({
               alt="Full Hero Backdrop"
               className="w-full h-full object-cover transition-transform duration-700 ease-out"
               style={{
-                objectPosition: `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 50}%`,
-                transform: `scale(${(backdrop.zoom ?? 105) / 100})`,
+                objectPosition: isMobile ? '50% 8%' : `${backdrop.positionX ?? 50}% ${backdrop.positionY ?? 50}%`,
+                transform: `scale(${isMobile ? 1.45 : ((backdrop.zoom ?? 105) / 100)})`,
+                transformOrigin: isMobile ? 'center 15%' : 'center center',
                 mixBlendMode: backdrop.blendMode || 'screen',
               }}
             />
@@ -508,11 +518,23 @@ export default function HeroSection({
           </motion.div>
         )}
 
-        {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser ("Bring More Center") */}
+        {/* Smooth Atmospheric Center Stage Darkening Vignette */}
+        <div
+          id="hero-ambient-center-vignette"
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none -z-5"
+          style={{
+            background: isMobile
+              ? 'radial-gradient(ellipse 90% 70% at 50% 50%, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.5) 60%, transparent 100%)'
+              : 'radial-gradient(ellipse 75% 58% at 50% 48%, rgba(6,6,8,0.75) 0%, rgba(6,6,8,0.3) 65%, transparent 100%)'
+          }}
+        />
+
+        {/* Center Main Stage: Tour Badge + Artist Title + Subtitle + Bio Teaser (Optical Center on Mobile) */}
         <div
           className={`w-full max-w-5xl mx-auto flex flex-col justify-center my-auto transition-transform duration-500 ease-out ${alignmentContainerClass}`}
           style={{
-            transform: `translateY(${artistInfo.heroVerticalOffset ?? 60}px)`
+            transform: isMobile ? 'translateY(0px)' : `translateY(${artistInfo.heroVerticalOffset ?? 60}px)`
           }}
         >
 
@@ -609,7 +631,7 @@ export default function HeroSection({
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] xs:w-[480px] sm:w-[720px] md:w-[920px] h-[160px] xs:h-[220px] sm:h-[300px] rounded-full pointer-events-none -z-10"
                 style={{
                   background: `radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0%, ${ambientGlowColor}85 30%, ${ambientGlowColor}20 62%, transparent 80%)`,
-                  filter: 'blur(35px) drop-shadow(0 0 50px rgba(255,255,255,0.6))',
+                  filter: isMobile ? 'blur(22px)' : 'blur(35px) drop-shadow(0 0 50px rgba(255,255,255,0.6))',
                   mixBlendMode: 'screen',
                 }}
               />
@@ -724,8 +746,8 @@ export default function HeroSection({
                 flicker={neonConfig.flicker ?? true}
                 canIgnite={canIgnite}
                 onIgnitionProgress={setIgnitionState}
-                style={neonConfig.fontSizeRem ? { fontSize: `clamp(2rem, 5.2vw, ${neonConfig.fontSizeRem}rem)` } : undefined}
-                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} ${neonConfig.size || 'text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem]'} tracking-tight xs:tracking-tighter uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
+                style={{ fontSize: `clamp(2.1rem, 9.4vw, ${neonConfig.fontSizeRem || 4.25}rem)` }}
+                className={`${neonConfig.font || 'font-display'} ${neonConfig.fontWeight || 'font-black'} tracking-[0.14em] sm:tracking-[0.18em] uppercase leading-[0.98] ${titleJustifyClass} whitespace-nowrap`}
               >
                 {artistInfo.name || 'UNNOTICED'}
               </NeonSign>
@@ -751,7 +773,7 @@ export default function HeroSection({
                 />
               )}
               <p
-                className="font-tech text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold px-1 select-none transition-all duration-300"
+                className="font-tech text-[8.5px] xs:text-[9.5px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.22em] font-bold px-1 select-none transition-all duration-300 whitespace-nowrap"
                 style={{
                   color: captionTextColor,
                   opacity: captionOpacity,
@@ -778,16 +800,20 @@ export default function HeroSection({
           {/* Bio Teaser - Dynamic Alignment & Balanced Scale with Smooth Collapse */}
           <AnimatePresence>
             {isHeroBioVisible && (
-              <motion.p
+              <motion.div
                 key="hero-bio-statement"
                 initial={{ opacity: 0, height: 0, y: 10, marginTop: 0 }}
-                animate={canIgnite ? { opacity: 1, height: 'auto', y: 0, marginTop: '1rem' } : { opacity: 0, height: 0, y: 10, marginTop: 0 }}
+                animate={canIgnite ? { opacity: 1, height: 'auto', y: 0, marginTop: '0.85rem' } : { opacity: 0, height: 0, y: 10, marginTop: 0 }}
                 exit={{ opacity: 0, height: 0, y: -8, marginTop: 0 }}
                 transition={{ duration: 0.4, ease: 'easeInOut' }}
-                className={`max-w-lg text-xs sm:text-sm text-slate-300 font-light leading-relaxed text-balance px-2 whitespace-pre-line overflow-hidden ${bioAlignClass}`}
+                className={`max-w-lg mx-auto px-2 ${bioAlignClass}`}
               >
-                {heroBioText}
-              </motion.p>
+                <div className="p-0">
+                  <p className="text-xs sm:text-sm text-slate-200 sm:text-slate-300 font-light leading-relaxed text-balance whitespace-pre-line drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
+                    {heroBioText}
+                  </p>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -814,14 +840,19 @@ export default function HeroSection({
             <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.22em] text-slate-400 group-hover:text-purple-300">
               Scroll To Explore
             </span>
-            <div className="w-5 h-8 rounded-full border border-white/20 group-hover:border-purple-400/60 p-0.5 flex justify-center bg-black/40 backdrop-blur-md transition-colors">
+            {/* Desktop: Tactile mouse cylinder */}
+            <div className="hidden sm:flex w-5 h-8 rounded-full border border-white/20 group-hover:border-purple-400/60 p-0.5 justify-center bg-black/40 backdrop-blur-md transition-colors">
               <motion.div
                 animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                 className="w-1 h-2 rounded-full bg-purple-400"
               />
             </div>
-            <ArrowDown className="w-3 h-3 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
+            {/* Mobile: Sleek touch-friendly Chevron pill */}
+            <div className="sm:hidden flex items-center justify-center w-7 h-7 rounded-full bg-black/60 border border-white/15 text-purple-300 shadow-md">
+              <ChevronDown className="w-4 h-4 animate-bounce" />
+            </div>
+            <ArrowDown className="hidden sm:block w-3 h-3 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
           </motion.button>
         </div>
 

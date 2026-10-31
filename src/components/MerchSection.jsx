@@ -54,10 +54,10 @@ export default function MerchSection({
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-2">
-            <Tag className="w-3.5 h-3.5" /> OFFICIAL ATELIER
+            <Tag className="w-3.5 h-3.5" /> Merch & Physicals
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            OFFICIAL MERCH & VINYL
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+            Merch & Physical Editions
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-lg">
             Custom heavyweight garments, limited 180g vinyl pressings, and hand-pulled screen prints.

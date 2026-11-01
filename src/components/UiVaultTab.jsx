@@ -13,6 +13,52 @@ import SpotlightCard from './SpotlightCard';
 // ============================================================================
 export const INSTALLED_SKILLS_AND_PLUGINS = [
   {
+    id: 'spec-kit',
+    name: 'GitHub Spec Kit',
+    author: 'GitHub Official',
+    version: 'v1.2.5 (CLI & Commands Installed)',
+    category: 'Architecture & Workflow',
+    type: 'Spec-Driven Development',
+    status: 'Active & Installed',
+    highlight: 'SDD Lifecycle • /speckit.* Commands',
+    triggerCommand: '/speckit.specify',
+    color: '#3b82f6',
+    accentBg: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
+    badge: 'Spec-Driven Dev',
+    tagline: 'Replaces unstructured vibe-coding with versioned specifications, technical plans, and granular task lists.',
+    description: 'Developed by GitHub to solve context drift in AI coding agents. Enforces an evidence-first, human-in-the-loop workflow: /speckit.constitution sets project laws, /speckit.specify captures requirements before code, /speckit.plan formulates architecture, /speckit.tasks sequences atomic work, and /speckit.implement executes against disk artifacts rather than fading chat transcripts.',
+    capabilities: [
+      'Establishes project constitution (.specify/constitution.md) with quality and design boundaries',
+      'Derives formal functional specifications (/speckit.specify) before writing implementation code',
+      'Interactive ambiguity resolution (/speckit.clarify) to de-risk unclear requirements upfront',
+      'Generates technical architecture blueprints (/speckit.plan) and data flow models',
+      'Decomposes plans into ordered, verifiable atomic checklists (/speckit.tasks)',
+      'Executes implementations methodically (/speckit.implement) and audits drift (/speckit.converge)'
+    ],
+    howToUse: [
+      'Run /speckit.specify <feature idea> in chat to draft a structured specification.',
+      'Review and refine the generated spec.md artifact in the .specify/ directory.',
+      'Execute /speckit.plan to produce a technical architecture and dependency breakdown.',
+      'Run /speckit.tasks to generate sequenced, bite-sized tasks.',
+      'Execute /speckit.implement to have the agent write and verify the code against tasks.'
+    ],
+    examplePrompts: [
+      {
+        title: 'Spec-Driven Feature Specification',
+        prompt: '/speckit.specify Build a VIP Fan Portal with exclusive audio stems, passwordless magic links, and download quotas.'
+      },
+      {
+        title: 'Formulate Architecture Plan',
+        prompt: '/speckit.plan for the VIP Fan Portal feature: define data models, Supabase auth schema, API endpoints, and component trees.'
+      },
+      {
+        title: 'Generate Execution Tasks & Verify',
+        prompt: '/speckit.tasks for VIP Fan Portal, then run /speckit.analyze to verify cross-artifact alignment before writing code.'
+      }
+    ]
+  },
+
+  {
     id: 'frontend-design',
     name: 'Frontend Design',
     author: 'Anthropic Official',

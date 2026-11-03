@@ -13,6 +13,50 @@ import SpotlightCard from './SpotlightCard';
 // ============================================================================
 export const INSTALLED_SKILLS_AND_PLUGINS = [
   {
+    id: 'appllama',
+    name: 'Appllama Mobile Design & MCP',
+    author: 'Appllama Official (appllama.io)',
+    version: 'v1.3.0 (Global Plugin & Skills)',
+    category: 'Mobile & App Design',
+    type: 'Mobile HIG & Research Engine',
+    status: 'Active & Connected',
+    highlight: 'Top-Grossing App Intelligence • Apple HIG',
+    triggerCommand: '/appllama',
+    color: '#06b6d4',
+    accentBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+    badge: 'Mobile App Bar',
+    tagline: 'Benchmark against top-grossing apps and build native-quality Expo / React Native screens.',
+    description: 'Brings the design library of top-grossing mobile apps into Antigravity: research real screens, flows, onboarding, and paywalls with the Appllama MCP (mcp.appllama.io), then build native-feeling mobile interfaces with Apple HIG fidelity, semantic colors, Reanimated 60fps springs, and a full-motion simulator loop.',
+    capabilities: [
+      'Research top-grossing mobile app screens, flows, onboarding, and paywalls via Appllama MCP',
+      'Enforces Apple Human Interface Guidelines (HIG) fidelity and native platform controls',
+      'Strict navigation ergonomics (push vs replace, modal vs sheet, one-way exit doors for paywalls)',
+      'Purposeful Reanimated 60fps motion carrying finger velocity (nothing on the JS thread)',
+      'Full-motion simulator verification loop for polished production quality'
+    ],
+    howToUse: [
+      'Connect the Appllama MCP at https://mcp.appllama.io/mcp to study live top-grossing apps.',
+      'Ask the agent to research a category: "Study how the top 10 fitness apps structure onboarding."',
+      'Extract layout skeletons, spacing rhythms, and paywall timing.',
+      'Build native React Native / Expo screens adhering strictly to HIG and Reanimated physics.'
+    ],
+    examplePrompts: [
+      {
+        title: 'Study Top-Grossing Mobile Onboarding',
+        prompt: 'Use the Appllama MCP to study the onboarding flows and paywall placement of the top 5 meditation and habit apps.'
+      },
+      {
+        title: 'Build Native Audio Player Sheet',
+        prompt: 'Build a native-feeling bottom sheet audio player in React Native / Expo with gesture-driven drag-to-dismiss, Reanimated 60fps spring physics, and Apple HIG typography.'
+      },
+      {
+        title: 'Mobile Paywall & Subscription Flow',
+        prompt: 'Design a mobile subscription paywall adhering to Apple HIG guidelines: transparent pricing tiers, restore purchase button, and one-way dismissal navigation.'
+      }
+    ]
+  },
+
+  {
     id: 'spec-kit',
     name: 'GitHub Spec Kit',
     author: 'GitHub Official',

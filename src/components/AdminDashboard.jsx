@@ -620,7 +620,7 @@ export default function AdminDashboard({ onReturnToSite }) {
     { id: 'gallery', label: 'Gallery Slides', icon: Layers, count: galleryImages.length },
     { id: 'social', label: 'Social Feed', icon: Instagram, count: socialPosts.length },
     { id: 'epk', label: 'EPK & Press', icon: Shield, count: null },
-    { id: 'ui-vault', label: 'UI & Inspo Vault', icon: Compass, count: (UI_INSPIRATION_SITES?.length || 17) + (INSTALLED_SKILLS_AND_PLUGINS?.length || 8) },
+    { id: 'ui-vault', label: 'UI & Inspo Vault', icon: Compass, count: (UI_INSPIRATION_SITES?.length || 17) + (INSTALLED_SKILLS_AND_PLUGINS?.length || 9) },
     { id: 'github', label: 'Cloud Database & Git Sync', icon: HardDrive, count: null },
   ];
 

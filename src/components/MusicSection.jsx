@@ -186,7 +186,15 @@ export default function MusicSection({
 
           {/* Responsive Track Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-            {tracks.map((track, trackIdx) => {
+            {(!tracks || tracks.length === 0) ? (
+              <div className="col-span-full p-12 text-center rounded-3xl bg-white/[0.02] border border-white/[0.08] max-w-lg mx-auto">
+                <Disc3 className="w-12 h-12 text-purple-400 mx-auto mb-4 animate-spin" style={{ animationDuration: '10s' }} />
+                <h3 className="font-display font-bold text-lg text-white mb-2">Studio Catalog In Flight</h3>
+                <p className="text-xs text-slate-400 leading-relaxed font-mono">
+                  Studio masters are currently being synchronized. Connect via Spotify or Apple Music to stream immediately.
+                </p>
+              </div>
+            ) : tracks.map((track, trackIdx) => {
               const isThisPlaying = isPlaying && currentTrack?.id === track.id;
               const trackAnnotatedCount = (track.lyrics || []).filter((l) => l.annotated).length;
               const firstAnnotatedLine = track.lyrics?.find((l) => l.annotated);
@@ -204,7 +212,7 @@ export default function MusicSection({
                     <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/[0.1] shadow-lg bg-black/40">
                       <img
                         src={track.cover}
-                        alt={track.title}
+                        alt={track?.title || 'Track'}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
 
@@ -240,7 +248,7 @@ export default function MusicSection({
                             : 'bg-black/60 text-white border border-white/30 backdrop-blur-md opacity-0 group-hover:opacity-100 group-hover:scale-100 hover:scale-105'
                         }`}
                         title={isThisPlaying ? 'Pause Studio Preview' : 'Play Studio Preview'}
-                        aria-label={`Play preview for ${track.title}`}
+                        aria-label={`Play preview for ${track?.title || 'Track'}`}
                       >
                         {isThisPlaying ? (
                           <Pause className="w-6 h-6 fill-current" />
@@ -270,7 +278,7 @@ export default function MusicSection({
                     <div className="space-y-1 mb-4">
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="font-display font-black text-xl text-white group-hover:text-purple-300 transition-colors truncate">
-                          {track.title}
+                          {track?.title || 'Untitled Track'}
                         </h3>
                       </div>
                       <p className="text-xs text-slate-400 font-mono truncate">
@@ -406,7 +414,7 @@ export default function MusicSection({
                   {/* Centered Track Badge with ShinyText */}
                   <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs font-mono text-slate-300">
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <ShinyText text={`INSPECTING: ${focusedTrack.title.toUpperCase()}`} speed={4} />
+                    <ShinyText text={`INSPECTING: ${(focusedTrack?.title || 'STUDIO CUT').toUpperCase()}`} speed={4} />
                   </div>
 
                   {/* Esc Key & Close Button */}
@@ -521,7 +529,7 @@ export default function MusicSection({
                         >
                           <img
                             src={focusedTrack.cover}
-                            alt={focusedTrack.title}
+                            alt={focusedTrack?.title || 'Cover Artwork'}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
 
@@ -575,7 +583,7 @@ export default function MusicSection({
 
                         <div className="h-7 sm:h-8 flex items-center justify-center">
                           <h3 className="font-display font-black text-xl xl:text-2xl text-white tracking-tight truncate">
-                            {focusedTrack.title}
+                            {focusedTrack?.title || 'Untitled Track'}
                           </h3>
                         </div>
 

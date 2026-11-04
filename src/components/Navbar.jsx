@@ -254,17 +254,17 @@ export default function Navbar({
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Disc3 className="w-3 h-3 text-slate-400" /> Current Track
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 tabular-nums">{currentTrack.duration}</span>
+                <span className="text-[10px] font-mono text-slate-400 tabular-nums">{currentTrack?.duration || '0:00'}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
-                    src={currentTrack.cover}
-                    alt={currentTrack.title}
+                    src={currentTrack?.cover || artistInfo?.avatar || ''}
+                    alt={currentTrack?.title || 'Current Track'}
                     className="w-10 h-10 rounded-xl object-cover border border-white/[0.1] shrink-0"
                   />
                   <div className="min-w-0">
-                    <h5 className="font-bold text-sm text-white truncate">{currentTrack.title}</h5>
+                    <h5 className="font-bold text-sm text-white truncate">{currentTrack?.title || 'UNNOTICED'}</h5>
                     <p className="text-[11px] text-slate-400 truncate">UNNOTICED</p>
                   </div>
                 </div>

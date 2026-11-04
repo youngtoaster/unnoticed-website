@@ -93,7 +93,7 @@ export default function BioSection() {
                 }`}
               >
                 0{idx + 1}. {(() => {
-                const raw = para.title || '';
+                const raw = para?.title || '';
                 if (raw.toLowerCase().includes('roots')) return 'McKees Rocks';
                 if (raw.toLowerCase().includes('ty sciullo')) return 'Ty Sciullo Era';
                 if (raw.toLowerCase().includes('metamorphosis') || raw.toLowerCase().includes('unnoticed')) return 'Rebirth (UNNOTICED)';
@@ -115,7 +115,7 @@ export default function BioSection() {
             </div>
 
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-3">
-              {biography[activeBioTab]?.title}
+              {biography[activeBioTab]?.title || 'Biography'}
             </h3>
 
             <p className="text-slate-300 text-xs sm:text-base leading-relaxed font-sans font-normal whitespace-pre-line">

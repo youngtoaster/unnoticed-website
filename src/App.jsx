@@ -248,7 +248,7 @@ function AppContent() {
         <>
           {/* Persistent Floating Navbar with Island aesthetic */}
           <Navbar
-            currentTrack={currentTrack || tracks[0]}
+            currentTrack={currentTrack || (tracks && tracks[0]) || null}
             isPlaying={isPlaying}
             isPlayerVisible={isPlayerVisible}
             togglePlay={togglePlay}
@@ -263,7 +263,7 @@ function AppContent() {
             <main className="relative z-10">
               {/* 1. Kinetic Hero with Identity Morph & Sound Reactive Badges */}
               <HeroSection
-                currentTrack={currentTrack || tracks[0]}
+                currentTrack={currentTrack || (tracks && tracks[0]) || null}
                 isPlaying={isPlaying}
                 togglePlay={togglePlay}
                 onSelectTrack={onSelectTrack}
@@ -276,7 +276,7 @@ function AppContent() {
               {/* 2. Music: Discography Studio Cuts & Inspect Lyrics Pop-Up */}
               {sectionsVisibility?.music !== false && (
                 <MusicSection
-                  currentTrack={currentTrack || tracks[0]}
+                  currentTrack={currentTrack || (tracks && tracks[0]) || null}
                   isPlaying={isPlaying}
                   togglePlay={togglePlay}
                   onSelectTrack={onSelectTrack}

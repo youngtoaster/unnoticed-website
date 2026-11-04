@@ -19,7 +19,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
   const [copied, setCopied] = useState(false);
   const audioRef = useRef(null);
 
-  const release = featuredRelease || {
+  const release = (featuredRelease && typeof featuredRelease === 'object' && featuredRelease.title) ? featuredRelease : {
     sectionEnabled: true,
     title: 'Calling for Help',
     artist: 'UNNOTICED',
@@ -37,7 +37,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
   };
 
   // Visibility check
-  if (release.sectionEnabled === false || sectionsVisibility?.featuredRelease === false) {
+  if (release?.sectionEnabled === false || sectionsVisibility?.featuredRelease === false) {
     return null;
   }
 
@@ -184,7 +184,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
             >
               <img
                 src={release.cover}
-                alt={release.title}
+                alt={release?.title || 'Featured Release'}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.1] to-transparent pointer-events-none" />
@@ -229,7 +229,7 @@ export default function FeaturedReleaseSection({ onSelectTrack }) {
 
               {/* Song Title & Moniker */}
               <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
-                {release.title}
+                {release?.title || 'Featured Release'}
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 font-mono mt-1">
                 <span className="text-white font-bold">{release.artist || 'UNNOTICED'}</span>

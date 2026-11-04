@@ -161,14 +161,14 @@ export default function AudioPlayerBar({
             <div className="p-4 border-b border-white/[0.08] flex items-center justify-between gap-3 bg-white/[0.02]">
               <div className="flex items-center gap-3 min-w-0">
                 <img
-                  src={currentTrack.cover}
-                  alt={currentTrack.title}
+                  src={currentTrack?.cover}
+                  alt={currentTrack?.title || 'Track'}
                   className="w-10 h-10 rounded-xl object-cover border border-white/[0.1] shadow-md shrink-0"
                 />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <h4 className="font-display font-bold text-white text-sm truncate">
-                      {currentTrack.title}
+                      {currentTrack?.title || 'Current Track'}
                     </h4>
                     {isPlaying && (
                       <span className="flex items-center gap-0.5 h-3">
@@ -421,8 +421,8 @@ export default function AudioPlayerBar({
                     {/* Large Album Art with Clean Depth */}
                     <div className="relative aspect-square w-full max-w-[260px] rounded-2xl overflow-hidden border border-white/[0.12] shadow-2xl shadow-black mb-6 bg-[#0c0d16]">
                       <img
-                        src={currentTrack.cover}
-                        alt={currentTrack.title}
+                        src={currentTrack?.cover}
+                        alt={currentTrack?.title || 'Track Cover'}
                         className="w-full h-full object-cover"
                       />
                       {isPlaying && (
@@ -436,7 +436,7 @@ export default function AudioPlayerBar({
                     {/* Track Meta */}
                     <div className="mb-4">
                       <h3 className="font-display text-2xl font-bold text-white tracking-tight">
-                        {currentTrack.title}
+                        {currentTrack?.title || 'Current Track'}
                       </h3>
                       <p className="text-sm text-slate-300 font-medium mt-1">
                         UNNOTICED {currentTrack.featuring && `(${currentTrack.featuring})`}
@@ -710,8 +710,8 @@ export default function AudioPlayerBar({
                 >
                   <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 border border-white/[0.15] shadow-lg shadow-purple-950/40">
                     <img
-                      src={currentTrack.cover}
-                      alt={currentTrack.title}
+                      src={currentTrack?.cover}
+                      alt={currentTrack?.title || 'Track'}
                       className={`w-full h-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
                       style={{ animationDuration: '8s' }}
                     />
@@ -725,7 +725,7 @@ export default function AudioPlayerBar({
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <h5 className="font-display font-bold text-white text-xs sm:text-sm truncate">
-                        {currentTrack.title}
+                        {currentTrack?.title || 'Current Track'}
                       </h5>
                       {isPlaying && (
                         <span className="flex items-end gap-[2px] h-3 shrink-0">

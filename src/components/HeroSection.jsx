@@ -18,8 +18,8 @@ export default function HeroSection({
   const { artistInfo, tracks, siteTheme, sectionsVisibility, toggleSectionVisibility } = useSiteData();
   const theme = siteTheme || artistInfo?.theme || { primary: '#a855f7', secondary: '#6366f1', accent: '#06b6d4' };
   const [identityMode, setIdentityMode] = useState('unnoticed'); // 'unnoticed' or 'ty'
-  const featuredTrack = tracks[0] || currentTrack;
-  const isFeaturedPlaying = isPlaying && currentTrack?.id === featuredTrack?.id;
+  const featuredTrack = (tracks && tracks.length > 0 ? tracks[0] : null) || currentTrack || null;
+  const isFeaturedPlaying = Boolean(isPlaying && currentTrack?.id && featuredTrack?.id && currentTrack.id === featuredTrack.id);
 
   // Track real-time letter ignition status from NeonSign component
   const [ignitionState, setIgnitionState] = useState({
@@ -888,8 +888,12 @@ export default function HeroSection({
               <Magnet padding={20} magnetStrength={2}>
                 <button
                   onClick={() => {
-                    if (currentTrack?.id !== featuredTrack.id) {
-                      onSelectTrack(featuredTrack);
+                    if (featuredTrack) {
+                      if (currentTrack?.id !== featuredTrack.id) {
+                        onSelectTrack(featuredTrack);
+                      } else {
+                        togglePlay();
+                      }
                     } else {
                       togglePlay();
                     }
@@ -906,7 +910,13 @@ export default function HeroSection({
                   ) : (
                     <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                   )}
-                  <span>{isFeaturedPlaying ? 'Pause Preview' : `Listen: ${featuredTrack.title}`}</span>
+                  <span>
+                    {isFeaturedPlaying
+                      ? 'Pause Preview'
+                      : featuredTrack?.title
+                      ? `Listen: ${featuredTrack.title}`
+                      : 'Listen to Catalog'}
+                  </span>
                   <span className="flex items-center gap-0.5 h-2.5 ml-1">
                     <span className={`w-0.5 bg-current rounded-full ${isFeaturedPlaying ? 'h-2.5 animate-equalizer-1' : 'h-1'}`} />
                     <span className={`w-0.5 bg-current rounded-full ${isFeaturedPlaying ? 'h-3 animate-equalizer-2' : 'h-1.5'}`} />

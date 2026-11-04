@@ -32,7 +32,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
   const [shockwave, setShockwave] = useState(false);
   const audioRef = useRef(null);
 
-  const release = featuredRelease || {
+  const release = (featuredRelease && typeof featuredRelease === 'object' && featuredRelease.title) ? featuredRelease : {
     popupEnabled: true,
     title: 'Calling for Help',
     artist: 'UNNOTICED',
@@ -61,14 +61,14 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
       setIsOpen(true);
       return;
     }
-    if (release.popupEnabled === false) {
+    if (release?.popupEnabled === false) {
       setIsOpen(false);
       if (onDismissRef.current) onDismissRef.current();
       return;
     }
 
     // Check session storage to avoid annoyance on repetitive soft reloads
-    const sessionKey = `unnoticed_seen_release_${release.title}_v1`;
+    const sessionKey = `unnoticed_seen_release_${release?.title || 'release'}_v1`;
     const seen = sessionStorage.getItem(sessionKey);
     if (seen) {
       setIsOpen(false);
@@ -81,7 +81,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
       setIsOpen(true);
     }, 280);
     return () => clearTimeout(timer);
-  }, [forceOpen, release.popupEnabled, release.title]);
+  }, [forceOpen, release?.popupEnabled, release?.title]);
 
   // Audio sample playback handling
   useEffect(() => {
@@ -205,7 +205,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
       audioRef.current.pause();
     }
     setIsOpen(false);
-    sessionStorage.setItem(`unnoticed_seen_release_${release.title}_v1`, 'true');
+    sessionStorage.setItem(`unnoticed_seen_release_${release?.title || 'release'}_v1`, 'true');
     if (onCloseForce) onCloseForce();
     if (onDismissRef.current) onDismissRef.current();
   };
@@ -363,8 +363,8 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                   className="relative z-10 w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64 rounded-2xl overflow-hidden border border-white/[0.22] shadow-[0_25px_60px_rgba(0,0,0,0.9)] group shrink-0 bg-[#0c0d16]"
                 >
                   <img
-                    src={release.cover}
-                    alt={release.title}
+                    src={release?.cover}
+                    alt={release?.title || 'Featured Release'}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.12] to-transparent pointer-events-none" />
@@ -395,7 +395,7 @@ export default function NewReleaseOverlay({ forceOpen = false, onCloseForce, onD
                   </div>
 
                   <h2 className="font-display font-black text-2xl sm:text-4xl text-white tracking-tight">
-                    {release.title}
+                    {release?.title || 'Featured Release'}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-300 font-mono mt-1">
                     <span className="text-white font-bold">{release.artist || 'UNNOTICED'}</span>

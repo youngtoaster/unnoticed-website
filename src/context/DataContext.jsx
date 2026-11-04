@@ -59,8 +59,8 @@ export function DataProvider({ children }) {
         return {
           _lastUpdated: parsed._lastUpdated || Date.now(),
           artistInfo: parsed.artistInfo || DEFAULT_ARTIST,
-          tracks: parsed.tracks || DEFAULT_TRACKS,
-          biography: parsed.biography || DEFAULT_BIO,
+          tracks: (parsed.tracks && Array.isArray(parsed.tracks) && parsed.tracks.length > 0) ? parsed.tracks : DEFAULT_TRACKS,
+          biography: (parsed.biography && Array.isArray(parsed.biography) && parsed.biography.length > 0) ? parsed.biography : DEFAULT_BIO,
           videos: parsed.videos || DEFAULT_VIDEOS,
           tourDates: parsed.tourDates || DEFAULT_TOUR,
           pastTours: parsed.pastTours || DEFAULT_PAST_TOUR,
@@ -69,7 +69,7 @@ export function DataProvider({ children }) {
           socialPosts: parsed.socialPosts || DEFAULT_SOCIAL,
           epkData: parsed.epkData || DEFAULT_EPK,
           sectionsVisibility: parsed.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
-          featuredRelease: parsed.featuredRelease || DEFAULT_FEATURED_RELEASE,
+          featuredRelease: (parsed.featuredRelease && typeof parsed.featuredRelease === 'object' && parsed.featuredRelease.title) ? parsed.featuredRelease : DEFAULT_FEATURED_RELEASE,
         };
       }
     } catch (err) {
@@ -216,8 +216,12 @@ export function DataProvider({ children }) {
                   ...prev,
                   ...remoteData,
                   artistInfo: remoteData.artistInfo || prev.artistInfo,
-                  tracks: remoteData.tracks || prev.tracks,
-                  biography: remoteData.biography || prev.biography,
+                  tracks: (remoteData.tracks && Array.isArray(remoteData.tracks) && remoteData.tracks.length > 0)
+                    ? remoteData.tracks
+                    : (prev.tracks && prev.tracks.length > 0 ? prev.tracks : DEFAULT_TRACKS),
+                  biography: (remoteData.biography && Array.isArray(remoteData.biography) && remoteData.biography.length > 0)
+                    ? remoteData.biography
+                    : (prev.biography && prev.biography.length > 0 ? prev.biography : DEFAULT_BIO),
                   videos: remoteData.videos || prev.videos,
                   tourDates: remoteData.tourDates || prev.tourDates,
                   pastTours: remoteData.pastTours || prev.pastTours,
@@ -226,7 +230,9 @@ export function DataProvider({ children }) {
                   socialPosts: remoteData.socialPosts || prev.socialPosts,
                   epkData: remoteData.epkData || prev.epkData,
                   sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
-                  featuredRelease: remoteData.featuredRelease || prev.featuredRelease,
+                  featuredRelease: (remoteData.featuredRelease && typeof remoteData.featuredRelease === 'object' && remoteData.featuredRelease.title)
+                    ? remoteData.featuredRelease
+                    : (prev.featuredRelease && prev.featuredRelease.title ? prev.featuredRelease : DEFAULT_FEATURED_RELEASE),
                   _lastUpdated: remoteData._lastUpdated || Date.now(),
                 };
                 try {

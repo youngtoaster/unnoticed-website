@@ -321,8 +321,8 @@ export default async function handler(req, res) {
         return;
       }
 
-      // Stamp with universal synchronization time
-      payload._lastUpdated = Date.now();
+      // Preserve client timestamp if provided, otherwise stamp with server time
+      payload._lastUpdated = payload._lastUpdated || Date.now();
 
       // Update in-memory edge cache immediately
       edgeMemoryCache = payload;

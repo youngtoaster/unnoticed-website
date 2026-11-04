@@ -59,14 +59,14 @@ export function DataProvider({ children }) {
         return {
           _lastUpdated: parsed._lastUpdated || Date.now(),
           artistInfo: parsed.artistInfo || DEFAULT_ARTIST,
-          tracks: (parsed.tracks && Array.isArray(parsed.tracks) && parsed.tracks.length > 0) ? parsed.tracks : DEFAULT_TRACKS,
-          biography: (parsed.biography && Array.isArray(parsed.biography) && parsed.biography.length > 0) ? parsed.biography : DEFAULT_BIO,
-          videos: parsed.videos || DEFAULT_VIDEOS,
-          tourDates: parsed.tourDates || DEFAULT_TOUR,
-          pastTours: parsed.pastTours || DEFAULT_PAST_TOUR,
-          merchProducts: parsed.merchProducts || DEFAULT_MERCH,
-          galleryImages: parsed.galleryImages || DEFAULT_GALLERY,
-          socialPosts: parsed.socialPosts || DEFAULT_SOCIAL,
+          tracks: Array.isArray(parsed.tracks) ? parsed.tracks : DEFAULT_TRACKS,
+          biography: Array.isArray(parsed.biography) ? parsed.biography : DEFAULT_BIO,
+          videos: Array.isArray(parsed.videos) ? parsed.videos : DEFAULT_VIDEOS,
+          tourDates: Array.isArray(parsed.tourDates) ? parsed.tourDates : DEFAULT_TOUR,
+          pastTours: Array.isArray(parsed.pastTours) ? parsed.pastTours : DEFAULT_PAST_TOUR,
+          merchProducts: Array.isArray(parsed.merchProducts) ? parsed.merchProducts : DEFAULT_MERCH,
+          galleryImages: Array.isArray(parsed.galleryImages) ? parsed.galleryImages : DEFAULT_GALLERY,
+          socialPosts: Array.isArray(parsed.socialPosts) ? parsed.socialPosts : DEFAULT_SOCIAL,
           epkData: parsed.epkData || DEFAULT_EPK,
           sectionsVisibility: parsed.sectionsVisibility || DEFAULT_SECTIONS_VISIBILITY,
           featuredRelease: (parsed.featuredRelease && typeof parsed.featuredRelease === 'object' && parsed.featuredRelease.title) ? parsed.featuredRelease : DEFAULT_FEATURED_RELEASE,
@@ -209,25 +209,27 @@ export function DataProvider({ children }) {
             const remoteTime = remoteData._lastUpdated || 0;
             const localTime = localParsed?._lastUpdated || 0;
 
-            // If remote has newer data or if device has no local modifications, hydrate
-            if (!localParsed || remoteTime >= localTime) {
+            const timeSinceLocalSave = Date.now() - localTime;
+
+            // If remote has strictly newer data (and user didn't just save locally within 2.5s) or device has no local cache, hydrate
+            if (!localParsed || (remoteTime > localTime && timeSinceLocalSave > 2500)) {
               setData((prev) => {
                 const merged = {
                   ...prev,
                   ...remoteData,
                   artistInfo: remoteData.artistInfo || prev.artistInfo,
-                  tracks: (remoteData.tracks && Array.isArray(remoteData.tracks) && remoteData.tracks.length > 0)
+                  tracks: Array.isArray(remoteData.tracks)
                     ? remoteData.tracks
-                    : (prev.tracks && prev.tracks.length > 0 ? prev.tracks : DEFAULT_TRACKS),
-                  biography: (remoteData.biography && Array.isArray(remoteData.biography) && remoteData.biography.length > 0)
+                    : (Array.isArray(prev.tracks) ? prev.tracks : DEFAULT_TRACKS),
+                  biography: Array.isArray(remoteData.biography)
                     ? remoteData.biography
-                    : (prev.biography && prev.biography.length > 0 ? prev.biography : DEFAULT_BIO),
-                  videos: remoteData.videos || prev.videos,
-                  tourDates: remoteData.tourDates || prev.tourDates,
-                  pastTours: remoteData.pastTours || prev.pastTours,
-                  merchProducts: remoteData.merchProducts || prev.merchProducts,
-                  galleryImages: remoteData.galleryImages || prev.galleryImages,
-                  socialPosts: remoteData.socialPosts || prev.socialPosts,
+                    : (Array.isArray(prev.biography) ? prev.biography : DEFAULT_BIO),
+                  videos: Array.isArray(remoteData.videos) ? remoteData.videos : prev.videos,
+                  tourDates: Array.isArray(remoteData.tourDates) ? remoteData.tourDates : prev.tourDates,
+                  pastTours: Array.isArray(remoteData.pastTours) ? remoteData.pastTours : prev.pastTours,
+                  merchProducts: Array.isArray(remoteData.merchProducts) ? remoteData.merchProducts : prev.merchProducts,
+                  galleryImages: Array.isArray(remoteData.galleryImages) ? remoteData.galleryImages : prev.galleryImages,
+                  socialPosts: Array.isArray(remoteData.socialPosts) ? remoteData.socialPosts : prev.socialPosts,
                   epkData: remoteData.epkData || prev.epkData,
                   sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
                   featuredRelease: (remoteData.featuredRelease && typeof remoteData.featuredRelease === 'object' && remoteData.featuredRelease.title)

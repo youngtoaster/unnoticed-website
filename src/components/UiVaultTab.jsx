@@ -22,6 +22,8 @@ export const INSTALLED_SKILLS_AND_PLUGINS = [
     status: 'Active & Connected',
     highlight: 'Top-Grossing App Intelligence • Apple HIG',
     triggerCommand: '/appllama',
+    githubUrl: 'https://github.com/Appllama/appllama-skills',
+    mcpUrl: 'https://mcp.appllama.io/mcp',
     color: '#06b6d4',
     accentBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
     badge: 'Mobile App Bar',
@@ -66,6 +68,7 @@ export const INSTALLED_SKILLS_AND_PLUGINS = [
     status: 'Active & Installed',
     highlight: 'SDD Lifecycle • /speckit.* Commands',
     triggerCommand: '/speckit.specify',
+    githubUrl: 'https://github.com/github/spec-kit',
     color: '#3b82f6',
     accentBg: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
     badge: 'Spec-Driven Dev',
@@ -112,6 +115,7 @@ export const INSTALLED_SKILLS_AND_PLUGINS = [
     status: 'Active & Installed',
     highlight: '185,000★ • 760,000+ Installs',
     triggerCommand: '/frontend-design',
+    githubUrl: 'https://github.com/anthropics/skills/tree/main/skills/frontend-design',
     color: '#ec4899',
     accentBg: 'bg-pink-500/10 text-pink-300 border-pink-500/30',
     badge: 'Anti-AI Slop Design',
@@ -155,6 +159,7 @@ export const INSTALLED_SKILLS_AND_PLUGINS = [
     status: 'Active & Installed',
     highlight: '9-Pass UI Audit Engine',
     triggerCommand: '/unslop',
+    githubUrl: 'https://github.com/heydamir/unslop',
     color: '#f59e0b',
     accentBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
     badge: '9-Pass UI Audit',
@@ -198,6 +203,8 @@ export const INSTALLED_SKILLS_AND_PLUGINS = [
     status: 'Connected & Live',
     highlight: 'ftinvmrjijnncwzkvgcn.supabase.co',
     triggerCommand: 'Supabase MCP',
+    docsUrl: 'https://supabase.com/docs',
+    dashboardUrl: 'https://supabase.com/dashboard/project/ftinvmrjijnncwzkvgcn',
     color: '#10b981',
     accentBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
     badge: 'Cloud Postgres & Sync',
@@ -612,6 +619,42 @@ export const UI_INSPIRATION_SITES = [
     color: '#22d3ee',
     accentBg: 'bg-cyan-400/10 text-cyan-300 border-cyan-400/30',
     badge: '60 FPS Motion'
+  },
+  {
+    id: 'designeer',
+    name: 'Designeer',
+    url: 'https://designeer.xyz',
+    category: 'Product & Design Systems',
+    superpower: 'Curated design engineering inspiration and creative web interactions',
+    description: 'Premier showcase of cutting-edge creative web design engineering, fluid layout architecture, interactive 3D experiments, and unconventional digital experiences.',
+    tags: ['Design Engineering', 'Creative Web', 'Fluid Motion'],
+    color: '#06b6d4',
+    accentBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+    badge: 'Design Engineering'
+  },
+  {
+    id: 'groover-unnoticed',
+    name: 'Groover Artist Profile',
+    url: 'https://groover.me/unnoticed',
+    category: 'Artist Data & Identity',
+    superpower: 'Official artist data, biography, streaming links, and discography for Unnoticed',
+    description: 'Primary artist portal and EPK data source for Unnoticed (formerly Ty Sciullo), featuring official bio, genre classifications, streaming platform links, and release credits.',
+    tags: ['Artist EPK', 'Bio & Press', 'Discography'],
+    color: '#10b981',
+    accentBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+    badge: 'Artist Data'
+  },
+  {
+    id: 'planes-neon',
+    name: 'Planes Neon Sign & Catalog',
+    url: 'https://useplanes.com/components/neon-sign',
+    category: '3D & Motion',
+    superpower: 'Neon sign glow shader effect and full component catalog',
+    description: 'The interactive neon glow and shader library used for the glowing artist header on the homepage, along with the complete Planes design engineer component catalog.',
+    tags: ['Neon Sign', 'Planes Shader', 'Kinetic Glow'],
+    color: '#f43f5e',
+    accentBg: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
+    badge: 'Neon Shaders'
   }
 ];
 
@@ -619,8 +662,10 @@ export const UI_INSPIRATION_SITES = [
 // 3. IN-STACK ANIMATED COMPONENT LIBRARIES
 // ============================================================================
 export const IN_STACK_LIBRARIES = [
-  { name: 'React Bits', url: 'https://reactbits.dev', role: 'Animated components: Decrypted Text, Shiny Text, Magnet, Spotlight Cards' },
+  { name: 'React Bits', url: 'https://reactbits.dev/get-started/index', role: 'Animated components: Decrypted Text, Shiny Text, Magnet, Spotlight Cards, Fluid Canvas' },
   { name: 'Planes Components', url: 'https://useplanes.com/components', role: 'Spring physics, layout morphing, and kinetic state transitions' },
+  { name: 'Planes Neon Sign', url: 'https://useplanes.com/components/neon-sign', role: 'Neon glow typography shader used for homepage title and shockwave effects' },
+  { name: 'Designeer', url: 'https://designeer.xyz', role: 'Design engineering creative showcase and fluid web interactions' },
   { name: 'Aceternity UI', url: 'https://ui.aceternity.com', role: 'Tailwind + Framer Motion components (Lamp glow, 3D tilt, tracing beam)' },
   { name: 'Magic UI', url: 'https://magicui.design', role: '50+ animated building blocks designed for design engineers' },
   { name: '21st.dev', url: 'https://21st.dev', role: 'Open-source component registry for design engineers with instant copy-paste' },
@@ -653,7 +698,8 @@ export default function UiVaultTab({ onToast }) {
     'Landing & Heroes',
     'Components & CTAs',
     'Product & Design Systems',
-    'Typography & Branding'
+    'Typography & Branding',
+    'Artist Data & Identity'
   ], []);
 
   // Filtered Skills
@@ -788,7 +834,7 @@ export default function UiVaultTab({ onToast }) {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
-              Complete command center for all installed AI design skills, 9-pass unslop engines, cloud databases, and reverse engineering tools — paired with your curated directory of 17 premier design inspiration sites.
+              Complete command center for all installed AI design skills, 9-pass unslop engines, cloud databases, and reverse engineering tools — paired with your curated directory of {UI_INSPIRATION_SITES.length} premier design inspiration sites and data platforms.
             </p>
           </div>
 
@@ -809,7 +855,7 @@ export default function UiVaultTab({ onToast }) {
                 title="Copy structured design prompt for Claude, Gemini, or ChatGPT"
               >
                 <Copy className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Copy 17-Site Prompt</span>
+                <span>Copy {UI_INSPIRATION_SITES.length}-Site Prompt</span>
               </button>
             )}
 
@@ -984,8 +1030,47 @@ export default function UiVaultTab({ onToast }) {
                           </div>
                         </div>
 
-                        {/* Trigger Command Badge with Copy Button */}
-                        <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+                        {/* Trigger Command Badge with Copy Button & External Links */}
+                        <div className="flex flex-wrap items-center gap-2 self-start md:self-center shrink-0">
+                          {skill.githubUrl && (
+                            <a
+                              href={skill.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/[0.1] text-xs font-mono font-semibold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm group/link"
+                              title="Open GitHub Repository"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 text-cyan-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                              <span>GitHub</span>
+                            </a>
+                          )}
+
+                          {skill.docsUrl && (
+                            <a
+                              href={skill.docsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/[0.1] text-xs font-mono font-semibold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm group/link"
+                              title="Open Documentation"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                              <span>Docs</span>
+                            </a>
+                          )}
+
+                          {skill.dashboardUrl && (
+                            <a
+                              href={skill.dashboardUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-200 border border-emerald-500/30 text-xs font-mono font-semibold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm group/link"
+                              title="Open Supabase Cloud Dashboard"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                              <span>Console</span>
+                            </a>
+                          )}
+
                           <button
                             onClick={() => copyTriggerCommand(skill.triggerCommand, skill.name)}
                             className="px-3.5 py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border border-purple-500/40 text-xs font-mono font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-sm group/btn"

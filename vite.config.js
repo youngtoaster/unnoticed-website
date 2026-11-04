@@ -5,6 +5,7 @@ import path from 'path'
 import fs from 'fs'
 import { execSync } from 'child_process'
 import dbHandler from './api/db.js'
+import metadataHandler from './api/metadata.js'
 
 // Helper to write data back to src/data/artistData.js so code repository matches live CMS
 function syncArtistDataFile(data, rootDir) {
@@ -101,6 +102,9 @@ function devDataSyncPlugin() {
     configureServer(server) {
       // 0. UNIFIED DATABASE API (/api/db) - Real-time persistence across all platforms
       server.middlewares.use('/api/db', dbHandler);
+
+      // 0.1 METADATA FETCHER API (/api/metadata) - Full-fidelity track duration, year, cover, preview
+      server.middlewares.use('/api/metadata', metadataHandler);
 
       // 1. DATA SYNC ENDPOINT (/api/sync-data)
       server.middlewares.use('/api/sync-data', async (req, res) => {

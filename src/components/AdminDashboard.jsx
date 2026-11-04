@@ -473,15 +473,21 @@ export default function AdminDashboard({ onReturnToSite }) {
           data: {
             ...prev.data,
             title: res.title || prev.data.title,
-            featuring: res.artist && res.artist !== 'UNNOTICED' ? `feat. ${res.artist}` : (prev.data.featuring || ''),
+            featuring: res.featuring !== undefined ? res.featuring : (res.artist && res.artist !== 'UNNOTICED' ? `feat. ${res.artist}` : (prev.data.featuring || '')),
+            type: res.releaseType || res.type || prev.data.type || 'Single',
             duration: res.duration || prev.data.duration,
-            cover: res.thumbnail || res.cover || prev.data.cover,
+            releaseYear: res.releaseYear || res.year || prev.data.releaseYear,
+            previewAudio: res.previewAudio || res.audioUrl || prev.data.previewAudio,
+            cover: res.cover || res.thumbnail || prev.data.cover,
             spotifyUrl: res.spotifyUrl || prev.data.spotifyUrl || url,
             description: res.description || prev.data.description
           }
         }));
-        setMetaFeedback('✓ Track metadata pulled & auto-updated! All fields below are fully editable.');
-        showToast('Auto-fetched track metadata');
+        const durationText = res.duration ? `Duration: ${res.duration}` : '';
+        const yearText = res.releaseYear ? `Year: ${res.releaseYear}` : '';
+        const details = [durationText, yearText].filter(Boolean).join(' • ');
+        setMetaFeedback(`✓ Pulled "${res.title}"${details ? ` (${details})` : ''} - fields auto-updated!`);
+        showToast(`Auto-fetched: ${res.title}${res.duration ? ` (${res.duration})` : ''}`);
       } else {
         setMetaFeedback(res.error || 'Could not fetch metadata from link');
       }
@@ -1029,15 +1035,15 @@ export default function AdminDashboard({ onReturnToSite }) {
                         data: {
                           id: `track-${Date.now()}`,
                           title: quickLinkResult.title,
-                          featuring: quickLinkResult.artist && quickLinkResult.artist !== 'UNNOTICED' ? `feat. ${quickLinkResult.artist}` : '',
-                          type: 'Single',
+                          featuring: quickLinkResult.featuring || (quickLinkResult.artist && quickLinkResult.artist !== 'UNNOTICED' ? `feat. ${quickLinkResult.artist}` : ''),
+                          type: quickLinkResult.releaseType || quickLinkResult.type || 'Single',
                           duration: quickLinkResult.duration || '3:00',
-                          releaseYear: new Date().getFullYear().toString(),
-                          previewAudio: 'https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8',
+                          releaseYear: quickLinkResult.releaseYear || quickLinkResult.year || new Date().getFullYear().toString(),
+                          previewAudio: quickLinkResult.previewAudio || quickLinkResult.audioUrl || '',
                           cover: quickLinkResult.cover || quickLinkResult.thumbnail || artistInfo.avatar,
                           spotifyUrl: quickLinkResult.spotifyUrl || quickLinkInput,
-                          appleMusicUrl: artistInfo.socials?.appleMusic || 'https://music.apple.com',
-                          deezerUrl: 'https://deezer.com',
+                          appleMusicUrl: quickLinkResult.appleMusicUrl || artistInfo.socials?.appleMusic || 'https://music.apple.com',
+                          deezerUrl: quickLinkResult.deezerUrl || 'https://deezer.com',
                           description: quickLinkResult.description || 'Studio recording mastered by UNNOTICED.',
                           lyrics: [
                             { text: 'New lyric verse bar one...', annotated: false },

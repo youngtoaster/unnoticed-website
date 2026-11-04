@@ -8,15 +8,17 @@ A hand-picked reference collection of installed AI design skills, 9-pass unslop 
 
 The AI capabilities and plugins installed and integrated into this project environment, complete with triggers, capabilities, and execution guides.
 
-| # | Skill / Plugin | Author | Trigger Command | Focus & Core Superpower |
-|---|----------------|--------|-----------------|------------------------|
-| 1 | **Frontend Design** | Anthropic Official | `/frontend-design` | **Anti-AI Slop Design**: Forces the AI model to commit to a bold aesthetic direction (Brutalist, Editorial, Retro-Futurist, Luxury Minimal, Organic) BEFORE writing a single line of code. Generates production-ready React, Tailwind, and CSS variable token systems without generic AI tropes. |
-| 2 | **Unslop** | Damir Sokolovsky | `/unslop` | **9-Pass UI Audit Engine**: Systematic redline audit across Spacing, Color, Icons, Copy, Type, Layout, Details, Visuals, and Motion. Strips out purple gradients, glowing blobs, "New ✨" badges, and battery-draining continuous pulses. |
-| 3 | **Supabase & Postgres Engine** | Supabase & Postgres Team | `Supabase MCP` | **Cloud Postgres & Multi-Device Sync**: Dedicated cloud database (`ftinvmrjijnncwzkvgcn.supabase.co`) with direct SQL execution, Row Level Security (RLS) audits, declarative migrations, and real-time cross-platform state persistence. |
-| 4 | **Reverse Engineer Anything (REA)** | REA Core / Antigravity | `REA MCP` | **Binary & Bundle Forensics**: 80+ deep reverse engineering tools to inspect production JavaScript bundles, reconstruct sourcemaps, trace API call paths, analyze WebAssembly, and capture browser network protocols. |
-| 5 | **Automation & Crons** | Google DeepMind / Antigravity | `/automation` | **Scheduled Autonomous Crons**: One-shot timers and recurring 5-field cron jobs (e.g. `0 9 * * 1`) that wake up in the background with zero CPU/token polling to run backups, sync checks, and site health audits. |
-| 6 | **Generative UI & Visual Canvases** | Google DeepMind / Antigravity | `Generative UI` | **Live Visual Canvases & Widgets**: Generates dynamic interactive HTML/Canvas visualizers, audio spectrum analyzers, mathematical KaTeX charts, and live parameter tuning benches directly inline or as standalone artifacts. |
-| 7 | **Antigravity Customization Engine** | Google DeepMind / Antigravity | `/plugin` | **Custom Plugins, Rules & Hooks**: Architecture guide and authoring tools to create modular plugins, custom subagents, pre-commit quality enforcement rules, and MCP server sidecars. |
+| # | Skill / Plugin | Author | Trigger Command | GitHub / Documentation | Focus & Core Superpower |
+|---|----------------|--------|-----------------|------------------------|------------------------|
+| 1 | **Frontend Design** | Anthropic Official | `/frontend-design` | [anthropics/skills/frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | **Anti-AI Slop Design**: Forces the AI model to commit to a bold aesthetic direction (Brutalist, Editorial, Retro-Futurist, Luxury Minimal, Organic) BEFORE writing a single line of code. Generates production-ready React, Tailwind, and CSS variable token systems without generic AI tropes. |
+| 2 | **Unslop** | Damir Sokolovsky | `/unslop` | [heydamir/unslop](https://github.com/heydamir/unslop) | **9-Pass UI Audit Engine**: Systematic redline audit across Spacing, Color, Icons, Copy, Type, Layout, Details, Visuals, and Motion. Strips out purple gradients, glowing blobs, "New ✨" badges, and battery-draining continuous pulses. |
+| 3 | **GitHub Spec Kit** | GitHub Official | `/speckit.specify` | [github/spec-kit](https://github.com/github/spec-kit) | **Spec-Driven Development (SDD)**: Solves context drift in AI coding agents. Enforces an evidence-first, human-in-the-loop workflow: `/speckit.constitution` sets boundaries, `/speckit.specify` defines requirements, `/speckit.plan` formulates architecture, `/speckit.tasks` sequences atomic work, and `/speckit.implement` executes against disk artifacts. |
+| 4 | **Appllama Mobile Design & MCP** | Appllama Official | `/appllama` | [Appllama/appllama-skills](https://github.com/Appllama/appllama-skills) • [MCP Server](https://mcp.appllama.io/mcp) | **Top-Grossing App Intelligence & Apple HIG**: Benchmark against top-grossing mobile apps and build native-quality Expo / React Native screens with Apple HIG fidelity, semantic colors, Reanimated 60fps springs, and full-motion simulator loops. |
+| 5 | **Supabase & Postgres Engine** | Supabase & Postgres Team | `Supabase MCP` | [Supabase Docs](https://supabase.com/docs) • [Console](https://supabase.com/dashboard/project/ftinvmrjijnncwzkvgcn) | **Cloud Postgres & Multi-Device Sync**: Dedicated cloud database (`ftinvmrjijnncwzkvgcn.supabase.co`) with direct SQL execution, Row Level Security (RLS) audits, declarative migrations, and real-time cross-platform state persistence. |
+| 6 | **Reverse Engineer Anything (REA)** | REA Core / Antigravity | `REA MCP` | [Antigravity REA Engine](https://github.com/antigravity/rea) | **Binary & Bundle Forensics**: 80+ deep reverse engineering tools to inspect production JavaScript bundles, reconstruct sourcemaps, trace API call paths, analyze WebAssembly, and capture browser network protocols. |
+| 7 | **Automation & Crons** | Google DeepMind / Antigravity | `/automation` | [Antigravity Scheduler](https://antigravity.google/docs/automation) | **Scheduled Autonomous Crons**: One-shot timers and recurring 5-field cron jobs (e.g. `0 9 * * 1`) that wake up in the background with zero CPU/token polling to run backups, sync checks, and site health audits. |
+| 8 | **Generative UI & Visual Canvases** | Google DeepMind / Antigravity | `Generative UI` | [Generative Visuals Guide](https://antigravity.google/docs/generative-ui) | **Live Visual Canvases & Widgets**: Generates dynamic interactive HTML/Canvas visualizers, audio spectrum analyzers, mathematical KaTeX charts, and live parameter tuning benches directly inline or as standalone artifacts. |
+| 9 | **Antigravity Customization Engine** | Google DeepMind / Antigravity | `/plugin` | [Antigravity Customizations](https://antigravity.google/docs/customizations) | **Custom Plugins, Rules & Hooks**: Architecture guide and authoring tools to create modular plugins, custom subagents, pre-commit quality enforcement rules, and MCP server sidecars. |
 
 ---
 
@@ -40,7 +42,26 @@ The AI capabilities and plugins installed and integrated into this project envir
 - **Example Prompt**:
   > *"Unslop the mobile audio player sheet: eliminate glowing purple blobs, replace emoji buttons with crisp Lucide icons, tighten the spacing rhythm, and remove continuous ping animations."*
 
-#### 3. Supabase & Postgres (`Supabase MCP`)
+#### 3. GitHub Spec-Kit (`/speckit.specify`)
+- **How to Use**:
+  1. Run `/speckit.specify <feature idea>` in chat to draft a structured specification.
+  2. Review and refine the generated `spec.md` artifact in the `.specify/` directory.
+  3. Execute `/speckit.plan` to produce a technical architecture and dependency breakdown.
+  4. Run `/speckit.tasks` to generate sequenced, bite-sized tasks.
+  5. Execute `/speckit.implement` to methodically execute against tasks.
+- **Example Prompt**:
+  > *"/speckit.specify Build a VIP Fan Portal with exclusive audio stems, passwordless magic links, and download quotas."*
+
+#### 4. Appllama Mobile Design (`/appllama`)
+- **How to Use**:
+  1. Connect Appllama MCP at `https://mcp.appllama.io/mcp`.
+  2. Benchmark against top-grossing apps: "Study the onboarding flows of top audio and music apps."
+  3. Extract layout skeletons, spacing rhythms, and paywall timing.
+  4. Build native React Native / Expo screens with Apple HIG fidelity and Reanimated 60fps springs.
+- **Example Prompt**:
+  > *"Use the Appllama MCP to study the onboarding flows and paywall placement of the top 5 meditation and habit apps."*
+
+#### 5. Supabase & Postgres (`Supabase MCP`)
 - **How to Use**:
   1. Direct the agent to read, write, or migrate database state on `unnoticed-website`.
   2. Uses Supabase MCP tools (`execute_sql`, `list_tables`, `apply_migration`, `query_logs`).
@@ -51,7 +72,7 @@ The AI capabilities and plugins installed and integrated into this project envir
 
 ---
 
-## 🎨 17 Curated Web & UI Design Inspiration Platforms
+## 🎨 20 Curated Web & UI Design Inspiration Platforms & Data Sources
 
 | # | Resource | URL | Category | Focus & Superpower |
 |---|----------|-----|----------|-------------------|
@@ -72,6 +93,9 @@ The AI capabilities and plugins installed and integrated into this project envir
 | 15 | **FontInLogo** | [fontinlogo.com](https://fontinlogo.com) | Typography & Branding | **Fonts Behind the World's Brands**: Search engine uncovering the exact typography, weights, and typefaces behind famous brand identities. |
 | 16 | **Godly** | [godly.website](https://godly.website) | Product & Design Systems | **Astronomically Good Web Design**: Elite, award-level websites featuring groundbreaking WebGL, typography, and micro-interactions. |
 | 17 | **60fps.design** | [60fps.design](https://60fps.design) | 3D & Motion | **Mobile UI Animations**: Interactive video library dissecting smooth 60 FPS mobile transitions, gestures, and onboarding flows. |
+| 18 | **Designeer** | [designeer.xyz](https://designeer.xyz) | Product & Design Systems | **Design Engineering Showcase**: Curated design engineering inspiration, fluid layouts, interactive 3D experiments, and unconventional digital experiences. |
+| 19 | **Groover Artist Profile** | [groover.me/unnoticed](https://groover.me/unnoticed) | Artist Data & Identity | **Unnoticed Official Artist Portal**: Artist biography, genre classifications, release credits, press contact, and streaming catalog data source. |
+| 20 | **Planes Neon Sign & Catalog** | [useplanes.com/components/neon-sign](https://useplanes.com/components/neon-sign) | 3D & Motion | **Neon Sign Shaders & LLM Catalog**: Interactive neon glow typography shader for artist headers and the complete Planes design engineer component catalog. |
 
 ---
 
@@ -81,8 +105,10 @@ The frontend frameworks and component registries integrated directly into this r
 
 | Resource | URL | Role & Integrated Components |
 |----------|-----|------------------------------|
-| **React Bits** | [reactbits.dev](https://reactbits.dev) | Animated components: Decrypted Text, Shiny Text, Magnet buttons, Spotlight Cards, Splash Cursor. |
+| **React Bits** | [reactbits.dev/get-started/index](https://reactbits.dev/get-started/index) | Animated components: Decrypted Text, Shiny Text, Magnet buttons, Spotlight Cards, Splash Cursor, Fluid Canvas. |
 | **Planes Components** | [useplanes.com/components](https://useplanes.com/components) | Spring physics, fluid micro-interactions, layout morphing, and drawer sheets. |
+| **Planes Neon Sign** | [useplanes.com/components/neon-sign](https://useplanes.com/components/neon-sign) | Neon glow typography shader used for homepage title and shockwave effects. |
+| **Designeer** | [designeer.xyz](https://designeer.xyz) | Design engineering creative showcase and fluid web interactions. |
 | **Aceternity UI** | [ui.aceternity.com](https://ui.aceternity.com) | Tailwind CSS + Framer Motion components (Lamp glow, 3D tilt cards, tracing beams). |
 | **Magic UI** | [magicui.design](https://magicui.design) | 50+ animated building blocks designed for design engineers. |
 | **21st.dev** | [21st.dev](https://21st.dev) | Open-source component registry for design engineers with instant copy-paste. |

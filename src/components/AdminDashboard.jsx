@@ -1107,8 +1107,8 @@ export default function AdminDashboard({ onReturnToSite }) {
                     {/* Cover Art */}
                     <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/[0.1] bg-black shrink-0">
                       <img
-                        src={track.cover}
-                        alt={track.title}
+                        src={track?.cover || artistInfo?.avatar || ''}
+                        alt={track?.title || 'Track'}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -1117,14 +1117,14 @@ export default function AdminDashboard({ onReturnToSite }) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-white text-sm sm:text-base truncate">
-                          {track.title}
+                          {track?.title || 'Untitled Track'}
                         </h4>
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
-                          {track.type}
+                          {track?.type || 'Single'}
                         </span>
                       </div>
                       <p className="text-xs text-slate-400 truncate">
-                        {track.featuring ? `feat. ${track.featuring}` : 'Solo'} • {track.duration} • {track.releaseYear}
+                        {track?.featuring ? `feat. ${track.featuring}` : 'Solo'} • {track?.duration || '3:00'} • {track?.releaseYear || '2026'}
                       </p>
                     </div>
                   </div>
@@ -1188,10 +1188,10 @@ export default function AdminDashboard({ onReturnToSite }) {
                       : 'bg-white/[0.03] border-white/[0.06] text-slate-300 hover:bg-white/[0.08]'
                   }`}
                 >
-                  <img src={track.cover} alt={track.title} className="w-9 h-9 rounded-lg object-cover" />
+                  <img src={track?.cover || ''} alt={track?.title || 'Track'} className="w-9 h-9 rounded-lg object-cover" />
                   <div className="min-w-0">
-                    <h5 className="font-bold text-xs truncate">{track.title}</h5>
-                    <p className="text-[10px] text-slate-400">{(track.lyrics || []).length} lyric lines</p>
+                    <h5 className="font-bold text-xs truncate">{track?.title || 'Untitled Track'}</h5>
+                    <p className="text-[10px] text-slate-400">{(track?.lyrics || []).length} lyric lines</p>
                   </div>
                 </button>
               ))}
@@ -1202,14 +1202,14 @@ export default function AdminDashboard({ onReturnToSite }) {
               {editingItem?.type === 'lyrics' && tracks[editingItem.trackIndex] ? (
                 (() => {
                   const currentTrack = tracks[editingItem.trackIndex];
-                  const lyricsList = currentTrack.lyrics || [];
+                  const lyricsList = currentTrack?.lyrics || [];
 
                   return (
                     <SpotlightCard className="p-6" tilt={false}>
                       <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
                         <div>
                           <span className="text-[10px] font-mono uppercase text-amber-400">Song Lyrics Editor</span>
-                          <h3 className="font-display text-xl font-bold text-white">{currentTrack.title}</h3>
+                          <h3 className="font-display text-xl font-bold text-white">{currentTrack?.title || 'Song Lyrics'}</h3>
                         </div>
 
                         <button
@@ -5435,7 +5435,7 @@ export default function AdminDashboard({ onReturnToSite }) {
               <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
                 <h3 className="font-display text-xl font-bold text-white flex items-center gap-2">
                   <Music className="w-5 h-5 text-purple-400" />
-                  <span>{editingItem.isNew ? 'Add New Track' : `Edit: ${editingItem.data.title}`}</span>
+                  <span>{editingItem?.isNew ? 'Add New Track' : `Edit: ${editingItem?.data?.title || 'Track'}`}</span>
                 </h3>
                 <button onClick={() => setEditingItem(null)} className="p-1 rounded-full text-slate-400 hover:text-white">
                   <X className="w-5 h-5" />
@@ -5455,14 +5455,14 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <input
                     type="text"
                     placeholder="Paste Spotify track, SoundCloud, or YouTube link..."
-                    value={editingItem.data.spotifyUrl || ''}
+                    value={editingItem?.data?.spotifyUrl || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, spotifyUrl: e.target.value } })}
                     className="flex-1 px-3 py-1.5 rounded-xl bg-black/50 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
                   />
                   <button
                     type="button"
                     disabled={isFetchingMeta}
-                    onClick={() => handleAutoFetchTrackInModal(editingItem.data.spotifyUrl)}
+                    onClick={() => handleAutoFetchTrackInModal(editingItem?.data?.spotifyUrl)}
                     className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
                   >
                     {isFetchingMeta ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-300" />}
@@ -5482,7 +5482,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <label className="text-[11px] font-mono text-slate-400 block mb-1">Track Title</label>
                   <input
                     type="text"
-                    value={editingItem.data.title}
+                    value={editingItem?.data?.title || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })}
                     className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-xs text-white focus:outline-none"
                   />

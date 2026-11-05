@@ -355,6 +355,26 @@ export default async function handler(req, res) {
       // 2. Write to Supabase Postgres
       if (config.supabaseUrl && config.supabaseKey) {
         try {
+          // Safely merge with existing record so partial saves never drop other sections
+          let mergedPayload = payload;
+          try {
+            const existingRes = await fetch(`${config.supabaseUrl}/rest/v1/site_data?id=eq.main&select=*`, {
+              headers: {
+                'apikey': config.supabaseKey,
+                'Authorization': `Bearer ${config.supabaseKey}`
+              }
+            });
+            if (existingRes.ok) {
+              const rows = await existingRes.json();
+              if (rows?.[0]?.data && typeof rows[0].data === 'object') {
+                mergedPayload = {
+                  ...rows[0].data,
+                  ...payload
+                };
+              }
+            }
+          } catch {}
+
           const supaRes = await fetch(`${config.supabaseUrl}/rest/v1/site_data?on_conflict=id`, {
             method: 'POST',
             headers: {
@@ -365,7 +385,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
               id: 'main',
-              data: payload,
+              data: mergedPayload,
               updated_at: new Date().toISOString()
             })
           });

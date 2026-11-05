@@ -111,8 +111,8 @@ export default function GallerySection() {
               className="relative w-full h-full"
             >
               <img
-                src={currentImage.url}
-                alt={currentImage.title}
+                src={currentImage?.url || ''}
+                alt={currentImage?.title || 'Gallery'}
                 className="w-full h-full object-cover object-center filter brightness-90"
               />
 
@@ -132,13 +132,13 @@ export default function GallerySection() {
               <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col md:flex-row md:items-end justify-between gap-3">
                 <div className="max-w-xl">
                   <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-purple-400 block mb-0.5">
-                    {currentImage.subtitle}
+                    {currentImage?.subtitle || 'Archive'}
                   </span>
                   <h3 className="font-display text-lg sm:text-2xl md:text-3xl font-extrabold text-white mb-1">
-                    {currentImage.title}
+                    {currentImage?.title || 'Photo Archive'}
                   </h3>
                   <p className="text-[11px] sm:text-xs md:text-sm text-slate-300 font-sans line-clamp-2 sm:line-clamp-none">
-                    {currentImage.caption}
+                    {currentImage?.caption || ''}
                   </p>
                 </div>
 
@@ -182,10 +182,10 @@ export default function GallerySection() {
             <div className="flex items-center justify-between z-10">
               <div>
                 <h4 className="font-bold text-white text-sm sm:text-lg">
-                  {currentImage.title}
+                  {currentImage?.title || 'Gallery'}
                 </h4>
                 <p className="text-[10px] sm:text-xs text-purple-400 font-mono">
-                  {currentImage.subtitle}
+                  {currentImage?.subtitle || 'Archive'}
                 </p>
               </div>
 
@@ -210,8 +210,8 @@ export default function GallerySection() {
               </button>
 
               <img
-                src={currentImage.url}
-                alt={currentImage.title}
+                src={currentImage?.url || ''}
+                alt={currentImage?.title || 'Gallery Image'}
                 className="max-h-[70vh] sm:max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl border border-white/[0.1]"
                 onClick={(e) => e.stopPropagation()}
               />

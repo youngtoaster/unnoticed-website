@@ -143,7 +143,7 @@ export default function MediaSection() {
                     <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/[0.1] mb-4 sm:mb-5 bg-[#08080c]">
                       <img
                         src={thumbSrc}
-                        alt={video.title}
+                        alt={video?.title || 'Video'}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
@@ -158,7 +158,7 @@ export default function MediaSection() {
                       {/* Top Badges */}
                       <div className="absolute top-3 left-3 flex items-center gap-1.5">
                         <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-slate-200 border border-white/[0.1]">
-                          {video.category}
+                          {video?.category || 'Music Video'}
                         </span>
                         {isUpload && (
                           <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white text-[9px] font-mono font-bold">
@@ -169,16 +169,16 @@ export default function MediaSection() {
 
                       {/* Duration Badge */}
                       <span className="absolute bottom-3 right-3 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-slate-200 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-purple-400" /> {video.duration}
+                        <Clock className="w-3 h-3 text-purple-400" /> {video?.duration || '3:30'}
                       </span>
                     </div>
 
                     {/* Title & Description */}
                     <h3 className="font-display text-lg sm:text-xl font-bold text-white group-hover:text-purple-300 transition-colors mb-2">
-                      {video.title}
+                      {video?.title || 'Untitled Video'}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-400 leading-relaxed line-clamp-2 mb-4 font-light">
-                      {video.description}
+                      {video?.description || ''}
                     </p>
                   </div>
 
@@ -247,8 +247,8 @@ export default function MediaSection() {
                   className="relative w-full h-full"
                 >
                   <img
-                    src={currentImage.url}
-                    alt={currentImage.title}
+                    src={currentImage?.url || ''}
+                    alt={currentImage?.title || 'Gallery'}
                     className="w-full h-full object-cover object-center filter brightness-90"
                   />
 
@@ -268,13 +268,13 @@ export default function MediaSection() {
                   <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col md:flex-row md:items-end justify-between gap-3 text-left">
                     <div className="max-w-xl">
                       <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-purple-400 block mb-0.5">
-                        {currentImage.subtitle}
+                        {currentImage?.subtitle || 'Archive'}
                       </span>
                       <h3 className="font-display text-lg sm:text-2xl md:text-3xl font-extrabold text-white mb-1">
-                        {currentImage.title}
+                        {currentImage?.title || 'Photo Exhibit'}
                       </h3>
                       <p className="text-[11px] sm:text-xs md:text-sm text-slate-300 font-sans line-clamp-2 sm:line-clamp-none font-light">
-                        {currentImage.caption}
+                        {currentImage?.caption || ''}
                       </p>
                     </div>
 
@@ -347,10 +347,10 @@ export default function MediaSection() {
               <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/[0.08]">
                 <div className="text-left min-w-0 pr-4">
                   <h4 className="font-display font-bold text-white text-base sm:text-lg truncate">
-                    {activeModalVideo.title}
+                    {activeModalVideo?.title || 'Video'}
                   </h4>
                   <span className="text-[11px] font-mono text-purple-400">
-                    {activeModalVideo.category} • {activeModalVideo.duration} • {activeModalVideo.views}
+                    {activeModalVideo?.category || 'Music Video'} • {activeModalVideo?.duration || '3:30'} • {activeModalVideo?.views || '100K+'}
                   </span>
                 </div>
                 <button
@@ -363,28 +363,28 @@ export default function MediaSection() {
 
               {/* Player Body */}
               <div className="relative aspect-video w-full bg-black flex items-center justify-center">
-                {activeModalVideo.type === 'upload' || isDirectVideo(activeModalVideo.videoUrl) ? (
+                {activeModalVideo?.type === 'upload' || isDirectVideo(activeModalVideo?.videoUrl) ? (
                   /* Native HTML5 Video for uploaded files */
                   <video
                     controls
                     autoPlay
-                    src={activeModalVideo.videoUrl}
+                    src={activeModalVideo?.videoUrl}
                     className="w-full h-full object-contain"
                   />
                 ) : (
                   /* YouTube Iframe Player with resolved ID */
                   (() => {
                     const ytId = extractYouTubeId(
-                      activeModalVideo.youtubeEmbedId ||
-                      activeModalVideo.youtubeId ||
-                      activeModalVideo.url ||
-                      activeModalVideo.extractedId ||
+                      activeModalVideo?.youtubeEmbedId ||
+                      activeModalVideo?.youtubeId ||
+                      activeModalVideo?.url ||
+                      activeModalVideo?.extractedId ||
                       'dQw4w9WgXcQ'
                     );
 
                     return (
                       <iframe
-                        title={activeModalVideo.title}
+                        title={activeModalVideo?.title || 'Video'}
                         src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -434,10 +434,10 @@ export default function MediaSection() {
             <div className="flex items-center justify-between z-10">
               <div className="text-left">
                 <h4 className="font-bold text-white text-sm sm:text-lg">
-                  {currentImage.title}
+                  {currentImage?.title || 'Gallery'}
                 </h4>
                 <p className="text-[10px] sm:text-xs text-purple-400 font-mono">
-                  {currentImage.subtitle}
+                  {currentImage?.subtitle || 'Archive'}
                 </p>
               </div>
 
@@ -462,8 +462,8 @@ export default function MediaSection() {
               </button>
 
               <img
-                src={currentImage.url}
-                alt={currentImage.title}
+                src={currentImage?.url || ''}
+                alt={currentImage?.title || 'Gallery Image'}
                 className="max-h-[70vh] sm:max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl border border-white/[0.1]"
                 onClick={(e) => e.stopPropagation()}
               />

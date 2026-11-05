@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play, Pause, ExternalLink, Disc, Music, CheckCircle2, Quote, Sparkles,
+  Play, Pause, ExternalLink, Disc, Disc3, Music, CheckCircle2, Quote, Sparkles,
   Volume2, Share2, Info, X, ChevronRight, Copy, Check, Eye, EyeOff,
   Radio, Compass, ChevronLeft, ArrowRight, ArrowLeft
 } from 'lucide-react';
@@ -631,7 +631,7 @@ export default function MusicSection({
 
                       <div className="grid grid-cols-2 gap-2 shrink-0">
                         <a
-                          href={focusedTrack.spotifyUrl || artistInfo.socials?.spotify}
+                          href={focusedTrack?.spotifyUrl || artistInfo?.socials?.spotify || '#'}
                           target="_blank"
                           rel="noreferrer"
                           className="h-10 px-3 rounded-xl bg-[#1ed760]/15 hover:bg-[#1ed760]/25 border border-[#1ed760]/40 text-[#1ed760] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 shrink-0"
@@ -642,7 +642,7 @@ export default function MusicSection({
                         </a>
 
                         <a
-                          href={focusedTrack.appleMusicUrl || artistInfo.socials?.appleMusic}
+                          href={focusedTrack?.appleMusicUrl || artistInfo?.socials?.appleMusic || '#'}
                           target="_blank"
                           rel="noreferrer"
                           className="h-10 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 shrink-0"
@@ -686,7 +686,7 @@ export default function MusicSection({
                             filterMode === 'all' ? 'theme-primary-btn font-bold' : 'text-slate-400 hover:text-slate-200'
                           }`}
                         >
-                          All ({selectedTrackForLyrics.lyrics?.length || 0})
+                          All ({selectedTrackForLyrics?.lyrics?.length || 0})
                         </button>
                         <button
                           onClick={() => setFilterMode('annotated')}
@@ -709,9 +709,9 @@ export default function MusicSection({
 
                     {/* Scrollable & Centered Dynamic Lyrics Window */}
                     <div className={`flex-1 overflow-y-auto pr-2 min-h-0 select-none custom-scrollbar flex flex-col ${
-                      (selectedTrackForLyrics.lyrics?.length || 0) <= 5 ? 'justify-center py-4' : 'space-y-1.5 py-1'
+                      (selectedTrackForLyrics?.lyrics?.length || 0) <= 5 ? 'justify-center py-4' : 'space-y-1.5 py-1'
                     }`}>
-                      {selectedTrackForLyrics.lyrics?.map((line, idx) => {
+                      {selectedTrackForLyrics?.lyrics?.map((line, idx) => {
                         const isAnnotated = line.annotated;
                         const isSelected = activeAnnotation?.content === line.annotation?.content;
 

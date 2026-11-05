@@ -52,7 +52,36 @@ export default function MediaUploadOrLink({
     setFileName(file.name);
     setFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
     setIsUploading(true);
-    setUploadProgress('Uploading asset to server & permanent storage...');
+    setUploadProgress('Uploading asset to Supabase cloud CDN...');
+
+    const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const ext = sanitized.lastIndexOf('.') !== -1 ? sanitized.substring(sanitized.lastIndexOf('.')) : '';
+    const base = sanitized.replace(ext, '');
+    const finalFileName = `${type}_${base}_${Date.now()}${ext}`;
+
+    // 1. Direct Supabase Storage Cloud Upload (High speed, 100MB limit, permanent public CDN)
+    const supaUrl = 'https://ftinvmrjijnncwzkvgcn.supabase.co';
+    const supaKey = 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV';
+    try {
+      const supaRes = await fetch(`${supaUrl}/storage/v1/object/media/${finalFileName}`, {
+        method: 'POST',
+        headers: {
+          'apikey': supaKey,
+          'Authorization': `Bearer ${supaKey}`,
+          'Content-Type': file.type || 'application/octet-stream'
+        },
+        body: file
+      });
+      if (supaRes.ok) {
+        const permanentUrl = `${supaUrl}/storage/v1/object/public/media/${finalFileName}`;
+        setIsUploading(false);
+        setUploadProgress('');
+        actualOnChange(permanentUrl);
+        return;
+      }
+    } catch (supaErr) {
+      console.warn('[MediaUploadOrLink] Direct Supabase upload notice:', supaErr);
+    }
 
     let storedToken = localStorage.getItem('unnoticed_github_token');
     if (!storedToken) {
@@ -186,21 +215,14 @@ export default function MediaUploadOrLink({
       return;
     }
 
-    // 4. Temporary local session fallback for audio/video if both endpoints are unavailable
-    if (file.size <= 4 * 1024 * 1024) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setIsUploading(false);
-        setUploadProgress('');
-        if (event.target?.result) actualOnChange(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      const objectUrl = URL.createObjectURL(file);
+    // 4. Offline / embedded fallback: persistent base64 Data URL (never temporary blob:)
+    const reader = new FileReader();
+    reader.onload = (event) => {
       setIsUploading(false);
       setUploadProgress('');
-      actualOnChange(objectUrl);
-    }
+      if (event.target?.result) actualOnChange(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleClear = () => {

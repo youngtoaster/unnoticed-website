@@ -42,14 +42,44 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Get GitHub Token from environment or request authorization header
+    // 1. Primary: Direct upload to Supabase Storage (media bucket, 100MB limit, fast CDN)
+    const supaUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ftinvmrjijnncwzkvgcn.supabase.co').replace(/\/$/, '');
+    const supaKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV';
+
+    try {
+      const supaRes = await fetch(`${supaUrl}/storage/v1/object/media/${finalFileName}`, {
+        method: 'POST',
+        headers: {
+          'apikey': supaKey,
+          'Authorization': `Bearer ${supaKey}`,
+          'Content-Type': req.headers['content-type'] || 'application/octet-stream'
+        },
+        body: fileBuffer
+      });
+
+      if (supaRes.ok) {
+        const publicUrl = `${supaUrl}/storage/v1/object/public/media/${finalFileName}`;
+        res.status(200).json({
+          success: true,
+          fileName: finalFileName,
+          url: publicUrl,
+          rawUrl: publicUrl,
+          provider: 'supabase_storage'
+        });
+        return;
+      }
+    } catch (supaErr) {
+      console.warn('[upload.js] Supabase storage upload notice:', supaErr.message);
+    }
+
+    // 2. Secondary fallback: GitHub repository upload
     const token = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN || req.headers.authorization?.replace(/^Bearer\s+|^token\s+/i, '');
     const owner = process.env.GITHUB_OWNER || 'youngtoaster';
     const repo = process.env.GITHUB_REPO || 'unnoticed-website';
 
     if (!token) {
       res.status(500).json({
-        error: 'No GITHUB_TOKEN configured on server. Please add GITHUB_TOKEN to Vercel environment variables or provide Authorization header.'
+        error: 'Upload storage providers unavailable. Please check Supabase or GitHub configuration.'
       });
       return;
     }

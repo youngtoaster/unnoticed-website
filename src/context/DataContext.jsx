@@ -191,70 +191,103 @@ export function DataProvider({ children }) {
     const syncFromNetwork = async () => {
       try {
         setSyncStatus('syncing');
-        let res = null;
+        let remoteData = null;
+
+        // 1. Direct Supabase Postgres read (Real-time live multi-device database)
+        const supaUrl = 'https://ftinvmrjijnncwzkvgcn.supabase.co';
+        const supaKey = 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV';
         try {
-          res = await fetch(`/api/db?t=${Date.now()}`, {
-            headers: getDbHeaders()
+          const supaRes = await fetch(`${supaUrl}/rest/v1/site_data?id=eq.main&select=*`, {
+            headers: {
+              'apikey': supaKey,
+              'Authorization': `Bearer ${supaKey}`
+            }
           });
+          if (supaRes.ok) {
+            const rows = await supaRes.json();
+            if (Array.isArray(rows) && rows[0]?.data) {
+              remoteData = {
+                ...rows[0].data,
+                _source: 'supabase_postgres'
+              };
+            }
+          }
         } catch {}
-        if (!res || !res.ok) {
-          res = await fetch(`/site_data.json?t=${Date.now()}`);
+
+        // 2. Secondary: Fall back to /api/db endpoint if Supabase REST call was blocked
+        if (!remoteData) {
+          try {
+            const dbRes = await fetch(`/api/db?t=${Date.now()}`, {
+              headers: getDbHeaders()
+            });
+            if (dbRes.ok) {
+              remoteData = await dbRes.json();
+            }
+          } catch {}
         }
-        if (res.ok) {
-          const remoteData = await res.json();
-          if (remoteData && typeof remoteData === 'object' && isMounted) {
-            const localStored = localStorage.getItem(STORAGE_KEY);
-            const localParsed = localStored ? JSON.parse(localStored) : null;
 
-            const remoteTime = remoteData._lastUpdated || 0;
-            const localTime = localParsed?._lastUpdated || 0;
-
-            const timeSinceLocalSave = Date.now() - localTime;
-
-            // If remote has strictly newer data (and user didn't just save locally within 2.5s) or device has no local cache, hydrate
-            if (!localParsed || (remoteTime > localTime && timeSinceLocalSave > 2500)) {
-              setData((prev) => {
-                const merged = {
-                  ...prev,
-                  ...remoteData,
-                  artistInfo: remoteData.artistInfo || prev.artistInfo,
-                  tracks: Array.isArray(remoteData.tracks)
-                    ? remoteData.tracks
-                    : (Array.isArray(prev.tracks) ? prev.tracks : DEFAULT_TRACKS),
-                  biography: Array.isArray(remoteData.biography)
-                    ? remoteData.biography
-                    : (Array.isArray(prev.biography) ? prev.biography : DEFAULT_BIO),
-                  videos: Array.isArray(remoteData.videos) ? remoteData.videos : prev.videos,
-                  tourDates: Array.isArray(remoteData.tourDates) ? remoteData.tourDates : prev.tourDates,
-                  pastTours: Array.isArray(remoteData.pastTours) ? remoteData.pastTours : prev.pastTours,
-                  merchProducts: Array.isArray(remoteData.merchProducts) ? remoteData.merchProducts : prev.merchProducts,
-                  galleryImages: Array.isArray(remoteData.galleryImages) ? remoteData.galleryImages : prev.galleryImages,
-                  socialPosts: Array.isArray(remoteData.socialPosts) ? remoteData.socialPosts : prev.socialPosts,
-                  epkData: remoteData.epkData || prev.epkData,
-                  sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
-                  featuredRelease: (remoteData.featuredRelease && typeof remoteData.featuredRelease === 'object' && remoteData.featuredRelease.title)
-                    ? remoteData.featuredRelease
-                    : (prev.featuredRelease && prev.featuredRelease.title ? prev.featuredRelease : DEFAULT_FEATURED_RELEASE),
-                  _lastUpdated: remoteData._lastUpdated || Date.now(),
-                };
-                try {
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-                } catch (e) {
-                  console.warn('LocalStorage save failed:', e);
-                }
-                return merged;
-              });
+        // 3. Last resort: /site_data.json static bundle
+        if (!remoteData) {
+          try {
+            const staticRes = await fetch(`/site_data.json?t=${Date.now()}`);
+            if (staticRes.ok) {
+              remoteData = await staticRes.json();
             }
-            setSyncStatus('synced');
-            if (remoteData._source) {
-              setDbStatus((prev) => ({
+          } catch {}
+        }
+
+        if (remoteData && typeof remoteData === 'object' && isMounted) {
+          const localStored = localStorage.getItem(STORAGE_KEY);
+          const localParsed = localStored ? JSON.parse(localStored) : null;
+
+          const remoteTime = remoteData._lastUpdated || 0;
+          const localTime = localParsed?._lastUpdated || 0;
+
+          const timeSinceLocalSave = Date.now() - localTime;
+
+          // If remote has strictly newer data (and user didn't just save locally within 2.5s) or device has no local cache, hydrate
+          if (!localParsed || (remoteTime > localTime && timeSinceLocalSave > 2500)) {
+            setData((prev) => {
+              const merged = {
                 ...prev,
-                connected: true,
-                activeProvider: remoteData._source,
-                latencyMs: remoteData._readLatencyMs || prev.latencyMs,
-                lastSynced: Date.now()
-              }));
-            }
+                ...remoteData,
+                artistInfo: remoteData.artistInfo || prev.artistInfo,
+                tracks: Array.isArray(remoteData.tracks)
+                  ? remoteData.tracks
+                  : (Array.isArray(prev.tracks) ? prev.tracks : DEFAULT_TRACKS),
+                biography: Array.isArray(remoteData.biography)
+                  ? remoteData.biography
+                  : (Array.isArray(prev.biography) ? prev.biography : DEFAULT_BIO),
+                videos: Array.isArray(remoteData.videos) ? remoteData.videos : prev.videos,
+                tourDates: Array.isArray(remoteData.tourDates) ? remoteData.tourDates : prev.tourDates,
+                pastTours: Array.isArray(remoteData.pastTours) ? remoteData.pastTours : prev.pastTours,
+                merchProducts: Array.isArray(remoteData.merchProducts) ? remoteData.merchProducts : prev.merchProducts,
+                galleryImages: Array.isArray(remoteData.galleryImages) ? remoteData.galleryImages : prev.galleryImages,
+                socialPosts: Array.isArray(remoteData.socialPosts) ? remoteData.socialPosts : prev.socialPosts,
+                epkData: remoteData.epkData || prev.epkData,
+                sectionsVisibility: remoteData.sectionsVisibility || prev.sectionsVisibility,
+                featuredRelease: (remoteData.featuredRelease && typeof remoteData.featuredRelease === 'object' && remoteData.featuredRelease.title)
+                  ? remoteData.featuredRelease
+                  : (prev.featuredRelease && prev.featuredRelease.title ? prev.featuredRelease : DEFAULT_FEATURED_RELEASE),
+                _lastUpdated: remoteData._lastUpdated || Date.now(),
+              };
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+              } catch (e) {
+                console.warn('LocalStorage save failed:', e);
+              }
+              return merged;
+            });
+          }
+          setSyncStatus('synced');
+          if (remoteData._source) {
+            setDbStatus((prev) => ({
+              ...prev,
+              connected: true,
+              activeProvider: remoteData._source,
+              latencyMs: remoteData._readLatencyMs || prev.latencyMs,
+              lastSynced: Date.now()
+            }));
           }
         } else {
           setSyncStatus('synced');
@@ -398,7 +431,25 @@ export function DataProvider({ children }) {
         if (storedToken) {
           headers['Authorization'] = `token ${storedToken}`;
         }
-        // Save to Universal Database Engine (Upstash, Supabase, GitHub, Disk)
+        // 1. Direct client-to-Supabase Postgres sync (Bypasses any serverless proxy limitations)
+        const supaUrl = 'https://ftinvmrjijnncwzkvgcn.supabase.co';
+        const supaKey = 'sb_publishable_HLp7KJ1CopJ803WGeoggJg_cwRD5lFV';
+        fetch(`${supaUrl}/rest/v1/site_data?on_conflict=id`, {
+          method: 'POST',
+          headers: {
+            'apikey': supaKey,
+            'Authorization': `Bearer ${supaKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            id: 'main',
+            data: payload,
+            updated_at: new Date().toISOString()
+          })
+        }).catch(() => {});
+
+        // 2. Save to Universal Database Engine (Upstash, Supabase, GitHub, Disk)
         fetch('/api/db', {
           method: 'POST',
           headers: getDbHeaders(),

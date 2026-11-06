@@ -593,13 +593,20 @@ export default function AudioPlayerBar({
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={togglePlay}
-                  className="w-16 h-16 rounded-full bg-white text-[#08090e] hover:bg-slate-200 flex items-center justify-center shadow-2xl border border-white/60 active:scale-95 font-bold cursor-pointer"
+                  className="w-16 h-16 rounded-full bg-white text-black hover:bg-slate-200 flex items-center justify-center shadow-2xl border border-white/80 active:scale-95 font-bold cursor-pointer"
+                  style={{ backgroundColor: '#ffffff', color: '#000000' }}
                   aria-label={isPlaying ? 'Pause preview' : 'Play preview'}
                 >
                   {isPlaying ? (
-                    <Pause className="w-7 h-7 fill-current" />
+                    <Pause
+                      className="w-7 h-7 text-black"
+                      style={{ fill: '#000000', stroke: '#000000', color: '#000000' }}
+                    />
                   ) : (
-                    <Play className="w-7 h-7 fill-current ml-0.5" />
+                    <Play
+                      className="w-7 h-7 ml-0.5 text-black"
+                      style={{ fill: '#000000', stroke: '#000000', color: '#000000' }}
+                    />
                   )}
                 </motion.button>
 
@@ -759,13 +766,21 @@ export default function AudioPlayerBar({
                   <motion.button
                     whileTap={{ scale: 0.92 }}
                     onClick={togglePlay}
-                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#08090e] hover:bg-slate-200 flex items-center justify-center shadow-md border border-white/60 active:scale-90 cursor-pointer font-bold shrink-0"
+                    className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-black hover:bg-slate-200 flex items-center justify-center shadow-md border border-white/80 active:scale-90 cursor-pointer font-bold shrink-0"
+                    style={{ backgroundColor: '#ffffff', color: '#000000' }}
                     title={isPlaying ? 'Pause' : 'Play'}
+                    aria-label={isPlaying ? 'Pause preview' : 'Play preview'}
                   >
                     {isPlaying ? (
-                      <Pause className="w-4 h-4 fill-current" />
+                      <Pause
+                        className="w-4 h-4 text-black"
+                        style={{ fill: '#000000', stroke: '#000000', color: '#000000' }}
+                      />
                     ) : (
-                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                      <Play
+                        className="w-4 h-4 ml-0.5 text-black"
+                        style={{ fill: '#000000', stroke: '#000000', color: '#000000' }}
+                      />
                     )}
                   </motion.button>
 

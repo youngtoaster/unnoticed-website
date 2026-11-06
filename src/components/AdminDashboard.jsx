@@ -5,7 +5,7 @@ import {
   ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Plus, Trash2, Edit3, Save,
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Pause, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
-  Zap, Palette, Type, RefreshCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
+  Zap, Palette, Type, RefreshCw, RotateCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
   AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio, Layout, Layers
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
@@ -333,6 +333,8 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [quickLinkInput, setQuickLinkInput] = useState('');
   const [quickLinkResult, setQuickLinkResult] = useState(null);
   const [isQuickFetching, setIsQuickFetching] = useState(false);
+  const [refreshingTrackIdx, setRefreshingTrackIdx] = useState(null);
+  const [isRefreshingAll, setIsRefreshingAll] = useState(false);
   const [sampleAuditionPlaying, setSampleAuditionPlaying] = useState(false);
   const sampleAuditionRef = useRef(null);
 
@@ -495,6 +497,103 @@ export default function AdminDashboard({ onReturnToSite }) {
       setMetaFeedback('Failed to pull link metadata');
     } finally {
       setIsFetchingMeta(false);
+    }
+  };
+
+  const handleRefreshTrackMetadata = async (idx) => {
+    const track = tracks[idx];
+    if (!track) return;
+
+    const targetUrl = track.spotifyUrl || track.appleMusicUrl || track.soundcloudUrl || track.previewAudio;
+    if (!targetUrl || !targetUrl.trim()) {
+      showToast(`No streaming link on "${track.title || 'Track'}" to pull from. Click Edit to add one.`, 'error');
+      return;
+    }
+
+    setRefreshingTrackIdx(idx);
+    try {
+      const res = await fetchMediaMetadata(targetUrl.trim());
+      if (res && res.success) {
+        const updatedTracks = [...tracks];
+        updatedTracks[idx] = {
+          ...track,
+          title: res.title || track.title,
+          featuring: res.featuring !== undefined ? res.featuring : (res.artist && res.artist !== 'UNNOTICED' ? `feat. ${res.artist}` : (track.featuring || '')),
+          type: res.releaseType || res.type || track.type || 'Single',
+          duration: res.duration || track.duration,
+          releaseYear: res.releaseYear || res.year || track.releaseYear,
+          previewAudio: res.previewAudio || res.audioUrl || track.previewAudio,
+          cover: res.cover || res.thumbnail || track.cover,
+          spotifyUrl: res.spotifyUrl || track.spotifyUrl,
+          description: res.description || track.description
+        };
+
+        updateData((prev) => ({
+          ...prev,
+          tracks: updatedTracks
+        }));
+
+        const durInfo = res.duration ? ` (${res.duration})` : '';
+        const yrInfo = res.releaseYear ? ` • ${res.releaseYear}` : '';
+        showToast(`Updated metadata: "${updatedTracks[idx].title}"${durInfo}${yrInfo}`);
+      } else {
+        showToast(`Could not pull metadata: ${res?.error || 'Link unavailable'}`, 'error');
+      }
+    } catch (err) {
+      console.error('Error refreshing track metadata:', err);
+      showToast('Failed to pull fresh metadata', 'error');
+    } finally {
+      setRefreshingTrackIdx(null);
+    }
+  };
+
+  const handleRefreshAllTracksMetadata = async () => {
+    if (tracks.length === 0) return;
+    setIsRefreshingAll(true);
+    let updatedCount = 0;
+    try {
+      const updatedTracks = [...tracks];
+      for (let i = 0; i < updatedTracks.length; i++) {
+        const track = updatedTracks[i];
+        const targetUrl = track.spotifyUrl || track.appleMusicUrl || track.soundcloudUrl || track.previewAudio;
+        if (!targetUrl || !targetUrl.trim()) continue;
+
+        try {
+          const res = await fetchMediaMetadata(targetUrl.trim());
+          if (res && res.success) {
+            updatedTracks[i] = {
+              ...track,
+              title: res.title || track.title,
+              featuring: res.featuring !== undefined ? res.featuring : (res.artist && res.artist !== 'UNNOTICED' ? `feat. ${res.artist}` : (track.featuring || '')),
+              type: res.releaseType || res.type || track.type || 'Single',
+              duration: res.duration || track.duration,
+              releaseYear: res.releaseYear || res.year || track.releaseYear,
+              previewAudio: res.previewAudio || res.audioUrl || track.previewAudio,
+              cover: res.cover || res.thumbnail || track.cover,
+              spotifyUrl: res.spotifyUrl || track.spotifyUrl,
+              description: res.description || track.description
+            };
+            updatedCount++;
+          }
+        } catch (singleErr) {
+          console.warn(`Could not refresh track ${track.title}:`, singleErr);
+        }
+      }
+
+      if (updatedCount > 0) {
+        updateData((prev) => ({
+          ...prev,
+          tracks: updatedTracks
+        }));
+        showToast(`Successfully updated metadata on ${updatedCount} song${updatedCount === 1 ? '' : 's'}!`);
+      } else {
+        showToast('No tracks with active streaming links were found to update.', 'error');
+      }
+    } catch (err) {
+      console.error('Error in batch metadata refresh:', err);
+      showToast('Batch metadata update encountered an error', 'error');
+    } finally {
+      setIsRefreshingAll(false);
     }
   };
 
@@ -928,7 +1027,7 @@ export default function AdminDashboard({ onReturnToSite }) {
                   featuring: '',
                   type: 'Single',
                   duration: '3:00',
-                  releaseYear: '2026',
+                  releaseYear: '2024',
                   previewAudio: 'https://p.scdn.co/mp3-preview/07e6651dfa67afa6f3b9b820f7c2382ce546399a?cid=3bb56cf560444175950d63e79d4febc8',
                   cover: artistInfo.avatar,
                   spotifyUrl: artistInfo.socials?.spotify || 'https://open.spotify.com',
@@ -992,6 +1091,32 @@ export default function AdminDashboard({ onReturnToSite }) {
                   <>
                     <Zap className="w-3.5 h-3.5 text-amber-300" />
                     <span>Auto-Pull Details</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Batch Action: Update Metadata On All Songs */}
+            <div className="mt-3.5 pt-3.5 border-t border-purple-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="text-[11px] text-slate-300 font-mono">
+                <span className="text-purple-300 font-semibold">Bulk Metadata Re-Sync:</span> Re-pull Title, Cover Art, Duration, and Year on all {tracks.length} tracks from their streaming links.
+              </div>
+              <button
+                type="button"
+                disabled={isRefreshingAll || tracks.length === 0}
+                onClick={handleRefreshAllTracksMetadata}
+                className="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 hover:text-emerald-200 border border-emerald-500/40 text-xs font-bold flex items-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50 shrink-0 shadow-sm"
+                title="Re-query Spotify/SoundCloud to update metadata on all tracks in catalog"
+              >
+                {isRefreshingAll ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-300" />
+                    <span>Updating All Songs...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCw className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Update All Songs Metadata</span>
                   </>
                 )}
               </button>
@@ -1124,13 +1249,32 @@ export default function AdminDashboard({ onReturnToSite }) {
                         </span>
                       </div>
                       <p className="text-xs text-slate-400 truncate">
-                        {track?.featuring ? `feat. ${track.featuring}` : 'Solo'} • {track?.duration || '3:00'} • {track?.releaseYear || '2026'}
+                        {track?.featuring ? `feat. ${track.featuring}` : 'Solo'} • {track?.duration || '3:00'} • {track?.releaseYear || '2024'}
                       </p>
                     </div>
                   </div>
 
                   {/* Right: Actions */}
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    <button
+                      onClick={() => handleRefreshTrackMetadata(idx)}
+                      disabled={refreshingTrackIdx === idx || isRefreshingAll}
+                      className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                      title="Re-pull fresh Title, Artist, Cover Artwork, Duration, and Year from streaming link"
+                    >
+                      {refreshingTrackIdx === idx ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-300" />
+                          <span>Pulling...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Pull Metadata</span>
+                        </>
+                      )}
+                    </button>
+
                     <button
                       onClick={() => setEditingItem({ type: 'track', isNew: false, data: { ...track }, index: idx })}
                       className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-semibold text-white flex items-center gap-1.5 active:scale-95"

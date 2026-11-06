@@ -28,7 +28,7 @@ export default function VideoSection() {
         </div>
 
         <a
-          href={artistInfo.socials.youtube}
+          href={artistInfo?.socials?.youtube || 'https://youtube.com'}
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-colors self-start md:self-auto shadow-lg shadow-red-600/30"
@@ -40,9 +40,9 @@ export default function VideoSection() {
 
       {/* Two-Column YouTube Video Showcase Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {videos.map((video) => (
+        {(videos || []).map((video) => (
           <SpotlightCard
-            key={video.id}
+            key={video?.id || Math.random()}
             tilt={true}
             spotlightColor="rgba(239, 68, 68, 0.15)"
             className="p-5 flex flex-col justify-between group cursor-pointer"
@@ -52,8 +52,8 @@ export default function VideoSection() {
               {/* Video Thumbnail with Hover Play Button */}
               <div className="relative aspect-video rounded-xl overflow-hidden border border-white/[0.1] mb-5 bg-[#08080c]">
                 <img
-                  src={video.thumbnail}
-                  alt={video.title}
+                  src={video?.thumbnail || ''}
+                  alt={video?.title || 'Video'}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
@@ -75,23 +75,23 @@ export default function VideoSection() {
 
                 {/* Bottom Duration Badge */}
                 <span className="absolute bottom-3 right-3 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[11px] font-mono text-slate-200 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-red-400" /> {video.duration}
+                  <Clock className="w-3 h-3 text-red-400" /> {video?.duration || '3:30'}
                 </span>
               </div>
 
               {/* Title & Description */}
               <h3 className="font-display text-xl font-bold text-white group-hover:text-red-300 transition-colors mb-2">
-                {video.title}
+                {video?.title || 'Video Showcase'}
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4">
-                {video.description}
+                {video?.description || ''}
               </p>
             </div>
 
             {/* Bottom Meta Row */}
             <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
               <span className="flex items-center gap-1 font-mono">
-                <Eye className="w-3.5 h-3.5 text-red-400" /> {video.views}
+                <Eye className="w-3.5 h-3.5 text-red-400" /> {video?.views || '100K views'}
               </span>
               <span className="text-red-400 group-hover:text-red-300 font-semibold flex items-center gap-1 transition-colors">
                 Watch Video <Play className="w-3 h-3 fill-current" />
@@ -170,10 +170,10 @@ export default function VideoSection() {
               <div className="p-4 sm:p-5 border-b border-white/[0.08] flex items-center justify-between">
                 <div>
                   <h4 className="font-bold text-white text-base sm:text-lg">
-                    {activeModalVideo.title}
+                    {activeModalVideo?.title || 'Video Player'}
                   </h4>
                   <p className="text-xs text-red-400 font-mono">
-                    {activeModalVideo.category} • {activeModalVideo.duration}
+                    {activeModalVideo?.category || 'Music Video'} • {activeModalVideo?.duration || '3:30'}
                   </p>
                 </div>
                 <button
@@ -187,8 +187,8 @@ export default function VideoSection() {
               {/* Video Player Frame with Animated Visualizer */}
               <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
                 <img
-                  src={activeModalVideo.thumbnail}
-                  alt={activeModalVideo.title}
+                  src={activeModalVideo?.thumbnail || ''}
+                  alt={activeModalVideo?.title || 'Video'}
                   className="absolute inset-0 w-full h-full object-cover opacity-40 blur-xs"
                 />
                 
@@ -198,13 +198,13 @@ export default function VideoSection() {
                     <Play className="w-8 h-8 fill-white ml-1" />
                   </div>
                   <h5 className="font-display text-xl font-bold text-white mb-2">
-                    {activeModalVideo.title}
+                    {activeModalVideo?.title || 'Video'}
                   </h5>
                   <p className="text-xs text-slate-300 mb-5 leading-relaxed">
                     Watch the official HD stream directly on YouTube for high quality 4K and Dolby audio.
                   </p>
                   <a
-                    href={artistInfo.socials.youtube}
+                    href={artistInfo?.socials?.youtube || 'https://youtube.com'}
                     target="_blank"
                     rel="noreferrer"
                     className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-red-600/40 transition-all"
@@ -217,7 +217,7 @@ export default function VideoSection() {
 
               {/* Modal Footer */}
               <div className="p-4 sm:p-5 bg-white/[0.02] flex items-center justify-between text-xs text-slate-400">
-                <span>{activeModalVideo.description}</span>
+                <span>{activeModalVideo?.description || ''}</span>
                 <span className="font-mono text-red-300">{activeModalVideo.views}</span>
               </div>
             </motion.div>

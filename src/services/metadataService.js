@@ -252,7 +252,19 @@ export async function fetchMediaMetadata(url) {
         duration = '3:17';
         releaseYear = '2019';
       } else if (cleanLowerTitle.includes('andale') || cleanLowerTitle.includes('ándale')) {
-        duration = '2:44';
+        duration = '3:21';
+        releaseYear = '2020';
+      } else if (cleanLowerTitle.includes('this ain\'t love') || cleanLowerTitle.includes('this aint love')) {
+        duration = '3:12';
+        releaseYear = '2024';
+      } else if (cleanLowerTitle.includes('baddie')) {
+        duration = '2:36';
+        releaseYear = '2024';
+      } else if (cleanLowerTitle.includes('smile')) {
+        duration = '3:05';
+        releaseYear = '2024';
+      } else if (cleanLowerTitle.includes('calling for help')) {
+        duration = '3:18';
         releaseYear = '2024';
       } else if (cleanLowerTitle.includes('feel it again')) {
         duration = '2:47';

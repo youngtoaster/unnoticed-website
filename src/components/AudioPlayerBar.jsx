@@ -204,29 +204,41 @@ export default function AudioPlayerBar({
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="overflow-hidden border-b border-purple-500/30 bg-purple-950/40"
+                  className="overflow-hidden border-b border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-black/60"
                 >
                   <div className="p-4 text-xs">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <img
-                          src={artistInfo.avatar}
-                          alt="UNNOTICED"
-                          className="w-6 h-6 rounded-full object-cover border border-purple-400"
-                        />
-                        <span className="font-bold text-white">{activeAnnotation.author}</span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-200 border border-purple-500/30">
-                          {activeAnnotation.badge}
+                        <div className="relative">
+                          <img
+                            src={artistInfo.avatar}
+                            alt="UNNOTICED"
+                            className="w-7 h-7 rounded-full object-cover border-2 border-amber-400"
+                          />
+                          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center text-black text-[7px] font-black border border-black">
+                            ✓
+                          </span>
+                        </div>
+                        <span className="font-bold text-white text-xs">{activeAnnotation.author || 'UNNOTICED'}</span>
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-semibold">
+                          {activeAnnotation.badge || 'Verified Artist Note'}
                         </span>
                       </div>
                       <button
                         onClick={() => setActiveAnnotation(null)}
-                        className="text-slate-400 hover:text-white"
+                        className="p-1 rounded-full text-slate-400 hover:text-white"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-slate-200 italic leading-relaxed font-sans pl-1">
+
+                    {activeAnnotation.title && (
+                      <h5 className="font-display font-bold text-xs sm:text-sm text-white mb-1.5 pl-0.5">
+                        {activeAnnotation.title}
+                      </h5>
+                    )}
+
+                    <p className="text-slate-200 leading-relaxed font-sans pl-0.5">
                       "{activeAnnotation.content}"
                     </p>
                   </div>
@@ -237,11 +249,25 @@ export default function AudioPlayerBar({
             {/* Lyrics Stream List */}
             <div
               ref={lyricsContainerRef}
-              className="p-3.5 sm:p-4 overflow-y-auto space-y-2 flex-1 max-h-[380px] select-none text-left"
+              className="p-3.5 sm:p-4 overflow-y-auto space-y-2 flex-1 max-h-[380px] select-none text-left custom-scrollbar"
             >
               {trackLyrics.map((line, idx) => {
+                const isHeader = line.isHeader || (typeof line.text === 'string' && line.text.startsWith('[') && line.text.endsWith(']'));
                 const isActive = idx === activeLineIndex;
                 const isSelectedAnnot = activeAnnotation?.content === line.annotation?.content;
+
+                if (isHeader) {
+                  return (
+                    <div key={idx} className="pt-3 pb-1 select-none">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-amber-400 bg-amber-500/15 border border-amber-500/25 px-2 py-0.5 rounded">
+                          {line.text.replace(/[\[\]]/g, '')}
+                        </span>
+                        <div className="flex-1 h-px bg-white/[0.08]" />
+                      </div>
+                    </div>
+                  );
+                }
 
                 return (
                   <motion.div
@@ -255,15 +281,25 @@ export default function AudioPlayerBar({
                       isActive
                         ? 'bg-purple-600/20 border border-purple-500/40 text-white shadow-lg shadow-purple-600/10'
                         : isSelectedAnnot
-                        ? 'bg-amber-500/15 border border-amber-500/30 text-white'
+                        ? 'bg-amber-400/20 border-l-4 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/30 text-white'
                         : 'hover:bg-white/[0.04] text-slate-400 hover:text-slate-200 border border-transparent'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className={`text-xs sm:text-sm leading-relaxed ${isActive ? 'font-bold text-white' : 'font-normal'}`}>
-                          "{line.text}"
-                        </p>
+                        {line.annotated ? (
+                          <span className={`inline py-0.5 px-1.5 rounded-md leading-relaxed text-xs sm:text-sm ${
+                            isSelectedAnnot
+                              ? 'bg-[#ffff64]/30 border-b-2 border-[#ffff64] text-white font-semibold shadow-sm'
+                              : 'bg-[#ffff64]/10 hover:bg-[#ffff64]/20 border-b border-dashed border-[#ffff64]/70 text-amber-100'
+                          }`}>
+                            "{line.text}"
+                          </span>
+                        ) : (
+                          <p className={`text-xs sm:text-sm leading-relaxed ${isActive ? 'font-bold text-white' : 'font-normal'}`}>
+                            "{line.text}"
+                          </p>
+                        )}
 
                         {/* Annotation Badge Trigger */}
                         {line.annotated && (
@@ -275,9 +311,9 @@ export default function AudioPlayerBar({
                                   activeAnnotation?.content === line.annotation?.content ? null : line.annotation
                                 );
                               }}
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono flex items-center gap-1 transition-all active:scale-95 ${
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
                                 isSelectedAnnot
-                                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/30'
+                                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-400/30'
                                   : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30'
                               }`}
                             >

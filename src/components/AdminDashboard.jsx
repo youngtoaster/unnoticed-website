@@ -6,7 +6,8 @@ import {
   RotateCcw, Download, Upload, Check, AlertTriangle, Eye, EyeOff, Shield, Sparkles, ExternalLink,
   Film, Video, Play, Pause, Link as LinkIcon, X, Calendar, Mail, Tag, DollarSign, Globe, Award,
   Zap, Palette, Type, RefreshCw, RotateCw, Crop, Sun, Moon, Info, HardDrive, CheckCircle2,
-  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio, Layout, Layers
+  AlignLeft, AlignCenter, AlignRight, Compass, GitBranch, GitCommit, Disc3, Volume2, Radio, Layout, Layers,
+  Search, Copy, ChevronLeft, ChevronRight, Quote, Bookmark, Share2
 } from 'lucide-react';
 import { YoutubeIcon as Youtube, InstagramIcon as Instagram } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
@@ -337,6 +338,15 @@ export default function AdminDashboard({ onReturnToSite }) {
   const [isRefreshingAll, setIsRefreshingAll] = useState(false);
   const [sampleAuditionPlaying, setSampleAuditionPlaying] = useState(false);
   const sampleAuditionRef = useRef(null);
+
+  // Overhauled Genius Lyrics & Annotations Studio States
+  const [bulkLyricsModalTrackIndex, setBulkLyricsModalTrackIndex] = useState(null);
+  const [bulkLyricsRawText, setBulkLyricsRawText] = useState('');
+  const [bulkPreserveAnnotations, setBulkPreserveAnnotations] = useState(true);
+  const [lyricsSearchQuery, setLyricsSearchQuery] = useState('');
+  const [lyricsPreviewMode, setLyricsPreviewMode] = useState(false);
+  const [adminActiveAnnotIdx, setAdminActiveAnnotIdx] = useState(null);
+  const [adminCopiedQuote, setAdminCopiedQuote] = useState(false);
 
   const neonConfig = artistInfo?.neonSign || {
     color: '#a855f7',
@@ -1319,152 +1329,893 @@ export default function AdminDashboard({ onReturnToSite }) {
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Track Selector */}
-            <div className="lg:col-span-4 space-y-2">
-              <span className="text-xs font-mono uppercase text-slate-400 block mb-2">Select Song:</span>
-              {tracks.map((track, tIdx) => (
-                <button
-                  key={track.id}
-                  onClick={() => setEditingItem({ type: 'lyrics', trackIndex: tIdx })}
-                  className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition-all ${
-                    editingItem?.trackIndex === tIdx
-                      ? 'bg-purple-600 border-purple-400 text-white shadow-md'
-                      : 'bg-white/[0.03] border-white/[0.06] text-slate-300 hover:bg-white/[0.08]'
-                  }`}
-                >
-                  <img src={track?.cover || ''} alt={track?.title || 'Track'} className="w-9 h-9 rounded-lg object-cover" />
-                  <div className="min-w-0">
-                    <h5 className="font-bold text-xs truncate">{track?.title || 'Untitled Track'}</h5>
-                    <p className="text-[10px] text-slate-400">{(track?.lyrics || []).length} lyric lines</p>
-                  </div>
-                </button>
-              ))}
+            {/* Left Track Selector Rail with Search */}
+            <div className="lg:col-span-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
+                  <Music className="w-3.5 h-3.5 text-purple-400" />
+                  Select Track ({tracks.length})
+                </span>
+                <span className="text-[10px] font-mono text-purple-300">Genius Studio</span>
+              </div>
+
+              {/* Search input for songs */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search tracks by title..."
+                  value={lyricsSearchQuery}
+                  onChange={(e) => setLyricsSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-black/50 border border-white/[0.08] text-xs text-white focus:outline-none focus:border-purple-500 font-mono placeholder:text-slate-500"
+                />
+                {lyricsSearchQuery && (
+                  <button
+                    onClick={() => setLyricsSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {/* Track Buttons List */}
+              <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1 custom-scrollbar">
+                {tracks
+                  .map((track, tIdx) => ({ track, tIdx }))
+                  .filter(({ track }) => {
+                    if (!lyricsSearchQuery.trim()) return true;
+                    const q = lyricsSearchQuery.toLowerCase();
+                    return (
+                      (track?.title || '').toLowerCase().includes(q) ||
+                      (track?.featuring || '').toLowerCase().includes(q)
+                    );
+                  })
+                  .map(({ track, tIdx }) => {
+                    const isSelected = editingItem?.trackIndex === tIdx;
+                    const lyrics = track?.lyrics || [];
+                    const annotCount = lyrics.filter((l) => l.annotated).length;
+
+                    return (
+                      <button
+                        key={track.id}
+                        onClick={() => {
+                          setEditingItem({ type: 'lyrics', trackIndex: tIdx });
+                          setAdminActiveAnnotIdx(null);
+                        }}
+                        className={`w-full text-left p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-purple-900/50 via-purple-800/40 to-black/80 border-purple-400 text-white shadow-lg ring-1 ring-purple-400/30'
+                            : 'bg-white/[0.03] border-white/[0.06] text-slate-300 hover:bg-white/[0.08] hover:border-white/[0.12]'
+                        }`}
+                      >
+                        <div className="relative shrink-0">
+                          <img
+                            src={track?.cover || artistInfo?.avatar || ''}
+                            alt={track?.title || 'Track'}
+                            className="w-11 h-11 rounded-xl object-cover border border-white/[0.1]"
+                          />
+                          {annotCount > 0 && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-slate-950 font-black text-[9px] flex items-center justify-center border border-black shadow">
+                              {annotCount}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <h5 className="font-bold text-xs truncate text-white">
+                              {track?.title || 'Untitled Track'}
+                            </h5>
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/[0.06] text-slate-400 shrink-0">
+                              #{tIdx + 1}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] font-mono text-slate-400">
+                              {lyrics.length} bars
+                            </span>
+                            <span className="text-slate-600">•</span>
+                            {annotCount > 0 ? (
+                              <span className="text-[10px] font-mono text-amber-300 font-semibold flex items-center gap-0.5">
+                                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                                {annotCount} verified
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-mono text-slate-500">
+                                0 notes
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
             </div>
 
-            {/* Right Lyrics Editor */}
+            {/* Right Genius Lyrics Management Studio */}
             <div className="lg:col-span-8">
               {editingItem?.type === 'lyrics' && tracks[editingItem.trackIndex] ? (
                 (() => {
                   const currentTrack = tracks[editingItem.trackIndex];
                   const lyricsList = currentTrack?.lyrics || [];
+                  const annotatedCount = lyricsList.filter((l) => l.annotated).length;
+                  const percentAnnotated = lyricsList.length > 0 ? Math.round((annotatedCount / lyricsList.length) * 100) : 0;
+
+                  const handleUpdateLyrics = (newLyrics) => {
+                    const newTracks = [...tracks];
+                    newTracks[editingItem.trackIndex] = {
+                      ...newTracks[editingItem.trackIndex],
+                      lyrics: newLyrics
+                    };
+                    updateData({ tracks: newTracks });
+                  };
+
+                  const handleInsertSectionHeader = (headerText) => {
+                    const newHeader = { text: headerText, isHeader: true, annotated: false };
+                    handleUpdateLyrics([...lyricsList, newHeader]);
+                    showToast(`Added section header: ${headerText}`);
+                  };
+
+                  const handleAddLine = () => {
+                    const newLine = { text: '', annotated: false };
+                    handleUpdateLyrics([...lyricsList, newLine]);
+                    showToast('Added lyric bar');
+                  };
+
+                  const handleMoveLine = (idx, direction) => {
+                    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+                    if (targetIdx < 0 || targetIdx >= lyricsList.length) return;
+                    const copy = [...lyricsList];
+                    const [moved] = copy.splice(idx, 1);
+                    copy.splice(targetIdx, 0, moved);
+                    handleUpdateLyrics(copy);
+                  };
+
+                  const handleDuplicateLine = (idx) => {
+                    const copy = [...lyricsList];
+                    const duplicated = JSON.parse(JSON.stringify(copy[idx]));
+                    copy.splice(idx + 1, 0, duplicated);
+                    handleUpdateLyrics(copy);
+                    showToast('Duplicated lyric bar');
+                  };
+
+                  const handleDeleteLine = (idx) => {
+                    const copy = [...lyricsList];
+                    copy.splice(idx, 1);
+                    handleUpdateLyrics(copy);
+                    showToast('Removed line');
+                  };
+
+                  const handleCopyFullSong = () => {
+                    const text = lyricsList.map((l) => l.text).join('\n');
+                    navigator.clipboard.writeText(text);
+                    setAdminCopiedQuote(true);
+                    setTimeout(() => setAdminCopiedQuote(false), 2500);
+                    showToast('Copied full song lyrics to clipboard!');
+                  };
+
+                  const annotatedItems = lyricsList
+                    .map((line, idx) => ({ line, idx }))
+                    .filter(({ line }) => line.annotated);
+
+                  const activePreviewLine = adminActiveAnnotIdx !== null
+                    ? lyricsList[adminActiveAnnotIdx]
+                    : (annotatedItems[0]?.line || null);
 
                   return (
-                    <SpotlightCard className="p-6" tilt={false}>
-                      <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
-                        <div>
-                          <span className="text-[10px] font-mono uppercase text-amber-400">Song Lyrics Editor</span>
-                          <h3 className="font-display text-xl font-bold text-white">{currentTrack?.title || 'Song Lyrics'}</h3>
+                    <SpotlightCard className="p-5 sm:p-6" tilt={false}>
+                      {/* Song Dossier Header & Controls */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/[0.08] mb-5 gap-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={currentTrack?.cover || artistInfo?.avatar || ''}
+                            alt={currentTrack?.title || 'Track Cover'}
+                            className="w-12 h-12 rounded-xl object-cover border border-white/[0.1] shadow-md shrink-0"
+                          />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
+                                <Sparkles className="w-3 h-3" /> Genius Studio
+                              </span>
+                              <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-purple-500/20 text-purple-300">
+                                {currentTrack?.type || 'Single'}
+                              </span>
+                            </div>
+                            <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
+                              {currentTrack?.title || 'Untitled Track'}
+                            </h3>
+                            <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 mt-0.5">
+                              <span>{lyricsList.length} bars</span>
+                              <span>•</span>
+                              <span className="text-amber-300 font-semibold">{annotatedCount} Genius verified notes</span>
+                              <span>•</span>
+                              <span>{percentAnnotated}% coverage</span>
+                            </div>
+                          </div>
                         </div>
 
-                        <button
-                          onClick={() => {
-                            const newLyric = { text: 'New lyric bar...', annotated: false };
-                            const updated = [...lyricsList, newLyric];
-                            const newTracks = [...tracks];
-                            newTracks[editingItem.trackIndex].lyrics = updated;
-                            updateData({ tracks: newTracks });
-                            showToast('Added lyric line');
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs flex items-center gap-1 active:scale-95"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Add Line</span>
-                        </button>
+                        {/* Top Action Buttons (Bulk Import, Live Preview Toggle, Add Line) */}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {/* Live Preview Toggle */}
+                          <button
+                            type="button"
+                            onClick={() => setLyricsPreviewMode(!lyricsPreviewMode)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer border ${
+                              lyricsPreviewMode
+                                ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
+                                : 'bg-white/[0.06] hover:bg-white/[0.1] text-amber-300 border-amber-500/30'
+                            }`}
+                            title="Preview interactive Genius experience directly in Admin"
+                          >
+                            {lyricsPreviewMode ? <Edit3 className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            <span>{lyricsPreviewMode ? 'Back to Editor' : 'Live Genius Preview'}</span>
+                          </button>
+
+                          {/* Bulk Paste Lyrics */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setBulkLyricsModalTrackIndex(editingItem.trackIndex);
+                              setBulkLyricsRawText(lyricsList.map((l) => l.text).join('\n'));
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                            title="Paste raw lyrics from Notes or Genius to auto-import all bars"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-purple-400" />
+                            <span>Bulk Paste Song</span>
+                          </button>
+
+                          {/* Copy All Plaintext Lyrics */}
+                          <button
+                            type="button"
+                            onClick={handleCopyFullSong}
+                            className="p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/[0.08] transition-colors"
+                            title="Copy full song lyrics to clipboard"
+                          >
+                            {adminCopiedQuote ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
-                        {lyricsList.map((line, lIdx) => (
-                          <div key={lIdx} className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[10px] font-mono text-slate-500">Bar #{lIdx + 1}</span>
-                              <div className="flex items-center gap-2">
-                                <label className="flex items-center gap-1.5 text-xs text-purple-300 font-mono cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={line.annotated || false}
-                                    onChange={(e) => {
-                                      const checked = e.target.checked;
-                                      const newTracks = [...tracks];
-                                      newTracks[editingItem.trackIndex].lyrics[lIdx].annotated = checked;
-                                      if (checked && !newTracks[editingItem.trackIndex].lyrics[lIdx].annotation) {
-                                        newTracks[editingItem.trackIndex].lyrics[lIdx].annotation = {
-                                          author: 'UNNOTICED',
-                                          badge: 'Verified Artist',
-                                          content: 'Add your insight behind this lyric...'
-                                        };
-                                      }
-                                      updateData({ tracks: newTracks });
-                                    }}
-                                    className="rounded accent-purple-600"
-                                  />
-                                  <span>Genius Annotated</span>
-                                </label>
+                      {/* Quick Section Divider Adder Toolbar (Edit Mode Only) */}
+                      {!lyricsPreviewMode && (
+                        <div className="mb-4 p-3 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-wrap items-center justify-between gap-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-mono text-slate-400 font-bold uppercase flex items-center gap-1">
+                              <Tag className="w-3 h-3 text-purple-400" />
+                              Insert Section:
+                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {['[Intro]', '[Verse 1]', '[Chorus]', '[Verse 2]', '[Hook]', '[Bridge]', '[Outro]'].map((tag) => (
                                 <button
-                                  onClick={() => {
-                                    const newTracks = [...tracks];
-                                    newTracks[editingItem.trackIndex].lyrics.splice(lIdx, 1);
-                                    updateData({ tracks: newTracks });
-                                    showToast('Removed line');
-                                  }}
-                                  className="text-red-400 hover:text-red-300 p-1"
+                                  key={tag}
+                                  type="button"
+                                  onClick={() => handleInsertSectionHeader(tag)}
+                                  className="px-2 py-0.5 rounded-lg bg-white/[0.04] hover:bg-purple-600/30 text-[10px] font-mono text-purple-300 hover:text-white border border-purple-500/20 hover:border-purple-400/50 transition-all active:scale-95 cursor-pointer"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                  {tag}
                                 </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleAddLine}
+                            className="px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1 active:scale-95 transition-all shadow-md cursor-pointer shrink-0"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add Lyric Bar</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* ======================================================== */}
+                      {/* VIEW 1: LIVE GENIUS VISITOR PREVIEW IN ADMIN             */}
+                      {/* ======================================================== */}
+                      {lyricsPreviewMode ? (
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 pt-1">
+                          {/* Left: Interactive Lyrics with Gold Highlighter */}
+                          <div className="md:col-span-7 space-y-1 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-3 text-[11px] font-mono text-amber-300 flex items-center gap-2">
+                              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                              <span>Live Genius Preview: Click any highlighted punchline to inspect verified lore.</span>
+                            </div>
+
+                            {lyricsList.map((line, idx) => {
+                              const isHeader = line.isHeader || (line.text.startsWith('[') && line.text.endsWith(']'));
+                              const isAnnotated = line.annotated;
+                              const isSelected = isAnnotated && (adminActiveAnnotIdx === idx || (!adminActiveAnnotIdx && activePreviewLine === line));
+
+                              if (isHeader) {
+                                return (
+                                  <div key={idx} className="pt-4 pb-1.5 select-none">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-amber-400 bg-amber-500/15 border border-amber-500/25 px-2.5 py-0.5 rounded-md">
+                                        {line.text.replace(/[\[\]]/g, '')}
+                                      </span>
+                                      <div className="flex-1 h-px bg-white/[0.08]" />
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div
+                                  key={idx}
+                                  onClick={() => {
+                                    if (isAnnotated) setAdminActiveAnnotIdx(idx);
+                                  }}
+                                  className={`rounded-xl px-3 py-2 transition-all flex items-start gap-3 ${
+                                    isSelected
+                                      ? 'bg-amber-400/20 border-l-4 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/30'
+                                      : isAnnotated
+                                      ? 'hover:bg-amber-400/10 cursor-pointer'
+                                      : 'hover:bg-white/[0.02]'
+                                  }`}
+                                >
+                                  <span className="font-mono text-[10px] text-slate-500 w-6 shrink-0 select-none pt-0.5">
+                                    #{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                                  </span>
+
+                                  <div className="flex-1 min-w-0">
+                                    {isAnnotated ? (
+                                      <span
+                                        className={`inline py-0.5 px-1.5 rounded-md font-sans text-xs sm:text-sm tracking-wide ${
+                                          isSelected
+                                            ? 'bg-amber-400/30 border-b-2 border-amber-400 text-white font-bold'
+                                            : 'bg-[#ffff64]/15 hover:bg-[#ffff64]/25 border-b border-dashed border-[#ffff64]/70 text-amber-200'
+                                        }`}
+                                      >
+                                        "{line.text}"
+                                      </span>
+                                    ) : (
+                                      <span className="text-slate-300 text-xs sm:text-sm font-sans leading-relaxed">
+                                        "{line.text}"
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {isAnnotated && (
+                                    <span
+                                      className={`shrink-0 text-[9px] font-mono px-2 py-0.5 rounded-full flex items-center gap-1 font-bold ${
+                                        isSelected
+                                          ? 'bg-amber-400 text-slate-950 shadow-sm'
+                                          : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                                      }`}
+                                    >
+                                      <Sparkles className="w-2.5 h-2.5" />
+                                      {isSelected ? 'Active' : 'Genius'}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Right: Genius Verified Artist Dossier Card */}
+                          <div className="md:col-span-5 flex flex-col min-h-0 bg-black/40 border border-white/[0.08] rounded-2xl p-4 sm:p-5 backdrop-blur-md">
+                            {/* Verified Artist Header */}
+                            <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.08] mb-3">
+                              <div className="relative shrink-0">
+                                <img
+                                  src={artistInfo.avatar}
+                                  alt="UNNOTICED"
+                                  className="w-9 h-9 rounded-full object-cover border-2 border-amber-400 shadow-md"
+                                />
+                                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 flex items-center justify-center text-black text-[9px] font-black border border-black shadow">
+                                  ✓
+                                </span>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <h4 className="font-display font-bold text-white text-xs">
+                                    UNNOTICED Verified
+                                  </h4>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                </div>
+                                <span className="text-[10px] text-amber-300 font-mono">
+                                  {activePreviewLine?.annotation?.badge || 'Verified Artist Commentary'}
+                                </span>
                               </div>
                             </div>
 
-                            <input
-                              type="text"
-                              value={line.text}
-                              onChange={(e) => {
-                                const newTracks = [...tracks];
-                                newTracks[editingItem.trackIndex].lyrics[lIdx].text = e.target.value;
-                                updateData({ tracks: newTracks });
-                              }}
-                              className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-purple-400 font-mono"
-                            />
+                            {/* Active Quote Pull Card */}
+                            {activePreviewLine?.text ? (
+                              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 mb-3 shadow-inner">
+                                <span className="text-[9px] font-mono text-amber-300 uppercase tracking-widest font-bold flex items-center gap-1 mb-1">
+                                  <Quote className="w-3 h-3 text-amber-400" /> Annotated Verse
+                                </span>
+                                <p className="font-display italic text-xs sm:text-sm text-amber-100 font-bold leading-snug">
+                                  "{activePreviewLine.text}"
+                                </p>
+                              </div>
+                            ) : null}
 
-                            {line.annotated && line.annotation && (
-                              <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-500/20 space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    placeholder="Author badge (e.g. Verified Artist)"
-                                    value={line.annotation.badge || ''}
-                                    onChange={(e) => {
-                                      const newTracks = [...tracks];
-                                      newTracks[editingItem.trackIndex].lyrics[lIdx].annotation.badge = e.target.value;
-                                      updateData({ tracks: newTracks });
-                                    }}
-                                    className="px-2 py-1 rounded bg-black/50 border border-white/[0.1] text-[11px] text-purple-300 w-1/2 focus:outline-none"
-                                  />
+                            {/* Annotation Topic / Title */}
+                            {activePreviewLine?.annotation?.title && (
+                              <h5 className="font-display font-bold text-xs sm:text-sm text-white mb-2">
+                                {activePreviewLine.annotation.title}
+                              </h5>
+                            )}
+
+                            {/* Commentary Body */}
+                            {activePreviewLine?.annotation?.content ? (
+                              <div className="flex-1 overflow-y-auto pr-1 text-xs text-slate-200 font-sans leading-relaxed custom-scrollbar space-y-3 mb-3">
+                                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                  <p className="whitespace-pre-line text-slate-200 leading-relaxed">
+                                    {activePreviewLine.annotation.content}
+                                  </p>
                                 </div>
-                                <textarea
-                                  rows={2}
-                                  placeholder="Verified commentary explaining the bar..."
-                                  value={line.annotation.content || ''}
-                                  onChange={(e) => {
-                                    const newTracks = [...tracks];
-                                    newTracks[editingItem.trackIndex].lyrics[lIdx].annotation.content = e.target.value;
-                                    updateData({ tracks: newTracks });
-                                  }}
-                                  className="w-full px-2.5 py-1.5 rounded bg-black/50 border border-white/[0.1] text-xs text-slate-200 focus:outline-none"
-                                />
+
+                                <div className="p-2.5 rounded-xl bg-[#090a14] border border-white/[0.06] text-[10px] font-mono space-y-1 text-slate-400">
+                                  <div className="flex justify-between">
+                                    <span>Author:</span>
+                                    <span className="text-white font-semibold">{activePreviewLine.annotation.author || 'UNNOTICED'}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Origin:</span>
+                                    <span className="text-purple-300">McKees Rocks, Pennsylvania</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-xs text-slate-400 gap-2 mb-3">
+                                <Sparkles className="w-6 h-6 text-amber-400 animate-pulse" />
+                                <p className="font-bold text-white text-xs">No Verse Selected</p>
+                                <p className="text-[11px] text-slate-400">Click any highlighted bar on the left to inspect its backstory.</p>
                               </div>
                             )}
+
+                            <button
+                              type="button"
+                              onClick={() => setLyricsPreviewMode(false)}
+                              className="w-full py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-bold text-white transition-all active:scale-95"
+                            >
+                              Exit Live Preview & Edit
+                            </button>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ) : (
+                        /* ======================================================== */
+                        /* VIEW 2: FULL GENIUS LYRICS EDIT STUDIO                   */
+                        /* ======================================================== */
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
+                          {lyricsList.length === 0 ? (
+                            <div className="p-10 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center space-y-3">
+                              <div className="w-12 h-12 rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center mx-auto text-purple-400">
+                                <FileText className="w-6 h-6" />
+                              </div>
+                              <h4 className="font-display font-bold text-white text-sm">No Lyrics Added Yet</h4>
+                              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                                Paste the complete song in one click with Bulk Paste, or add lines manually bar by bar.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setBulkLyricsModalTrackIndex(editingItem.trackIndex);
+                                  setBulkLyricsRawText('');
+                                }}
+                                className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-md active:scale-95"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>Paste Full Song Lyrics</span>
+                              </button>
+                            </div>
+                          ) : (
+                            lyricsList.map((line, lIdx) => {
+                              const isHeader = line.isHeader || (line.text.startsWith('[') && line.text.endsWith(']'));
+
+                              if (isHeader) {
+                                return (
+                                  <div
+                                    key={lIdx}
+                                    className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 shadow-inner"
+                                  >
+                                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black uppercase shrink-0">
+                                        SECTION
+                                      </span>
+                                      <input
+                                        type="text"
+                                        value={line.text}
+                                        onChange={(e) => {
+                                          const copy = [...lyricsList];
+                                          copy[lIdx].text = e.target.value;
+                                          handleUpdateLyrics(copy);
+                                        }}
+                                        className="font-mono text-xs font-bold text-amber-200 bg-transparent focus:outline-none border-b border-transparent focus:border-amber-400 flex-1 min-w-0"
+                                      />
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      <button
+                                        type="button"
+                                        disabled={lIdx === 0}
+                                        onClick={() => handleMoveLine(lIdx, 'up')}
+                                        className="p-1 rounded bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 disabled:opacity-20"
+                                        title="Move Section Up"
+                                      >
+                                        <ArrowUp className="w-3.5 h-3.5" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={lIdx === lyricsList.length - 1}
+                                        onClick={() => handleMoveLine(lIdx, 'down')}
+                                        className="p-1 rounded bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 disabled:opacity-20"
+                                        title="Move Section Down"
+                                      >
+                                        <ArrowDown className="w-3.5 h-3.5" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteLine(lIdx)}
+                                        className="p-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400"
+                                        title="Delete Section Header"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div
+                                  key={lIdx}
+                                  className={`p-3.5 rounded-2xl border transition-all space-y-2.5 ${
+                                    line.annotated
+                                      ? 'bg-amber-950/20 border-amber-500/35 ring-1 ring-amber-500/20 shadow-md'
+                                      : 'bg-white/[0.02] border-white/[0.06]'
+                                  }`}
+                                >
+                                  {/* Bar Top Header: Number, Genius Toggle, Reorder, Delete */}
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[10px] font-mono text-slate-500 font-bold">
+                                      Bar #{lIdx + 1 < 10 ? `0${lIdx + 1}` : lIdx + 1}
+                                    </span>
+
+                                    <div className="flex items-center gap-2">
+                                      {/* Genius Annotated Toggle */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const copy = [...lyricsList];
+                                          const nextState = !copy[lIdx].annotated;
+                                          copy[lIdx].annotated = nextState;
+                                          if (nextState && !copy[lIdx].annotation) {
+                                            copy[lIdx].annotation = {
+                                              author: 'UNNOTICED',
+                                              badge: 'Verified Artist',
+                                              title: '',
+                                              verified: true,
+                                              content: ''
+                                            };
+                                          }
+                                          handleUpdateLyrics(copy);
+                                        }}
+                                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
+                                          line.annotated
+                                            ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/30'
+                                            : 'bg-white/[0.05] hover:bg-white/[0.1] text-amber-300 border border-amber-500/30'
+                                        }`}
+                                      >
+                                        <Sparkles className="w-3 h-3" />
+                                        <span>{line.annotated ? 'Annotated' : 'Add Annotation'}</span>
+                                      </button>
+
+                                      {/* Move Up */}
+                                      <button
+                                        type="button"
+                                        disabled={lIdx === 0}
+                                        onClick={() => handleMoveLine(lIdx, 'up')}
+                                        className="p-1 rounded bg-white/[0.04] hover:bg-white/[0.1] text-slate-400 hover:text-white disabled:opacity-20"
+                                        title="Move line up"
+                                      >
+                                        <ArrowUp className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      {/* Move Down */}
+                                      <button
+                                        type="button"
+                                        disabled={lIdx === lyricsList.length - 1}
+                                        onClick={() => handleMoveLine(lIdx, 'down')}
+                                        className="p-1 rounded bg-white/[0.04] hover:bg-white/[0.1] text-slate-400 hover:text-white disabled:opacity-20"
+                                        title="Move line down"
+                                      >
+                                        <ArrowDown className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      {/* Duplicate */}
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDuplicateLine(lIdx)}
+                                        className="p-1 rounded bg-white/[0.04] hover:bg-white/[0.1] text-slate-400 hover:text-white"
+                                        title="Duplicate line"
+                                      >
+                                        <Copy className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      {/* Delete */}
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteLine(lIdx)}
+                                        className="p-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400"
+                                        title="Delete line"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Line Lyric Text Input */}
+                                  <input
+                                    type="text"
+                                    placeholder="Enter lyric bar text..."
+                                    value={line.text}
+                                    onChange={(e) => {
+                                      const copy = [...lyricsList];
+                                      copy[lIdx].text = e.target.value;
+                                      handleUpdateLyrics(copy);
+                                    }}
+                                    className={`w-full px-3 py-2 rounded-xl bg-black/60 border text-xs sm:text-sm text-white focus:outline-none font-sans leading-relaxed ${
+                                      line.annotated
+                                        ? 'border-amber-400/40 focus:border-amber-400'
+                                        : 'border-white/[0.1] focus:border-purple-500'
+                                    }`}
+                                  />
+
+                                  {/* Genius Verified Lore Card (Expanded when annotated) */}
+                                  {line.annotated && line.annotation && (
+                                    <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-950/40 via-purple-950/20 to-black/60 border border-amber-500/30 space-y-2.5 shadow-sm">
+                                      <div className="flex flex-wrap items-center justify-between gap-2">
+                                        {/* Verified Badges Preset Chips */}
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                          {[
+                                            'Verified Artist',
+                                            'Behind The Bars',
+                                            'Studio Secret',
+                                            'Raw Confession',
+                                            'Producer Note'
+                                          ].map((badge) => (
+                                            <button
+                                              key={badge}
+                                              type="button"
+                                              onClick={() => {
+                                                const copy = [...lyricsList];
+                                                copy[lIdx].annotation.badge = badge;
+                                                handleUpdateLyrics(copy);
+                                              }}
+                                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono transition-all cursor-pointer ${
+                                                line.annotation.badge === badge
+                                                  ? 'bg-amber-400 text-slate-950 font-bold shadow-sm'
+                                                  : 'bg-white/[0.05] hover:bg-white/[0.1] text-amber-200 border border-white/[0.08]'
+                                              }`}
+                                            >
+                                              {badge}
+                                            </button>
+                                          ))}
+                                        </div>
+
+                                        <input
+                                          type="text"
+                                          placeholder="Author (e.g. UNNOTICED)"
+                                          value={line.annotation.author || 'UNNOTICED'}
+                                          onChange={(e) => {
+                                            const copy = [...lyricsList];
+                                            copy[lIdx].annotation.author = e.target.value;
+                                            handleUpdateLyrics(copy);
+                                          }}
+                                          className="px-2 py-1 rounded-lg bg-black/50 border border-white/[0.1] text-[10px] text-purple-300 font-mono w-28 focus:outline-none"
+                                        />
+                                      </div>
+
+                                      {/* Annotation Focus / Headline */}
+                                      <input
+                                        type="text"
+                                        placeholder="Annotation Headline / Topic (e.g. 'McKees Rocks industrial roots')..."
+                                        value={line.annotation.title || ''}
+                                        onChange={(e) => {
+                                          const copy = [...lyricsList];
+                                          copy[lIdx].annotation.title = e.target.value;
+                                          handleUpdateLyrics(copy);
+                                        }}
+                                        className="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-white/[0.1] text-xs font-semibold text-white focus:outline-none focus:border-amber-400 placeholder:text-slate-500 font-sans"
+                                      />
+
+                                      {/* Full Verified Commentary */}
+                                      <textarea
+                                        rows={3}
+                                        placeholder="Write verified backstory, punchline breakdown, studio memory, or real-life confession behind this verse..."
+                                        value={line.annotation.content || ''}
+                                        onChange={(e) => {
+                                          const copy = [...lyricsList];
+                                          copy[lIdx].annotation.content = e.target.value;
+                                          handleUpdateLyrics(copy);
+                                        }}
+                                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/[0.1] text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-sans leading-relaxed placeholder:text-slate-500"
+                                      />
+
+                                      {/* Quick Prompt Starter Chips */}
+                                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                        <span className="text-[10px] font-mono text-slate-500">Inspiration starters:</span>
+                                        {[
+                                          'Story behind this line:',
+                                          'Recorded late at night when',
+                                          'Double meaning:',
+                                          'McKees Rocks roots:'
+                                        ].map((prompt) => (
+                                          <button
+                                            key={prompt}
+                                            type="button"
+                                            onClick={() => {
+                                              const copy = [...lyricsList];
+                                              const curr = copy[lIdx].annotation.content || '';
+                                              copy[lIdx].annotation.content = curr ? `${curr} ${prompt} ` : `${prompt} `;
+                                              handleUpdateLyrics(copy);
+                                            }}
+                                            className="text-[9.5px] font-mono px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white transition-colors cursor-pointer"
+                                          >
+                                            + {prompt}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      )}
                     </SpotlightCard>
                   );
                 })()
               ) : (
-                <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center text-slate-400 text-xs">
-                  Select a song from the left to edit its full lyrics and Genius annotations.
+                <div className="p-12 rounded-3xl bg-white/[0.02] border border-white/[0.06] text-center space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center mx-auto text-purple-400 shadow-lg">
+                    <Music className="w-7 h-7" />
+                  </div>
+                  <h4 className="font-display font-bold text-white text-base">Select a Song to Begin</h4>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                    Choose any track from the left catalog to author line-by-line Genius lyrics, section dividers, and verified artist annotations.
+                  </p>
                 </div>
               )}
             </div>
           </div>
+
+          {/* ======================================================== */}
+          {/* BULK PASTE FULL SONG LYRICS MODAL DIALOG                 */}
+          {/* ======================================================== */}
+          <AnimatePresence>
+            {bulkLyricsModalTrackIndex !== null && tracks[bulkLyricsModalTrackIndex] && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+                onClick={() => setBulkLyricsModalTrackIndex(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full max-w-2xl bg-[#0e0f18] border border-purple-500/30 rounded-3xl p-6 shadow-2xl space-y-4"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-display font-bold text-white text-base">
+                          Bulk Paste Song Lyrics
+                        </h4>
+                        <p className="text-xs text-slate-400 font-mono">
+                          Importing into: <span className="text-purple-300 font-semibold">{tracks[bulkLyricsModalTrackIndex]?.title}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setBulkLyricsModalTrackIndex(null)}
+                      className="p-1.5 rounded-full text-slate-400 hover:text-white"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    Paste your raw song lyrics below. Lines starting with brackets like <code className="text-amber-300 font-mono bg-white/[0.06] px-1 rounded">[Verse 1]</code> or <code className="text-amber-300 font-mono bg-white/[0.06] px-1 rounded">[Chorus]</code> are automatically formatted as section dividers.
+                  </p>
+
+                  <textarea
+                    rows={12}
+                    placeholder={`[Intro]\nLate night in McKees Rocks\n\n[Verse 1]\nLate night in the steel city, wheels turning fast\nTell 'em Ándale, I cannot leave my future in the past\n\n[Chorus]\nRun it up, no brake lines, living on the edge...`}
+                    value={bulkLyricsRawText}
+                    onChange={(e) => setBulkLyricsRawText(e.target.value)}
+                    className="w-full p-4 rounded-2xl bg-black/70 border border-white/[0.12] text-xs sm:text-sm text-white font-mono leading-relaxed focus:outline-none focus:border-purple-500 custom-scrollbar"
+                  />
+
+                  <div className="flex items-center justify-between pt-2">
+                    <label className="flex items-center gap-2 text-xs text-slate-300 font-mono cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bulkPreserveAnnotations}
+                        onChange={(e) => setBulkPreserveAnnotations(e.target.checked)}
+                        className="rounded accent-purple-600"
+                      />
+                      <span>Preserve existing annotations if bar text matches</span>
+                    </label>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setBulkLyricsModalTrackIndex(null)}
+                        className="px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const raw = bulkLyricsRawText || '';
+                          const rawLines = raw.split('\n');
+                          const currentTrack = tracks[bulkLyricsModalTrackIndex];
+                          const existingLyrics = currentTrack?.lyrics || [];
+
+                          const parsedLines = [];
+                          for (const line of rawLines) {
+                            const trimmed = line.trim();
+                            if (!trimmed) continue; // skip blank lines
+
+                            const isHeader = trimmed.startsWith('[') && trimmed.endsWith(']');
+                            
+                            // Check if existing lyric matches to preserve annotation
+                            let preservedAnnotation = null;
+                            let isAnnotated = false;
+                            if (bulkPreserveAnnotations && !isHeader) {
+                              const match = existingLyrics.find((el) => el.text.trim().toLowerCase() === trimmed.toLowerCase() && el.annotated);
+                              if (match) {
+                                isAnnotated = true;
+                                preservedAnnotation = match.annotation;
+                              }
+                            }
+
+                            parsedLines.push({
+                              text: trimmed,
+                              isHeader,
+                              annotated: isAnnotated,
+                              ...(preservedAnnotation ? { annotation: preservedAnnotation } : {})
+                            });
+                          }
+
+                          const newTracks = [...tracks];
+                          newTracks[bulkLyricsModalTrackIndex] = {
+                            ...newTracks[bulkLyricsModalTrackIndex],
+                            lyrics: parsedLines
+                          };
+                          updateData({ tracks: newTracks });
+                          showToast(`Successfully imported ${parsedLines.length} lyric bars!`);
+                          setBulkLyricsModalTrackIndex(null);
+                        }}
+                        className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Format & Import Lyrics</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 

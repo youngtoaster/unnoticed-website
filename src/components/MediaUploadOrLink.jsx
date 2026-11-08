@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Link as LinkIcon, Image as ImageIcon, Music, Video, File, X, Check, Volume2 } from 'lucide-react';
+import { useMachine, uploadMachine } from '../machines/index.js';
 
 /**
  * MediaUploadOrLink
@@ -30,6 +31,9 @@ export default function MediaUploadOrLink({
   const [uploadProgress, setUploadProgress] = useState('');
   const fileInputRef = useRef(null);
 
+  // Upload Finite State Machine
+  const [uploadState, sendUpload] = useMachine(uploadMachine);
+
   // Set default accepts based on type
   const acceptTypes = accept || (
     type === 'image' ? 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml' :
@@ -48,6 +52,9 @@ export default function MediaUploadOrLink({
   const handleFileChosen = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    sendUpload({ type: 'START_UPLOAD', payload: { file } });
+    sendUpload({ type: 'VALID_FILE' });
 
     setFileName(file.name);
     setFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
@@ -74,6 +81,7 @@ export default function MediaUploadOrLink({
       });
       if (supaRes.ok) {
         const permanentUrl = `${supaUrl}/storage/v1/object/public/media/${finalFileName}`;
+        sendUpload({ type: 'UPLOAD_SUCCESS', payload: { url: permanentUrl } });
         setIsUploading(false);
         setUploadProgress('');
         actualOnChange(permanentUrl);

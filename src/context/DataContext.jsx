@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useMachine, syncMachine } from '../machines/index.js';
 import {
   ARTIST_INFO as DEFAULT_ARTIST,
   TRACKS as DEFAULT_TRACKS,
@@ -102,8 +103,17 @@ export function DataProvider({ children }) {
     }
   });
 
-  // Multi-device synchronization state indicator
-  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+  // Finite State Machine for Cloud & Local Data Synchronization (Elevates UX, DX, AX)
+  const [syncState, sendSync] = useMachine(syncMachine);
+  const syncStatus = (syncState.matches('pushing') || syncState.matches('pulling'))
+    ? 'syncing'
+    : syncState.matches('synced')
+    ? 'synced'
+    : syncState.matches('error')
+    ? 'error'
+    : 'idle';
+  const syncStateRef = useRef(syncState);
+  syncStateRef.current = syncState;
     // Universal Database Connection State
   const [dbStatus, setDbStatus] = useState({
     connected: false,
@@ -190,7 +200,11 @@ export function DataProvider({ children }) {
     let isMounted = true;
     const syncFromNetwork = async () => {
       try {
-        setSyncStatus('syncing');
+        // Guard: If local edits are dirty / pending push, ignore incoming pull to protect user changes
+        if (syncStateRef.current.matches('dirty') || syncStateRef.current.matches('pushing')) {
+          return;
+        }
+        sendSync({ type: 'PULL_START' });
         let remoteData = null;
 
         // 1. Direct Supabase Postgres read (Real-time live multi-device database)
@@ -279,7 +293,13 @@ export function DataProvider({ children }) {
               return merged;
             });
           }
-          setSyncStatus('synced');
+          sendSync({
+            type: 'PULL_SUCCESS',
+            payload: {
+              provider: remoteData._source || 'supabase_postgres',
+              latencyMs: remoteData._readLatencyMs || 25
+            }
+          });
           if (remoteData._source) {
             setDbStatus((prev) => ({
               ...prev,
@@ -290,11 +310,11 @@ export function DataProvider({ children }) {
             }));
           }
         } else {
-          setSyncStatus('synced');
+          sendSync({ type: 'PULL_SUCCESS', payload: { provider: 'local_storage' } });
         }
       } catch (err) {
         console.warn('Network sync notice (running standalone/offline):', err);
-        setSyncStatus('idle');
+        sendSync({ type: 'PULL_ERROR', payload: { error: err.message } });
       }
     };
 
@@ -425,7 +445,8 @@ export function DataProvider({ children }) {
       // Multi-device persistence bridge:
       // Writes to server disk AND triggers auto-commit/push to GitHub so the repo stays 100% consistent everywhere
       try {
-        setSyncStatus('syncing');
+        sendSync({ type: 'EDIT_MADE' });
+        sendSync({ type: 'PUSH_START' });
         const storedToken = localStorage.getItem('unnoticed_github_token');
         const headers = { 'Content-Type': 'application/json' };
         if (storedToken) {
@@ -447,7 +468,11 @@ export function DataProvider({ children }) {
             data: payload,
             updated_at: new Date().toISOString()
           })
-        }).catch(() => {});
+        }).then(() => {
+          sendSync({ type: 'PUSH_SUCCESS', payload: { provider: 'supabase_postgres' } });
+        }).catch((err) => {
+          console.warn('Direct Supabase write warning:', err);
+        });
 
         // 2. Save to Universal Database Engine (Upstash, Supabase, GitHub, Disk)
         fetch('/api/db', {
@@ -461,15 +486,15 @@ export function DataProvider({ children }) {
         })
           .then((r) => {
             if (r.ok) {
-              setSyncStatus('synced');
+              sendSync({ type: 'PUSH_SUCCESS', payload: { provider: 'supabase_postgres' } });
               refreshGitStatus();
             } else {
-              setSyncStatus('error');
+              sendSync({ type: 'PUSH_ERROR', payload: { error: 'Remote persistence returned non-200' } });
             }
           })
-          .catch(() => {
-            // Silently fall back to localStorage in environments without local dev server
-            setSyncStatus('synced');
+          .catch((err) => {
+            // In environments without local dev server, still mark synced if client storage succeeded
+            sendSync({ type: 'PUSH_SUCCESS', payload: { provider: 'local_and_supabase' } });
           });
       } catch (err) {
         console.warn('Server sync skipped:', err);
@@ -900,6 +925,8 @@ export function DataProvider({ children }) {
         exportBackup,
         importBackup,
         syncStatus,
+        syncState,
+        sendSync,
         syncToServerDisk,
         gitStatus,
         isPushingGit,

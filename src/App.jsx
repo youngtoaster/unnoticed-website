@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DataProvider, useSiteData } from './context/DataContext';
+import { SAFE_TRACK_PLACEHOLDER } from './machines/index.js';
 import FluidCanvas from './components/FluidCanvas';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -23,6 +24,7 @@ import FeaturedReleaseSection from './components/FeaturedReleaseSection';
 function AppContent() {
   const { tracks, merchProducts, isAdminAuthenticated, sectionsVisibility, featuredRelease } = useSiteData();
   const [currentTrack, setCurrentTrack] = useState(tracks && tracks[0] ? tracks[0] : null);
+  const safeTrack = currentTrack || (tracks && tracks[0]) || SAFE_TRACK_PLACEHOLDER;
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [activeView, setActiveView] = useState('main'); // 'main' | 'epk' | 'admin'
@@ -248,7 +250,7 @@ function AppContent() {
         <>
           {/* Persistent Floating Navbar with Island aesthetic */}
           <Navbar
-            currentTrack={currentTrack || (tracks && tracks[0]) || null}
+            currentTrack={safeTrack}
             isPlaying={isPlaying}
             isPlayerVisible={isPlayerVisible}
             togglePlay={togglePlay}
@@ -263,7 +265,7 @@ function AppContent() {
             <main className="relative z-10">
               {/* 1. Kinetic Hero with Identity Morph & Sound Reactive Badges */}
               <HeroSection
-                currentTrack={currentTrack || (tracks && tracks[0]) || null}
+                currentTrack={safeTrack}
                 isPlaying={isPlaying}
                 togglePlay={togglePlay}
                 onSelectTrack={onSelectTrack}
@@ -276,7 +278,7 @@ function AppContent() {
               {/* 2. Music: Discography Studio Cuts & Inspect Lyrics Pop-Up */}
               {sectionsVisibility?.music !== false && (
                 <MusicSection
-                  currentTrack={currentTrack || (tracks && tracks[0]) || null}
+                  currentTrack={safeTrack}
                   isPlaying={isPlaying}
                   togglePlay={togglePlay}
                   onSelectTrack={onSelectTrack}
@@ -334,9 +336,9 @@ function AppContent() {
           )}
 
           {/* Floating Studio Dynamic Island Audio Player Bar (only shown when user selects or plays music) */}
-          {currentTrack && (
+          {safeTrack && (
             <AudioPlayerBar
-              currentTrack={currentTrack}
+              currentTrack={safeTrack}
               isPlaying={isPlaying}
               isPlayerVisible={isPlayerVisible}
               togglePlay={togglePlay}

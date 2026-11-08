@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { SpotifyIcon } from './SocialIcons';
 import { useSiteData } from '../context/DataContext';
+import { useMachine, playbackMachine } from '../machines/index.js';
 
 export default function AudioPlayerBar({
   currentTrack,
@@ -31,6 +32,15 @@ export default function AudioPlayerBar({
   const [desktopLyricsOpen, setDesktopLyricsOpen] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
 
+  // Playback Finite State Machine for deterministic UX/DX/AX
+  const [playbackState, sendPlayback] = useMachine(playbackMachine, {
+    context: {
+      currentTrack,
+      volume: 0.8,
+      isMuted: false
+    }
+  });
+
   const trackLyrics = currentTrack?.lyrics || [];
   const annotatedCount = trackLyrics.filter((l) => l.annotated).length;
 
@@ -42,10 +52,13 @@ export default function AudioPlayerBar({
   // Sync audio source when track changes
   useEffect(() => {
     if (audioRef.current && currentTrack) {
+      sendPlayback({ type: 'SELECT_TRACK', payload: { track: currentTrack, autoplay: isPlaying } });
       audioRef.current.src = currentTrack.previewAudio;
       audioRef.current.load();
       if (isPlaying) {
-        audioRef.current.play().catch((err) => console.log('Audio autoplay prevented:', err));
+        audioRef.current.play().catch((err) => {
+          sendPlayback({ type: 'ERROR', payload: { error: err.message } });
+        });
       }
     }
     setActiveAnnotation(null);
@@ -55,8 +68,12 @@ export default function AudioPlayerBar({
   useEffect(() => {
     if (!audioRef.current) return;
     if (isPlaying) {
-      audioRef.current.play().catch((err) => console.log('Playback error:', err));
+      sendPlayback({ type: 'PLAY' });
+      audioRef.current.play().catch((err) => {
+        sendPlayback({ type: 'ERROR', payload: { error: err.message } });
+      });
     } else {
+      sendPlayback({ type: 'PAUSE' });
       audioRef.current.pause();
     }
   }, [isPlaying]);
@@ -73,14 +90,18 @@ export default function AudioPlayerBar({
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
+      const cur = audioRef.current.currentTime;
+      const dur = audioRef.current.duration || duration;
+      setCurrentTime(cur);
       if (audioRef.current.duration) {
         setDuration(audioRef.current.duration);
       }
+      sendPlayback({ type: 'TIME_UPDATE', payload: { currentTime: cur, duration: dur } });
     }
   };
 
   const handleEnded = () => {
+    sendPlayback({ type: 'ENDED' });
     onNextTrack();
   };
 
@@ -89,6 +110,7 @@ export default function AudioPlayerBar({
     if (audioRef.current) {
       audioRef.current.currentTime = seekTime;
       setCurrentTime(seekTime);
+      sendPlayback({ type: 'SEEK', payload: { time: seekTime } });
     }
   };
 

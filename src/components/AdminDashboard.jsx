@@ -18,6 +18,7 @@ import VisualSampleEditor from './VisualSampleEditor';
 import UiVaultTab, { UI_INSPIRATION_SITES, INSTALLED_SKILLS_AND_PLUGINS } from './UiVaultTab';
 import { extractYouTubeId, getYouTubeThumbnail, isDirectVideo } from '../utils/videoHelper';
 import { fetchMediaMetadata, formatViewsCount, detectProvider } from '../services/metadataService';
+import { useMachine, metadataMachine, modalMachine } from '../machines/index.js';
 import NeonSign from './ui/NeonSign';
 
 // Reusable Section Header Control Bar with Visibility Toggle, Delete All & Reset Defaults
@@ -322,9 +323,31 @@ export default function AdminDashboard({ onReturnToSite }) {
       })
       .catch(() => {});
   }, []);
-  const [editingItem, setEditingItem] = useState(null); // { type, isNew, data, index }
+  // Deterministic Finite State Machines for Admin Domain
+  const [metaState, sendMeta] = useMachine(metadataMachine);
+  const [modalState, sendModal] = useMachine(modalMachine);
+
+  const [editingItem, setEditingItemState] = useState(null); // { type, isNew, data, index }
+  const setEditingItem = (item) => {
+    setEditingItemState(item);
+    if (item) {
+      sendModal({ type: 'OPEN_EDIT', payload: { item } });
+    } else {
+      sendModal({ type: 'CLOSE' });
+    }
+  };
+
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState(null); // { title, collectionKey, count }
+  const [deleteConfirmModal, setDeleteConfirmModalState] = useState(null); // { title, collectionKey, count }
+  const setDeleteConfirmModal = (modal) => {
+    setDeleteConfirmModalState(modal);
+    if (modal) {
+      sendModal({ type: 'OPEN_DELETE_CONFIRM', payload: { target: modal } });
+    } else {
+      sendModal({ type: 'CLOSE' });
+    }
+  };
+
   const [isSavingDisk, setIsSavingDisk] = useState(false);
   const [previewIlluminated, setPreviewIlluminated] = useState(false);
   const [testIgnitionStep, setTestIgnitionStep] = useState(null); // null = idle, 0..9 = letter strike simulation
@@ -340,7 +363,15 @@ export default function AdminDashboard({ onReturnToSite }) {
   const sampleAuditionRef = useRef(null);
 
   // Overhauled Genius Lyrics & Annotations Studio States
-  const [bulkLyricsModalTrackIndex, setBulkLyricsModalTrackIndex] = useState(null);
+  const [bulkLyricsModalTrackIndex, setBulkLyricsModalTrackIndexState] = useState(null);
+  const setBulkLyricsModalTrackIndex = (idx) => {
+    setBulkLyricsModalTrackIndexState(idx);
+    if (idx !== null) {
+      sendModal({ type: 'OPEN_BULK_LYRICS', payload: { target: { trackIndex: idx } } });
+    } else {
+      sendModal({ type: 'CLOSE' });
+    }
+  };
   const [bulkLyricsRawText, setBulkLyricsRawText] = useState('');
   const [bulkPreserveAnnotations, setBulkPreserveAnnotations] = useState(true);
   const [lyricsSearchQuery, setLyricsSearchQuery] = useState('');
@@ -477,9 +508,11 @@ export default function AdminDashboard({ onReturnToSite }) {
     if (!url || !url.trim()) return;
     setIsFetchingMeta(true);
     setMetaFeedback(null);
+    sendMeta({ type: 'START_FETCH', payload: { url: url.trim() } });
     try {
       const res = await fetchMediaMetadata(url.trim());
       if (res && res.success) {
+        sendMeta({ type: 'FETCH_SUCCESS', payload: { data: res } });
         setEditingItem((prev) => ({
           ...prev,
           data: {
@@ -501,9 +534,11 @@ export default function AdminDashboard({ onReturnToSite }) {
         setMetaFeedback(`✓ Pulled "${res.title}"${details ? ` (${details})` : ''} - fields auto-updated!`);
         showToast(`Auto-fetched: ${res.title}${res.duration ? ` (${res.duration})` : ''}`);
       } else {
+        sendMeta({ type: 'FETCH_ERROR', payload: { error: res?.error || 'Could not fetch metadata' } });
         setMetaFeedback(res.error || 'Could not fetch metadata from link');
       }
     } catch (err) {
+      sendMeta({ type: 'FETCH_ERROR', payload: { error: 'Failed to pull link metadata' } });
       setMetaFeedback('Failed to pull link metadata');
     } finally {
       setIsFetchingMeta(false);
@@ -560,6 +595,7 @@ export default function AdminDashboard({ onReturnToSite }) {
   const handleRefreshAllTracksMetadata = async () => {
     if (tracks.length === 0) return;
     setIsRefreshingAll(true);
+    sendMeta({ type: 'START_BATCH', payload: { total: tracks.length } });
     let updatedCount = 0;
     try {
       const updatedTracks = [...tracks];
@@ -584,12 +620,17 @@ export default function AdminDashboard({ onReturnToSite }) {
               description: res.description || track.description
             };
             updatedCount++;
+            sendMeta({
+              type: 'BATCH_STEP',
+              payload: { current: i + 1, updated: true, title: track.title }
+            });
           }
         } catch (singleErr) {
           console.warn(`Could not refresh track ${track.title}:`, singleErr);
         }
       }
 
+      sendMeta({ type: 'BATCH_COMPLETE', payload: { updatedCount } });
       if (updatedCount > 0) {
         updateData((prev) => ({
           ...prev,
@@ -601,6 +642,7 @@ export default function AdminDashboard({ onReturnToSite }) {
       }
     } catch (err) {
       console.error('Error in batch metadata refresh:', err);
+      sendMeta({ type: 'CANCEL_BATCH' });
       showToast('Batch metadata update encountered an error', 'error');
     } finally {
       setIsRefreshingAll(false);

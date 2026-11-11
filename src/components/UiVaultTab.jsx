@@ -563,14 +563,14 @@ export const UI_INSPIRATION_SITES = [
   {
     id: 'inspora',
     name: 'Inspora Design',
-    url: 'https://inspora.design',
+    url: 'https://www.inspora.design/',
     category: 'Product & Design Systems',
-    superpower: 'New designs & fresh creative direction',
-    description: 'Curated gallery of freshly dropped digital experiences, boundary-pushing art direction, next-generation landing layouts, and trendsetting web aesthetics updated continuously.',
-    tags: ['New Designs', 'Fresh Inspo', 'Creative Direction'],
+    superpower: 'Curated daily UI/UX & creative design inspiration',
+    description: 'Curated gallery and archive aggregating standout visual design, UI/UX interaction patterns, web design trends, branding, and creative direction from top digital creators worldwide.',
+    tags: ['UI/UX Gallery', 'Design Trends', 'Web Inspo', 'Creative Direction'],
     color: '#06b6d4',
     accentBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
-    badge: 'New Designs'
+    badge: 'UI/UX Inspo'
   },
   {
     id: 'landdding',
